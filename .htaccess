@@ -1,0 +1,30 @@
+<IfModule mod_rewrite.c>
+    Options -MultiViews
+    RewriteEngine On
+    RewriteBase /
+
+    # Redirect to HTTPS and www (if not already)
+    RewriteCond %{HTTP_HOST} ^autispedia.in$ [NC,OR]
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://www.autispedia.in/$1 [NC,L,R=301]
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>
+
+<Files ~ "\.(env|json|config.js|md|gitignore|gitattributes|lock|editorconfig|yml|styleci.yml)$">
+    Order allow,deny
+    Deny from all
+</Files>
+
+Options -Indexes
+<Files ~ "(artisan|package.json|webpack.mix.js)$">
+    Order allow,deny
+    Deny from all
+</Files>
