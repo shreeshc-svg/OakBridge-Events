@@ -20,7 +20,7 @@
                                 class="accordion-collapse collapse @if ($loop->first) show @endif"
                                 aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                                 <div class="accordion-body my-2">
-                                    <h5>Dolor sit amet consectetur adipisicing elit.</h5>
+
                                     <p>{!! $faq->body !!}</p>
                                 </div>
                             </div>

@@ -25,6 +25,33 @@
                     <p class="mb-0">{{ $setting->phone }}</p>
                 </div>
             @endif
+
+
+        </div>
+        <div class="d-flex align-items-center mb-4">
+            <div class="bg-primary btn-lg-square rounded-circle p-2"><i class="fa fa-phone-alt text-white"></i></div>
+
+
+            @if ($setting->phone2)
+                <div class="ms-4">
+                    <h4>Mobile</h4>
+                    <p class="mb-0">{{ $setting->phone2 }}</p>
+                </div>
+            @endif
+
+
+
+        </div>
+        <div class="d-flex align-items-center mb-4">
+            <div class="bg-primary btn-lg-square rounded-circle p-2"><i class="fa fa-phone-alt text-white"></i></div>
+
+
+            <div class="ms-4">
+                <h4>Landline</h4>
+                <p class="mb-0">011-4477727</p>
+            </div>
+
+
         </div>
         <div class="d-flex align-items-center mb-4">
             <div class="bg-primary btn-lg-square rounded-circle p-2"><i class="fa fa-envelope-open text-white"></i>
@@ -35,6 +62,16 @@
                     <p class="mb-0">{{ $setting->email }}</p>
                 </div>
             @endif
+        </div>
+        <div class="d-flex align-items-center mb-4">
+            <div class="bg-primary btn-lg-square rounded-circle p-2"><i class="fa fa-envelope-open text-white"></i>
+            </div>
+
+                <div class="ms-4">
+                    <h4>Email</h4>
+                    <p class="mb-0">skyleadtravels@gmail.com</p>
+                </div>
+
         </div>
     </div>
 </div>

@@ -228,13 +228,25 @@
                         <a href=""><i class="fa fa-map-marker-alt me-2"></i>{{ $setting->address }}</a>
 
                         @if ($setting->email)
-                            <a href="{{ $setting->email }}"><i
+                            <a href="mailto:{{ $setting->email }}"><i
                                     class="fas fa-envelope me-2"></i>{{ $setting->email }}</a>
                         @endif
+
+                        <a href="mailto:skyleadtravels@gmail.com"><i
+                            class="fas fa-envelope me-2"></i>skyleadtravels@gmail.com</a>
+
                         @if ($setting->phone)
-                            <a href="{{ str_replace(' ', '', $setting->phone) }}"><i
+                            <a href="tel:{{ str_replace(' ', '', $setting->phone) }}"><i
                                     class="fas fa-phone me-2"></i>{{ $setting->phone }}</a>
                         @endif
+                        @if ($setting->phone2)
+                        <a href="tel:{{ str_replace(' ', '', $setting->phone2) }}"><i
+                                class="fas fa-phone me-2"></i>{{ $setting->phone2 }}</a>
+                                @endif
+
+                                <a href="tel:01144777277"><i
+                                        class="fas fa-phone me-2"></i>011-44777277</a>
+
 
                         <div class="d-flex align-items-center">
                             @if ($setting->facebook)
@@ -264,11 +276,11 @@
 
 
     <!-- Copyright Start -->
-    <div class="container-fluid copyright py-4">
+    <div class="container-fluid copyright py-4 p-0">
         <div class="container">
             <div class="row g-4 align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-md-0">
-                    <!-- <span class="text-body"><a href="#" class="border-bottom text-primary"><i class="fas fa-copyright text-light me-2"></i>Your Site Name</a>, All right reserved.</span> -->
+                  <span class="text-body"><a href="#" class="border-bottom text-primary"><i class="fas fa-copyright text-light me-2"></i>{{ $setting->bname }}</a>, All rights reserved.</span>
 
                 </div>
                 <div class="col-md-6 text-center text-md-end text-body">

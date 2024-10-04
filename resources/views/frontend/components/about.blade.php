@@ -96,6 +96,23 @@
                         </div>
                     </div>
                 </div>
+                <div class="row pt-3">
+                    <div class="col-md-12">
+                        <span class="h4 p-2 card">Registration Certificate No: Delhi/Company/6065879/2024</span>
+                    </div>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="border">
+                            <img class="img-fluid w-50" src="{{ asset('public/assets/img/ita.png') }}" alt="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border">
+                        <img class="img-fluid w-50 pb-3 mx-auto" src="{{ asset('public/assets/img/emigrate.png') }}" alt="">
+                    </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
