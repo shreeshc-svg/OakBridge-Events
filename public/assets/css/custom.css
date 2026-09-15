@@ -65,7 +65,7 @@
     .header-style-two .main-box > .auto-container {
         display: grid;
         grid-template-columns: 1fr auto 1fr;
-        align-items: center;
+        align-items: start;
     }
 
     .header-style-two .main-box > .auto-container:before,
@@ -80,10 +80,19 @@
         float: none;
     }
 
+    /* the menu and the button both live inside .nav-outer; let them sit in the grid directly */
     .header-style-two .main-box .nav-outer {
+        display: contents;
+    }
+
+    .header-style-two .main-box .nav-outer .main-menu {
         grid-column: 2;
         justify-self: center;
         float: none;
+    }
+
+    .header-style-two .main-box .nav-outer .mobile-nav-toggler {
+        display: none;
     }
 
     .header-style-two .main-box .outer-box {
