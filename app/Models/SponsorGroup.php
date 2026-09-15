@@ -12,9 +12,9 @@ class SponsorGroup extends Model
 
     /** Bootstrap column classes for each logo size. */
     public const SIZES = [
-        'large'  => ['label' => 'Large (1 per row)', 'class' => 'col-lg-7 col-md-6 col-sm-12'],
-        'medium' => ['label' => 'Medium (2 per row)', 'class' => 'col-lg-5 col-md-6 col-sm-12'],
-        'small'  => ['label' => 'Small (3 per row)', 'class' => 'col-lg-4 col-md-6 col-sm-12'],
+        'large'  => ['label' => 'Large – own row', 'class' => 'col-lg-7 col-md-6 col-sm-12'],
+        'medium' => ['label' => 'Medium', 'class' => 'col-lg-5 col-md-6 col-sm-12'],
+        'small'  => ['label' => 'Small', 'class' => 'col-lg-4 col-md-6 col-sm-12'],
     ];
 
     public function sponsors()

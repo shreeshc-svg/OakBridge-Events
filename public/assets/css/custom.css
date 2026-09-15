@@ -144,3 +144,194 @@
     font-family: "ElegantIcons";
     color: #e1137b;
 }
+
+/* ------------------------------------------------------------------
+   Partners & sponsors (homepage)
+   One card style for every logo, left aligned. "Large" groups get
+   their own row; "medium" and "small" groups sit side by side and wrap.
+------------------------------------------------------------------ */
+.ob-partners {
+    padding: 90px 0 70px;
+    background: #f7f7fb;
+}
+
+.ob-partners__head {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.ob-partners__eyebrow {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: #e1137b;
+    margin-bottom: 8px;
+}
+
+.ob-partners__head h2 {
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #1f1f2e;
+    margin: 0;
+}
+
+.ob-partners__tiers {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 40px 56px;
+}
+
+.ob-tier {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+}
+
+.ob-tier--large {
+    flex-basis: 100%;
+}
+
+.ob-tier__label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin: 0 0 18px;
+    font-size: 16px;
+    line-height: 1.3;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #1f1f2e;
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* pink accent bar before the title */
+.ob-tier__label::before {
+    content: "";
+    flex: none;
+    width: 4px;
+    height: 20px;
+    border-radius: 2px;
+    background: #e1137b;
+}
+
+/* hairline after the title */
+.ob-tier__label::after {
+    content: "";
+    flex: 1 1 24px;
+    min-width: 24px;
+    height: 1px;
+    background: #dcdce6;
+}
+
+.ob-tier {
+    --card-w: 200px;
+    --card-h: 104px;
+    --gap: 16px;
+}
+
+.ob-tier--medium {
+    --card-w: 240px;
+    --card-h: 120px;
+}
+
+.ob-tier--large {
+    --card-w: 320px;
+    --card-h: 150px;
+}
+
+.ob-tier__logos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: var(--gap);
+    max-width: calc(var(--per-row, 5) * (var(--card-w) + var(--gap)) - var(--gap));
+}
+
+.ob-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--card-w);
+    height: var(--card-h);
+    padding: 16px 20px;
+    background: #ffffff;
+    border: 1px solid #e6e6ef;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(20, 20, 43, .04);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+a.ob-logo:hover,
+.ob-logo:hover {
+    transform: translateY(-3px);
+    border-color: #d3d3e2;
+    box-shadow: 0 10px 24px rgba(20, 20, 43, .08);
+}
+
+.ob-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.ob-tier--large .ob-logo {
+    padding: 22px 30px;
+}
+
+@media (max-width: 767.98px) {
+    .ob-partners {
+        padding: 60px 0 50px;
+    }
+
+    .ob-partners__head h2 {
+        font-size: 30px;
+    }
+
+    .ob-partners__tiers {
+        gap: 28px;
+    }
+
+    .ob-tier {
+        flex-basis: 100%;
+    }
+
+    .ob-tier__label {
+        white-space: normal;
+        font-size: 14px;
+    }
+
+    .ob-tier__logos {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        width: 100%;
+        max-width: none;
+    }
+
+    .ob-tier__logos:has(> :only-child) {
+        grid-template-columns: minmax(0, calc(50% - 6px));
+        justify-content: start;
+    }
+
+    .ob-logo,
+    .ob-tier--medium .ob-logo,
+    .ob-tier--large .ob-logo {
+        width: 100%;
+        height: 92px;
+        padding: 12px 14px;
+    }
+
+    .ob-tier--large .ob-logo {
+        height: 120px;
+    }
+}
