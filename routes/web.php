@@ -112,24 +112,24 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
 // Send Email
 Route::post('contact-send', [FrontController::class, 'contactMail'])->name('contact.send');
-Route::post('service-booking', [FrontController::class, 'serviceBooking'])->name('service.booking');
+// Route::post('service-booking', [FrontController::class, 'serviceBooking'])->name('service.booking'); // disabled: serviceBooking() does not exist
 Route::post('newsletter', [FrontController::class, 'newsLetter'])->name('newsletter');
 // disclaimer
-Route::get('disclaimer', [FrontController::class, 'disclaimer'])->name('disclaimer');
+// Route::get('disclaimer', [FrontController::class, 'disclaimer'])->name('disclaimer'); // disabled: view frontend.disclaimer does not exist
 //return policy
 // Route::get('return-policy',[FrontController::class,'returnPolicy'])->name('return.policy');
 //privacy policy
 Route::get('privacy-policy', [FrontController::class, 'privacyPolicy'])->name('privacy.policy');
 // cookies
-Route::get('cookies', [FrontController::class, 'cookies'])->name('cookies');
+// Route::get('cookies', [FrontController::class, 'cookies'])->name('cookies'); // disabled: view frontend.cookies does not exist
 // term & conditino
-Route::get('terms-conditions', [FrontController::class, 'termCondition'])->name('term.condition');
+// Route::get('terms-conditions', [FrontController::class, 'termCondition'])->name('term.condition'); // disabled: view frontend.term-condition does not exist
 
 // Route::get('/', [FrontController::class, 'ticket'])->name('home');
 Route::get('/', [FrontController::class, 'index'])->name('home');
 Route::get('/about', [FrontController::class, 'about'])->name('about');
 
-Route::get('/products/{category?}', [FrontController::class, 'service'])->name('service');
+// Route::get('/products/{category?}', [FrontController::class, 'service'])->name('service'); // disabled: service() does not exist
 Route::get('/event/{slug}', [FrontController::class, 'serviceDetail'])->name('service.detail');
 Route::get('/blog', [FrontController::class, 'blog'])->name('blog');
 
@@ -156,9 +156,10 @@ Route::get('/speakers',[FrontController::class, 'speakers'])->name('speakers');
 Route::get('/speaker/{id}',[FrontController::class, 'speakerDetail'])->name('speaker.detail');
 Route::get('/gallery', [FrontController::class, 'gallery'])->name('gallery');
 
-Route::get('/grievence', [FrontController::class, 'grievence'])->name('grievence');
-Route::post('/grievence', [FrontController::class, 'grievenceForm'])->name('grievence.form');
-Route::post('/job-notification', [FrontController::class, 'jobNotification'])->name('job.notification');
+// disabled: grievence(), grievenceForm() and jobNotification() do not exist in FrontController
+// Route::get('/grievence', [FrontController::class, 'grievence'])->name('grievence');
+// Route::post('/grievence', [FrontController::class, 'grievenceForm'])->name('grievence.form');
+// Route::post('/job-notification', [FrontController::class, 'jobNotification'])->name('job.notification');
 
 Route::post('book-ticket',[FrontController::class,'bookTicket'])->name('book.ticket');
 Route::get('legathon',[FrontController::class,'legathan'])->name('legathan');
