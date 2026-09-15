@@ -51,7 +51,8 @@
 
 <body>
 
-    <!-- Modal -->
+    <!-- Registration modal (hidden when registration is closed in Admin > Registration) -->
+    @if ($registrationOpen)
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
@@ -68,6 +69,7 @@
             </div>
         </div>
     </div>
+    @endif
 
 
 
@@ -188,13 +190,14 @@
                                             href="{{ route('about') }}">About</a>
                                     </li>
 
+                                    @if ($registrationOpen)
                                     <div class="btn-box d-block d-sm-none mt-4 ml-3">
 
                                         <a href="#" data-toggle="modal" data-target="#exampleModal"
-                                            class="theme-btn btn-style-one"><span class="btn-title">Register
-                                                Now</span></a>
+                                            class="theme-btn btn-style-one"><span class="btn-title">{{ $registrationLabel }}</span></a>
 
                                     </div>
+                                    @endif
 
 
                                 </ul>
@@ -216,12 +219,13 @@
 
                             <!-- Button Box -->
 
+                            @if ($registrationOpen)
                             <div class="btn-box">
                                 <a href="#" data-toggle="modal" data-target="#exampleModal"
-                                    class="theme-btn btn-style-one"><span class="btn-title">Register
-                                        Now</span></a>
+                                    class="theme-btn btn-style-one"><span class="btn-title">{{ $registrationLabel }}</span></a>
 
                             </div>
+                            @endif
 
                         </div>
 
@@ -623,13 +627,14 @@
     @yield('js')
 
     @if (
+        $registrationOpen && (
         $errors->has('name') ||
             $errors->has('email') ||
             $errors->has('phone') ||
             $errors->has('designation') ||
             $errors->has('company') ||
             $errors->has('registration_closed') ||
-            $errors->has('date'))
+            $errors->has('date')))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Use Bootstrap's modal API to open the modal

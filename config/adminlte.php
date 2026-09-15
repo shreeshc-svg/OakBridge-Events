@@ -345,6 +345,11 @@ return [
             'icon' => 'fas fa-fw fa-bullhorn',
         ],
         [
+            'text' => 'Registration',
+            'route'  => 'registration.edit',
+            'icon' => 'fas fa-fw fa-user-check',
+        ],
+        [
             'text' => 'Booking',
             'route'  => 'booking.index',
             'icon' => 'fas fa-ticket-alt',

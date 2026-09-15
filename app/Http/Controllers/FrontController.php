@@ -333,6 +333,11 @@ class FrontController extends Controller
     
     public function bookTicket(Request $request)
     {
+        // Admin > Registration can close bookings
+        $registration = \App\Http\Controllers\RegistrationController::viewData(Setting::find(1));
+        if (! $registration['registrationOpen']) {
+            return back()->withErrors(['registration_closed' => $registration['registrationClosedMessage']]);
+        }
        
         $data = $request->validate([
         'name' => 'required|string|max:100',
