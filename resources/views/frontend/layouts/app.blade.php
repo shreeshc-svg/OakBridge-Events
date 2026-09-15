@@ -32,7 +32,7 @@
 
     <link href="{{ asset('public/assets/css/responsive.css') }}" rel="stylesheet">
 
-    <link href="{{ asset('public/assets/css/custom.css') }}?v=3" rel="stylesheet">
+    <link href="{{ asset('public/assets/css/custom.css') }}?v=5" rel="stylesheet">
 
     <!--Color Switcher Mockup-->
 
