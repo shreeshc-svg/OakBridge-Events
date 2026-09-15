@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -25,6 +26,18 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        // an upload bigger than the server's post_max_size: send admins back to the form with a message
+        $this->renderable(function (PostTooLargeException $e, $request) {
+            if ($request->routeIs('hero.update')) {
+                $limit = ini_get('post_max_size');
+
+                return redirect()->route('hero.edit')->withErrors([
+                    'hero_image' => 'That file is larger than this server accepts (' . $limit . '). '
+                        . 'Use a smaller video, or raise the upload limit in Hostinger hPanel > PHP Configuration.',
+                ]);
+            }
         });
     }
 }
