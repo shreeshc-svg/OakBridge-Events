@@ -40,3 +40,9 @@ Options -Indexes
     Order allow,deny
     Deny from all
 </FilesMatch>
+
+# Serve hero banner videos with the right type (some servers don't know .webm)
+<IfModule mod_mime.c>
+    AddType video/mp4 .mp4
+    AddType video/webm .webm
+</IfModule>
