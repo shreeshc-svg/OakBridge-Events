@@ -330,9 +330,9 @@
 
                             <div class="info-box">
 
-                                <h4 class="name"><a href="javascript::void">{{ $speaker->name }}</a></h4>
+                                <h4 class="name" title="{{ $speaker->name }}"><a href="javascript::void">{{ $speaker->name }}</a></h4>
 
-                                <span class="designation small">{{ $speaker->position }}</span>
+                                <span class="designation small" title="{{ $speaker->position }}">{{ $speaker->position }}</span>
 
                             </div>
 
