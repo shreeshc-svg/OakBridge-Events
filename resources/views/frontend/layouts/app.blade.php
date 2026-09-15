@@ -1,362 +1,646 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
+
 <head>
+
     <meta charset="utf-8">
+
     <title>@yield('title')</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="@yield('keywords')" name="keywords">
-    <meta content="@yield('description')" name="description">
 
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
-        rel="stylesheet">
+    <!-- Stylesheets -->
 
-    <!-- Icon Font Stylesheet -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ asset('public/assets/css/bootstrap.css') }}" rel="stylesheet">
 
-    <!-- Libraries Stylesheet -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <link href="{{ asset('public/assets/lib/animate/animate.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('public/assets/lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('public/assets/lib/lightbox/css/lightbox.min.css') }}" rel="stylesheet">
-
-
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="{{ asset('public/assets/css/bootstrap.min.css') }}" rel="stylesheet">
-
-    <!-- Template Stylesheet -->
     <link href="{{ asset('public/assets/css/style.css') }}" rel="stylesheet">
+
+    <link href="{{ asset('public/assets/css/responsive.css') }}" rel="stylesheet">
+
+    <!--Color Switcher Mockup-->
+
+    <link href="{{ asset('public/assets/css/color-switcher-design.css') }}" rel="stylesheet">
+
+
+
+    <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+
+    <link rel="icon" href="{{ asset('public/uploads/images/logo/' . $setting->logo) }}" type="image/png">
+
+
+
+    <!-- Responsive -->
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+
+
+    <!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js') }}"></script><![endif]-->
+
+    <!--[if lt IE 9]><script src="{{ asset('public/assets/js/respond.js') }}"></script><![endif]-->
+
     @if ($setting->gtag)
         {!! $setting->gtag !!}
     @endif
 
-    <style>
-        .read-more-target,
-.read-more-trigger_opened {
-  display: none;
-}
-.read-more-state:checked ~ .read-more-wrap .read-more-target,
-.read-more-state:checked ~ .read-more-trigger_opened {
-  display: block;
-}
-.read-more-state:checked ~ .read-more-trigger_closed {
-  display: none;
-}
-      </style>
-
-
-
 </head>
+
+
 
 <body>
 
-    <!-- Topbar Start -->
-    <div class="container-fluid topbar px-0 d-none d-lg-block">
-        <div class="container px-0">
-            <div class="row gx-0 align-items-center" style="height: 45px;">
-                <div class="col-lg-8 text-center text-lg-start mb-lg-0">
-                    <div class="d-flex flex-wrap">
-                        <a href="#" class="text-muted me-4"><i
-                                class="fas fa-map-marker-alt text-primary me-2"></i>{{ Str::limit($setting->address, 50) }}</a>
-                        @if ($setting->phone)
-                            <a href="#" class="text-muted me-4"><i
-                                    class="fas fa-phone-alt text-primary me-2"></i>{{ str_replace(' ', '', $setting->phone) }}</a>
-                        @endif
-                        @if ($setting->email)
-                            <a href="#" class="text-muted me-0"><i
-                                    class="fas fa-envelope text-primary me-2"></i>{{ $setting->email }}</a>
-                        @endif
-                    </div>
-                </div>
-                <div class="col-lg-4 text-center text-lg-end">
-                    <div class="d-flex align-items-center justify-content-end">
-                        @if ($setting->facebook)
-                            <a target="_blank" href="{{ $setting->facebook }}"
-                                class="btn btn-primary btn-square rounded-circle nav-fill me-3"><i
-                                    class="fab fa-facebook-f text-white"></i></a>
-                        @endif
-                        @if ($setting->twitter)
-                            <a target="_blank" href="{{ $setting->twitter }}"
-                                class="btn btn-primary btn-square rounded-circle nav-fill me-3"><i
-                                    class="fab fa-twitter text-white"></i></a>
-                        @endif
-                        @if ($setting->instagram)
-                            <a target="_blank" href="{{ $setting->instagram }}"
-                                class="btn btn-primary btn-square rounded-circle nav-fill me-3"><i
-                                    class="fab fa-instagram text-white"></i></a>
-                        @endif
-                        @if ($setting->linkedin)
-                            <a target="_blank" href="{{ $setting->linkedin }}"
-                                class="btn btn-primary btn-square rounded-circle nav-fill me-0"><i
-                                    class="fab fa-linkedin-in text-white"></i></a>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Topbar End -->
-
-
-    <!-- Navbar & Hero Start -->
-    <div class="container-fluid sticky-top px-0">
-        <div class="position-absolute bg-dark" style="left: 0; top: 0; width: 100%; height: 100%;">
-        </div>
-        <div class="container px-0">
-            <nav class="navbar navbar-expand-lg navbar-dark bg-white py-3 px-4">
-                <a href="index.html" class="navbar-brand p-0">
-                    <h1 class="text-primary m-0"></h1>
-                    <img class="d-none d-sm-block" src="{{ asset('public/uploads/images/logo/' . $setting->logo) }}"
-                        width="300" alt="Logo">
-
-                    <img class="d-block d-sm-none" src="{{ asset('public/uploads/images/logo/' . $setting->logo) }}"
-                        width="260" alt="Logo">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarCollapse">
-                    <span class="fa fa-bars"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <div class="navbar-nav ms-auto py-0">
-                        <a href="{{ route('home') }}"
-                            class="nav-item nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
-                        <a href="{{ route('about') }}"
-                            class="nav-item nav-link {{ request()->routeIs('about') ? 'active' : '' }} ">About</a>
-                        <div class="nav-item dropdown">
-                            <a href="{{ route('service') }}" class="nav-link dropdown-toggle {{ request()->routeIs('service') ? 'active' : '' }}" data-bs-toggle="dropdown">Jobs</a>
-                            <div class="dropdown-menu m-0">
-                                @foreach ($service_categories as $category)
-                                <a href="{{ route('service',$category->slug) }}" class="dropdown-item capitalize">{{ $category->title }}</a>
-                                @endforeach
-                                <a href="{{ route('service') }}" class="dropdown-item">View All</a>
-                            </div>
-                            </div>
-                        <a href="{{ route('faq') }}"
-                            class="nav-item nav-link {{ request()->routeIs('faq') ? 'active' : '' }} ">FAQ</a>
-                        <a href="{{ route('blog') }}"
-                            class="nav-item nav-link {{ request()->routeIs('blog') ? 'active' : '' }} ">Blogs</a>
-                        <a href="{{ route('grievence') }}"
-                            class="nav-item nav-link {{ request()->routeIs('grievence') ? 'active' : '' }} ">Grievence</a>
-
-                        <a href="{{ route('contact') }}"
-                            class="nav-item nav-link {{ request()->routeIs('contact') ? 'active' : '' }} ">Contact</a>
-                    </div>
-                    <div class="d-flex align-items-center flex-nowrap pt-xl-0">
-                        <a href="{{ route('service') }}"
-                            class="btn btn-primary rounded-pill text-white py-2 px-4 ms-2 flex-wrap flex-sm-shrink-0">Current
-                            Jobs</a>
-                    </div>
-                </div>
-            </nav>
-        </div>
-    </div>
-    <!-- Navbar & Hero End -->
-
-    <!-- Modal Search Start -->
-    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content rounded-0">
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title mb-0" id="exampleModalLabel">Search by keyword</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="exampleModalLabel">Hurry! Register now.</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div class="modal-body d-flex align-items-center">
-                    <div class="input-group w-75 mx-auto d-flex">
-                        <input type="search" class="form-control p-3" placeholder="keywords"
-                            aria-describedby="search-icon-1">
-                        <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
-                    </div>
+                <div class="modal-body">
+                    {{--<small class="text-danger text-center pb-3">**Booking will be confirmed upon payment.</small>--}}
+                    @include('frontend.components.booking-form')
                 </div>
             </div>
         </div>
     </div>
-    <!-- Modal Search End -->
 
 
 
+    <div class="page-wrapper">
+        <!-- Main Header-->
+        <!-- Header Span -->
 
-    @yield('content')
-    <!-- Footer Start -->
-    <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">
-        <div class="container py-5">
-            <div class="row g-5">
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="footer-item d-flex flex-column">
-                        <div class="footer-item">
-                            <img class="img-fluid bg-white p-2 rounded-2"
-                                src="{{ asset('public/uploads/images/logo/' . $setting->logo) }}" alt="Logo">
-                            <p class="mb-3">At SKY LEAD TRAVELS PVT. LTD., we excel in matching top talent with
-                                leading organizations.</p>
-                            <!-- <div class="position-relative mx-auto rounded-pill">
-                            <input class="form-control rounded-pill w-100 py-3 ps-4 pe-5" type="text" placeholder="Enter your email">
-                            <button type="button" class="btn btn-primary rounded-pill position-absolute top-0 end-0 py-2 mt-2 me-2">SignUp</button>
-                        </div> -->
+        <span class="header-span"></span>
+
+
+
+        <!-- Main Header-->
+
+        <header class="main-header header-style-two">
+
+            <div class="main-box">
+
+                <div class="auto-container clearfix">
+
+                    <div class="logo-box">
+
+                        <div class="logo "><a href="{{ route('home') }}"><img class="rounded"
+                                    src="{{ asset('public/uploads/images/logo/' . $setting->logo) }}" alt=""
+                                    title="" width="80"></a></div>
+
+                    </div>
+
+
+
+                    <!--Nav Box-->
+
+                    <div class="nav-outer clearfix">
+
+                        <!--Mobile Navigation Toggler-->
+
+                        <div class="mobile-nav-toggler"><span class="icon flaticon-menu"></span></div>
+
+                        <!-- Main Menu -->
+
+                        <nav class="main-menu navbar-expand-md navbar-light">
+
+                            <div class="navbar-header">
+
+                                <!-- Togg le Button -->
+
+                                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                                    data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                                    aria-expanded="false" aria-label="Toggle navigation">
+
+                                    <span class="icon flaticon-menu-button"></span>
+
+                                </button>
+
+                            </div>
+
+
+
+                            <div class="collapse navbar-collapse clearfix" id="navbarSupportedContent">
+
+                                <ul class="navigation clearfix">
+
+                                    <li class="dropdown {{ Route::is('home') ? 'current' : '' }}"><a
+                                            href="{{ route('home') }}">Home</a>
+                                    </li>
+                                    <li class="dropdown {{ Route::is('speakers') ? 'current' : '' }}"><a
+                                            href="{{ route('speakers') }}">Speakers</a>
+                                    </li>
+                                   <li class="dropdown {{ Route::is('events') ? 'current' : '' }}"><a
+                                            href="https://www.oakbridge.events/event/india-law-ai-tech-summit-2025">Schedule</a>
+                                    </li>
+                                    
+                                    
+                                    {{-- <li class="dropdown {{ Route::is('about') ? 'current' : '' }}"><a
+                                            href="{{ route('about') }}">About Us</a>
+
+                                    </li> --}}
+                                     
+                                    {{-- <li><a class="dropdown {{ Route::is('home') ? 'current' : '' }}"
+                                            href="{{}}#sponsorsid">Sponsors</a>
+                                    </li> --}}
+                                    
+                                     <li><a
+                                            href="{{ route('home') }}#sponsors">Sponsors</a>
+
+                                    </li>
+                                    
+                                    <li><a
+                                            href="{{ route('home') }}#exhibitors">Exhibitors</a>
+
+                                    </li>
+                                     
+                                     
+                                    {{-- <li class="dropdown {{ Route::is('advisors') ? 'current' : '' }}"><a
+                                            href="{{ route('advisors') }}">Advisors</a>
+                                    </li> 
+
+                                    <li class="dropdown {{ Route::is('testimonial') ? 'current' : '' }}"><a
+                                            href="{{ route('testimonial') }}">Testimonials</a>
+                                    </li>--}}
+
+                                    <li class="dropdown {{ Route::is('gallery', 'videos') ? 'current' : '' }}"><a
+                                            href="#">Gallery</a>
+
+                                        <ul>
+
+                                            <li><a href="{{ route('gallery') }}">Images</a></li>
+
+                                            <li><a href="{{ route('videos') }}">Videos</a></li>
+
+
+                                        </ul>
+
+                                    </li> 
+
+
+
+                                    <li class="dropdown {{ Route::is('about') ? 'current' : '' }}"><a
+                                            href="{{ route('about') }}">About</a>
+                                    </li>
+
+                                    <div class="btn-box d-block d-sm-none mt-4 ml-3">
+
+                                        <a href="#" data-toggle="modal" data-target="#exampleModal"
+                                            class="theme-btn btn-style-one"><span class="btn-title">Register
+                                                Now</span></a>
+
+                                    </div>
+
+
+                                </ul>
+
+                            </div>
+
+                        </nav>
+
+                        <!-- Main Menu End-->
+
+
+
+                        <!-- Outer box -->
+
+                        <div class="outer-box">
+
+                            <!--Search Box-->
+
+
+                            <!-- Button Box -->
+
+                            <div class="btn-box">
+                                <a href="#" data-toggle="modal" data-target="#exampleModal"
+                                    class="theme-btn btn-style-one"><span class="btn-title">Register
+                                        Now</span></a>
+
+                            </div>
+
                         </div>
+
                     </div>
-                </div>
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="footer-item d-flex flex-column">
-                        <h4 class="text-white mb-4">Explore</h4>
-                        <a href="{{ route('home') }}"><i class="fas fa-angle-right me-2"></i> Home</a>
-                        <a href="{{ route('about') }}"><i class="fas fa-angle-right me-2"></i> About Us</a>
-                        <a href="{{ route('service') }}"><i class="fas fa-angle-right me-2"></i> Jobs</a>
-                        <a href="{{ route('faq') }}"><i class="fas fa-angle-right me-2"></i> FAQ</a>
-                        <a href="{{ route('blog') }}"><i class="fas fa-angle-right me-2"></i> Blogs</a>
-                        <a href="{{ route('grievence') }}"><i class="fas fa-angle-right me-2"></i> Grievence</a>
-                        <a href="{{ route('contact') }}"><i class="fas fa-angle-right me-2"></i> Contact Us</a>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="footer-item d-flex flex-column">
-                        <h4 class="text-white mb-4">Jop</h4>
-                        @foreach ($featured_products as $featured_product)
-                            <a href="{{ route('service.detail', $featured_product->slug) }}"><i
-                                    class="fas fa-angle-right me-2"></i>{{ $featured_product->title }}</a>
-                        @endforeach
-                    </div>
+
                 </div>
 
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="footer-item d-flex flex-column">
-                        <h4 class="text-white mb-4">Contact Info</h4>
-                        <a href=""><i class="fa fa-map-marker-alt me-2"></i>{{ $setting->address }}</a>
-
-                        @if ($setting->email)
-                            <a href="mailto:{{ $setting->email }}"><i
-                                    class="fas fa-envelope me-2"></i>{{ $setting->email }}</a>
-                        @endif
-
-                        <a href="mailto:skyleadtravels@gmail.com"><i
-                            class="fas fa-envelope me-2"></i>skyleadtravels@gmail.com</a>
-
-                        @if ($setting->phone)
-                            <a href="tel:{{ str_replace(' ', '', $setting->phone) }}"><i
-                                    class="fas fa-phone me-2"></i>{{ $setting->phone }}</a>
-                        @endif
-                        @if ($setting->phone2)
-                        <a href="tel:{{ str_replace(' ', '', $setting->phone2) }}"><i
-                                class="fas fa-phone me-2"></i>{{ $setting->phone2 }}</a>
-                                @endif
-
-                                <a href="tel:01144777277"><i
-                                        class="fas fa-phone me-2"></i>011-44777277</a>
+            </div>
 
 
-                        <div class="d-flex align-items-center">
-                            @if ($setting->facebook)
-                                <a target="_blank" class="btn btn-light btn-md-square me-2"
-                                    href="{{ $setting->facebook }}"><i class="fab fa-facebook-f"></i></a>
-                            @endif
-                            @if ($setting->twitter)
-                                <a target="_blank" class="btn btn-light btn-md-square me-2"
-                                    href="{{ $setting->twitter }}"><i class="fab fa-twitter"></i></a>
-                            @endif
-                            @if ($setting->instagram)
-                                <a target="_blank" class="btn btn-light btn-md-square me-2"
-                                    href="{{ $setting->instagram }}"><i class="fab fa-instagram"></i></a>
-                            @endif
-                            @if ($setting->linkedin)
-                                <a target="_blank" class="btn btn-light btn-md-square me-0"
-                                    href="{{ $setting->linkedin }}"><i class="fab fa-linkedin-in"></i></a>
-                            @endif
+
+            <!-- Mobile Menu  -->
+
+            <div class="mobile-menu">
+
+                <div class="menu-backdrop"></div>
+
+                <div class="close-btn"><span class="icon flaticon-cancel-1"></span></div>
+
+
+
+                <!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header-->
+
+                <nav class="menu-box">
+
+                    <div class="nav-logo"><a href="{{ route('home') }}"><img src="images/logo-2.png" alt=""
+                                title=""></a></div>
+
+
+
+                    <ul class="navigation clearfix"><!--Keep This Empty / Menu will come through Javascript--></ul>
+
+                </nav>
+
+            </div><!-- End Mobile Menu -->
+
+        </header>
+
+        <!--End Main Header -->
+
+
+
+        @yield('content')
+
+
+        <!-- Main Footer -->
+
+        <footer class="main-footer">
+
+            <!--Widgets Section-->
+
+            <div class="widgets-section">
+
+                <div class="auto-container">
+
+                    <div class="row">
+
+                        <!--Big Column-->
+
+                        <div class="big-column col-md-8">
+
+                            <div class="row">
+
+                                <!--Footer Column-->
+
+                                <div class="footer-column col-xl-7 col-lg-6 col-md-6 col-sm-12">
+
+                                    <div class="footer-widget about-widget">
+
+                                        <div class="logo">
+
+                                            <a href="{{ route('home') }}"><img src="images/logo.png"
+                                                    alt="" /></a>
+
+                                        </div>
+
+                                        <div class="text">
+
+                                            <p>OakBridge Publishing is a new-age publishing and knowledge services organization, established with the objective of redeﬁning the craft of publishing to address the evolving requirements of today’s professionals and academia.
+                                            </p>
+
+                                        </div>
+
+                                        <ul class="social-icon-one social-icon-colored">
+
+                                            @if ($setting->facebook)
+                                                <li><a target="_blank" href="{{ $setting->facebook }}"><i
+                                                            class="fab fa-facebook-f"></i></a>
+                                                    </li>
+                                            @endif
+
+                                            @if ($setting->twitter)
+                                                <li><a target="_blank" href="{{ $setting->twitter }}"><i
+                                                            class="fab fa-twitter"></i></a></li>
+                                            @endif
+
+                                            @if ($setting->instagram)
+                                                <li><a target="_blank" href="{{ $setting->instagram }}"><i
+                                                            class="fab fa-instagram"></i></a></li>
+                                            @endif
+
+
+                                            @if ($setting->linkedin)
+                                                <li><a target="_blank" href="{{ $setting->linkedin }}"><i
+                                                            class="fab fa-linkedin-in"></i></a></li>
+                                            @endif
+
+
+                                            @if ($setting->youtube)
+                                                <li><a target="_blank" href="{{ $setting->youtube }}"><i
+                                                            class="fab fa-youtube"></i></a></li>
+                                            @endif
+
+
+                                        </ul>
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <!--Footer Column-->
+
+                                <div class="footer-column col-xl-5 col-lg-6 col-md-6 col-sm-12">
+
+                                    <div class="footer-widget useful-links">
+
+                                        <h2 class="widget-title">Useful Links</h2>
+
+                                        <ul class="user-links">
+
+                                             <li><a href="{{ route('speakers') }}">Speakers</a></li>
+                                            <li><a href="https://www.oakbridge.events/event/india-law-ai-tech-summit-2025">Schedule</a></li>
+                                           <li><a href="{{ route('home') }}#sponsorsid">Sponsors</a></li>
+                                          {{--  <li><a href="{{ route('image.gallery') }}">Gallery</a></li>
+                                            <li><a href="{{ route('testimonial') }}">Testimonials</a></li>
+                                            <li><a href="{{ route('blog') }}">Blogs</a></li> --}}
+                                            <li><a href="{{ route('contact') }}">Contact Us</a></li>
+                                            <li><a href="{{ route('privacy.policy') }}">Privacy Policy</a></li>
+
+                                        </ul>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
                         </div>
+
+
+
+                        <!--Big Column-->
+
+                        <div class="big-column col-md-4">
+
+                            <div class="row">
+
+                                <!--Footer Column-->
+
+                                <div class="footer-column col-md-12">
+
+                                    <!--Footer Column-->
+
+                                    <div class="footer-widget contact-widget">
+
+                                        <h2 class="widget-title">Contact Us</h2>
+
+                                        <!--Footer Column-->
+
+                                        <div class="widget-content">
+
+                                            <ul class="contact-list">
+
+
+
+
+                                                @if ($setting->phone)
+                                                    <li>
+
+                                                        <span class="icon flaticon-phone"></span>
+
+
+                                                        <div class="text"><a
+                                                                href="tel:{{ $setting->phone }}">{{ $setting->phone }}</a>
+                                                        </div>
+
+
+                                                    </li>
+                                                @endif
+
+                                                @if ($setting->phone2)
+                                                    <li>
+
+                                                        <span class="icon flaticon-phone"></span>
+
+
+                                                        <div class="text"><a
+                                                                href="tel:{{ $setting->phone2 }}">{{ $setting->phone2 }}</a>
+                                                        </div>
+
+
+                                                    </li>
+                                                @endif
+
+
+
+
+
+                                                @if ($setting->email)
+                                                    <li>
+
+                                                        <span class="icon flaticon-paper-plane"></span>
+
+                                                        <div class="text"><a
+                                                                href="mailto:{{ $setting->email }}">{{ $setting->email }}</a>
+                                                        </div>
+
+                                                    </li>
+                                                @endif
+
+
+
+                                                @if ($setting->address)
+                                                    <li>
+
+                                                        <span class="icon flaticon-worldwide"></span>
+
+                                                        <div class="text">{{ $setting->address }} </div>
+
+                                                    </li>
+                                                @endif
+
+
+                                               {{-- <li>
+
+                                                    <span class="icon flaticon-map"></span>
+
+
+
+
+                                                   <div class="text"><a target="_blank"
+                                                            href="https://maps.app.goo.gl/8K5s7p6bWZtNJcJQ6">View
+                                                            Map</a>
+                                                    </div>  
+
+
+                                                </li> --}}
+
+
+                                            </ul>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
                     </div>
+
                 </div>
 
             </div>
-        </div>
-    </div>
-    <!-- Footer End -->
 
 
-    <!-- Copyright Start -->
-    <div class="container-fluid copyright py-4 p-0">
-        <div class="container">
-            <div class="row g-4 align-items-center">
-                <div class="col-md-6 text-center text-md-start mb-md-0">
-                  <span class="text-body"><a href="#" class="border-bottom text-primary"><i class="fas fa-copyright text-light me-2"></i>{{ $setting->bname }}</a>, All rights reserved.</span>
+
+            <!--Footer Bottom-->
+
+            <div class="footer-bottom">
+
+                <div class="auto-container">
+
+                    <div class="inner-container clearfix">
+
+                        <div class="copyright-text">
+                                <p>&copy;2025 OakBridge Publishing</p>
+                           {{-- <p>@{{ date('Y') }} Made with ❤️ By <a target="_blank"
+                                    href="https://www.vfixtechnology.com">VFIX
+                                    TECHNOLOGY</a></p>  --}}
+
+                        </div>
+
+                    </div>
 
                 </div>
-                <div class="col-md-6 text-center text-md-end text-body">
-                    <a target="_blank" class="border-bottom text-primary text-decoration-none"
-                        href="https://www.vfixtechnology.com/">@ {{ date('Y') }} | Made with ❤️ by VFIX
-                        TECHNOLOGY</a>
-                </div>
+
             </div>
-        </div>
+
+        </footer>
+
+        <!-- End Footer -->
+
+
+
     </div>
-    <!-- Copyright End -->
+
+    <!--End pagewrapper-->
 
 
 
 
-    <!-- JavaScript Libraries -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('public/assets/lib/wow/wow.min.js') }}"></script>
-    <script src="{{ asset('public/assets/lib/easing/easing.min.js') }}"></script>
-    <script src="{{ asset('public/assets/lib/waypoints/waypoints.min.js') }}"></script>
-    <script src="{{ asset('public/assets/lib/counterup/counterup.min.js') }}"></script>
-    <script src="{{ asset('public/assets/lib/owlcarousel/owl.carousel.min.js') }}"></script>
-    <script src="{{ asset('public/assets/lib/lightbox/js/lightbox.min.js') }}"></script>
+
+    <!--Search Popup-->
+
+    {{-- <div id="search-popup" class="search-popup">
+
+        <div class="close-search theme-btn"><span class="fas fa-window-close"></span></div>
+
+        <div class="popup-inner">
+
+            <div class="overlay-layer"></div>
+
+            <div class="search-form">
+
+                <form method="post" action="https://expert-themes.com/html/eventrox/{{ route('home') }}">
+
+                    <div class="form-group">
+
+                        <fieldset>
+
+                            <input type="search" class="form-control" name="search-input" value=""
+                                placeholder="Search Here" required>
+
+                            <input type="submit" value="Search Now!" class="theme-btn">
+
+                        </fieldset>
+
+                    </div>
+
+                </form>
 
 
-    <!-- Template Javascript -->
-    <script src="{{ asset('public/assets/js/main.js') }}"></script>
+
+                <br>
+
+                <h3>Recent Search Keywords</h3>
+
+                <ul class="recent-searches">
+
+                    <li><a href="#">Seo</a></li>
+
+                    <li><a href="#">Bussiness</a></li>
+
+                    <li><a href="#">Events</a></li>
+
+                    <li><a href="#">Digital</a></li>
+
+                    <li><a href="#">Conferance</a></li>
+
+                </ul>
+
+
+
+            </div>
+
+
+
+        </div>
+
+    </div> --}}
+
+
+
+    <!--Scroll to top-->
+
+    <div class="scroll-to-top scroll-to-target" data-target="html"><span class="fa fa-angle-double-up"></span>
+    </div>
+
+    <script src="{{ asset('public/assets/js/jquery.js') }}"></script>
+
+    <script src="{{ asset('public/assets/js/popper.min.js') }}"></script>
+
+    <script src="{{ asset('public/assets/js/bootstrap.min.js') }}"></script>
+
+    <script src="{{ asset('public/assets/js/jquery-ui.js') }}"></script>
+
+    <script src="{{ asset('public/assets/js/jquery.fancybox.js') }}"></script>
+
+    <script src="{{ asset('public/assets/js/appear.js') }}"></script>
+
+    <script src="{{ asset('public/assets/js/owl.js') }}"></script>
+
+    <script src="{{ asset('public/assets/js/jquery.countdown.js') }}"></script>
+
+    <script src="{{ asset('public/assets/js/wow.js') }}"></script>
+
+    <script src="{{ asset('public/assets/js/script.js') }}"></script>
+
+    <!-- Color Setting -->
+
+    <script src="{{ asset('public/assets/js/color-settings.js') }}"></script>
+
+    @yield('js')
+
+    @if (
+        $errors->has('name') ||
+            $errors->has('email') ||
+            $errors->has('phone') ||
+            $errors->has('designation') ||
+            $errors->has('company') ||
+            $errors->has('registration_closed') ||
+            $errors->has('date'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Use Bootstrap's modal API to open the modal
+                var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+                modal.show(); 
+            });
+        </script>
+    @endif
+
+
+
 </body>
 
-
 </html>
-
-
-<style>
-    .calling-button {
-        position: fixed;
-        bottom: 30%;
-        right: 10px;
-        z-index: 9999;
-        width: 50px !important;
-    }
-
-    .fixed-buttonn {
-        position: fixed;
-        bottom: 10%;
-        right: 8px;
-        z-index: 9999;
-    }
-
-    .button-whatsapp {
-        background: #fff;
-        padding: 2px 7px;
-        box-shadow: 0 0 13px rgb(0 0 0 / 65%);
-        font-weight: 700;
-        border-radius: 30px;
-    }
-</style>
-<!-- calling sticky button -->
-@if ($setting->phone)
-    <div class="calling-button d-md-none d-block">
-        <a target="_blank" href="tel:{{ str_replace(' ', '', $setting->phone) }}">
-            <div class="">
-                <img style="width:60px !important;" src="{{ asset('public/assets/call.gif') }}">
-            </div>
-        </a>
-    </div>
-@endif
-<!-- whatsapp fixed button -->
-@if ($setting->whatsapp)
-    <div class="fixed-buttonn">
-        <a target="_blank" href="https://wa.me/{{ $setting->whatsapp }}">
-            <div class="button-whatsapp text-dark">
-                <img src="{{ asset('public/assets/whatsapp.png') }}">
-                Chat Now
-            </div>
-        </a>
-    </div>
-@endif

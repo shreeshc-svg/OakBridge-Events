@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('year')->nullable();
             $table->string('position')->nullable();
             $table->string('image')->nullable();
             $table->longText('bio')->nullable();

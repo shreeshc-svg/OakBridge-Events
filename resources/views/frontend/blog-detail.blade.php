@@ -11,142 +11,218 @@
 @endif
 @section('keywords', $post->meta_keyword)
 @section('content')
-    <!-- Header Start -->
-    <div class="container-fluid bg-breadcrumb">
-        <div class="bg-breadcrumb-single"></div>
-        <div class="container text-center py-5" style="max-width: 900px;">
-            <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">{{ $post->title }}</h4>
-            <ol class="breadcrumb justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item active text-primary">{{ $post->title }}</li>
-            </ol>
-        </div>
-    </div>
-    <!-- Header End -->
+    <!--Page Title-->
 
-    <!-- BLOG DETAILS START -->
-    <div class="rv-blog-details pt-120 pb-120 py-5">
-        <div class="container">
-            <div class="row justify-content-center ">
-                <div class="col-lg-8">
-                    <div class="rv-blog-details-left">
-                        @if ($post->image)
-                            <div class="rv-blog-details__img">
-                                <img class="w-100" src="{{ asset('public/uploads/images/post/' . $post->image) }}"
-                                    alt="blog banner">
+    {{-- <section class="page-title" style="background-image:url({{ asset('public/assets/images/background/5.jpg') }});"> --}}
+    <section class="page-title"
+        style="background-image:linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url({{ asset('public/assets/images/background/bread.webp') }}); background-size: cover; background-position: center;">
+        <div class="auto-container">
+
+            <h1>{{ $post->title }}</h1>
+
+            <ul class="bread-crumb clearfix">
+
+                <li><a href="{{ route('home') }}">Home</a></li>
+
+                <li>{{ $post->title }}</li>
+
+            </ul>
+
+        </div>
+
+    </section>
+
+    <!--End Page Title-->
+
+
+
+    <!--Sidebar Page Container-->
+
+    <div class="sidebar-page-container">
+
+        <div class="auto-container">
+
+            <div class="row clearfix">
+
+
+
+                <!--Content Side / Blog Sidebar-->
+
+                <div class="content-side col-lg-8 col-md-12 col-sm-12">
+
+                    <div class="blog-single">
+
+                        <!-- News Block Three -->
+
+                        <div class="news-block">
+
+                            <div class="inner-box">
+
+                                @if ($post->image)
+                                    <div class="image-box">
+
+                                        <figure class="image rounded"><img
+                                                src="{{ asset('public/uploads/images/post/' . $post->image) }}"
+                                                alt="">
+                                        </figure>
+
+                                    </div>
+                                @endif
+
+                                <div class="lower-content">
+
+                                    <ul class="post-info">
+
+                                        <li><span class="far fa-user"></span> Admin</li>
+
+                                        <li class="float-right"><span class="far fa-folder"></span>
+                                            @foreach ($post->categories as $category)
+                                                {{ $category->title }}@if (!$loop->last)
+                                                    ,
+                                                @endif
+                                            @endforeach
+                                        </li>
+
+                                    </ul>
+
+                                    <h2>{{ $post->title }}</h2>
+                                    {!! $post->body !!}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <hr>
+
+                    </div>
+
+                </div>
+
+
+
+                <!--Sidebar Side-->
+
+                <div class="sidebar-side col-lg-4 col-md-12 col-sm-12">
+
+                    <aside class="sidebar padding-left">
+
+
+
+                        <!-- Search -->
+
+                        <div class="sidebar-widget search-box">
+
+                            <form method="get" action="{{ route('blog') }}">
+
+                                <div class="form-group">
+
+                                    <input type="search" name="search" value="" placeholder="Search..." required>
+
+                                    <button type="submit"><span class="icon fa fa-search"></span></button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+
+
+                        <!-- Category Widget -->
+
+                        <div class="sidebar-widget categories">
+
+                            <h4 class="sidebar-title">Categories</h4>
+
+                            <div class="widget-content">
+
+                                <!-- Blog Category -->
+
+                                <ul class="blog-categories">
+
+                                    @foreach ($categories as $category)
+                                        <li><a href="{{ route('blog', ['category' => $category->slug]) }}">{{ $category->title }}
+                                                <span>{{ $category->posts->count() }}</span></a></li>
+                                    @endforeach
+
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Post Widget -->
+
+                        <div class="sidebar-widget popular-posts">
+
+                            <h4 class="sidebar-title">Latest Posts</h4>
+
+                            <div class="widget-content">
+
+
+
+                                @foreach ($recently as $post)
+                                    <article class="post">
+
+                                        <div class="post-inner">
+
+                                            <figure class="post-thumb"><a
+                                                    href="{{ route('blog.detail', $post->slug) }}"><img
+                                                        src="{{ asset('public/uploads/images/post/' . $post->image) }}"
+                                                        alt=""></a></figure>
+
+                                            <div class="post-info">{{ $post->created_at->format('d M Y') }}</div>
+
+                                            <div class="text"><a
+                                                    href="{{ route('blog.detail', $post->slug) }}">{{ Str::limit($post->title, 40) }}</a>
+                                            </div>
+
+                                        </div>
+
+                                    </article>
+                                @endforeach
+
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Tags Widget -->
+
+                        @if ($post->tags)
+                            <div class="sidebar-widget popular-tags">
+
+                                <h4 class="sidebar-title">Tags</h4>
+
+                                <div class="widget-content">
+
+                                    @foreach ($post->tags as $tag)
+                                        <a href="#">#{{ $tag->title }}</a>
+                                    @endforeach
+
+                                </div>
+
                             </div>
                         @endif
 
-                        <div class="d-flex py-3">
-                            <span class=""><i class="fa fa-calendar" aria-hidden="true"></i>
-                                <span>{{ date('d, M Y') }}</span>
-                            </span>
-                            <span class="mx-3"><i class="fa fa-folder" aria-hidden="true"></i>
-                                <span>
-                                    @foreach ($post->categories as $category)
-                                        {{ $post->title }}
-                                    @endforeach
-                                </span>
-                            </span>
+                    </aside>
 
-                        </div>
-
-                        <h2 class="rv-blog-details__title">{{ $post->title }}</h2>
-
-                        <div class="mb-5">
-                            {!! $post->body !!}
-                        </div>
-
-<hr>
-
-                    </div>
                 </div>
 
-                <div class="col-lg-4 col-md-8 col-10 col-xxs-12">
-                    <div class="rv-blog-details-right rv-blog-details-search">
-                        <h3 class="rv-blog-details-right__title">Search</h3>
-                        <form action="{{ route('blog') }}" method="get">
-                            <div class="input-group">
-                                <input type="text" class="form-control p-3" placeholder="Keyword" name="search">
-                                <button type="submit" class="btn btn-primary "><i class="fa fa-search"
-                                        aria-hidden="true"></i></button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="p-3 card mt-4">
-                        <h3 class="mb-0">Categories</h3>
-                        <hr>
-                        @foreach ($categories as $category)
-                            <p class=" h5">
-                                <a href="{{ route('blog', $category->slug) }}"class="text-secondary">
-                                    <span class="">{{ $category->title }}
-
-                                    </span>
-                                </a>
-                            </p>
-                        @endforeach
-
-                    </div>
-
-                    {{-- <div class="rv-blog-details-right rv-blog-details-recents wow fadeInRight mt-4 ">
-                        <h3 class="rv-blog-details-right__title">Request Callback</h3>
-                        <div class="rv-recent-blog">
-                            <form action="{{ route('contact.send') }}" method="POST">
-                                @csrf
-                                <div class="row g-3">
-                                    <div class="col-lg-12 col-xl-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control" name="name"
-                                                placeholder="Your Name">
-                                            @error('name')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                            <label for="name">Your Name</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12 col-xl-6">
-                                        <div class="form-floating">
-                                            <input type="email" class="form-control" name="email"
-                                                placeholder="Your Email">
-                                            @error('email')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                            <label for="email">Your Email</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12 col-xl-12">
-                                        <div class="form-floating">
-                                            <input type="phone" class="form-control" name="phone" placeholder="Phone">
-                                            @error('phone')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                            <label for="phone">Your Phone</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="form-floating">
-                                            <textarea class="form-control" placeholder="Leave a message here" name="message" style="height: 160px"></textarea>
-                                            @error('message')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                            <label for="message">Message</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <button class="btn btn-primary w-100 py-3">Send Message</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-                    </div> --}}
-                </div>
             </div>
+
         </div>
+
     </div>
-    <!-- BLOG DETAILS END -->
+
+    <!-- End Sidebar Page Container -->
+
+
 
 
 @stop

@@ -1,51 +1,37 @@
-@extends('frontend.layouts.app')
-@section('title', 'Thanks' . ' ' . '-' . '' . $setting->site_title)
-@section('keywords', $setting->site_keywords)
-@section('description', $setting->site_description)
-@section('content')
-    <!-- Header Start -->
-    <div class="container-fluid bg-breadcrumb">
-        <div class="bg-breadcrumb-single"></div>
-        <div class="container text-center py-5" style="max-width: 900px;">
-            <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Thanks</h4>
-            <ol class="breadcrumb justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item active text-primary">Thanks</li>
-            </ol>
-        </div>
-    </div>
-    <!-- Header End -->
+<!doctype html>
+<html lang="en">
 
-    <!-- Contact Start -->
-    @if (session('message'))
-        <div class="container-xxl py-5" id="error-section">
-            <div class="container">
-                <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-                    {{-- <h6 class="section-title bg-white text-center text-primary px-3">Thanks for being awesome</h6> --}}
-                    <h1 class="fs-1">Thanks for being awesome</h1>
-                    <p>
-                        {{ session('message') }}
-                    </p>
-                    <div>
-                        <a class="btn btn-primary mt-3" href="{{ route('home') }}">Back to home</a>
-                    </div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Book Your Ticket</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container py-5 my-5">
+        <div class="row justify-content-center text-center">
+            <div class="col-md-6">
+
+                <div class="">
+                    {{-- <h2>🎉 Thank you for expressing your interest in the event!</h2>
+                     <p>You have successfully registered for the event: <strong> {{ session('eventName') }} </strong> .</p>
+    <p>We look forward to seeing you there!</p>
+                    <p>We’re thrilled to have you join us at <strong>Vidhi Utsav {{ date('Y') }}</strong>!</p>
+                    <p>Stay tuned for updates and further details about the event. If you have any questions, feel free
+                        to reach out to us at <a href="mailto:info@vidhiutsav.in">info@vidhiutsav.in</a> / <a
+                            href="tel:7055503337">+91 705550 3337</a>.
+                    </p> --}}
+                    <h2>Thank you for expressing your interest. We have added you to our mailing list for future events!</h2>
+                   {{-- <a target="_blank" href="https://oakbridgepublishing.mojo.page/ilats-2025" class="btn btn-success">Complete Registration</a> --}}
                 </div>
             </div>
-    @endif
-
+        </div>
     </div>
-    <!-- Contact End -->
-@stop
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script>
+</body>
 
-@section('js')
-    @if ($errors->any())
-        <script>
-            $(document).ready(function() {
-                // Scroll to the error section
-                $('html, body').animate({
-                    scrollTop: $('#error-section').offset().top
-                }, 'slow');
-            });
-        </script>
-    @endif
-@stop
+</html>

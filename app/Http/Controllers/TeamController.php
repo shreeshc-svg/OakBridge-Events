@@ -31,9 +31,19 @@ class TeamController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(TeamRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->validated();
+       // dd($request->all());
+
+        $data = $request->validate([
+            'name' => 'required|string|max:75',
+            'position' => 'required|string|max:75',
+            'image' => 'nullable|image|mimes:png,jpg,webp,jpeg|max:2048',
+            'social' => 'nullable',
+            'bio' => 'nullable',
+            'year' => 'required',
+        ]);
+
 
         if($request->file('image'))
         {

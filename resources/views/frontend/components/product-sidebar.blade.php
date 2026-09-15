@@ -4,7 +4,8 @@
             <h3 class="service-sidebar__title">Categories</h3><!-- /.service-sidebar__title -->
             <ul class="list-unstyled service-sidebar__nav">
                 @foreach ($categories as $category)
-                    <li><a href="{{ route('service', ['category' => $category->slug]) }}">{{ $category->title }}
+                    <li><a style="font-weight: 500; font-size:16px !important;"
+                            href="{{ route('service', ['category' => $category->slug]) }}">{{ $category->title }}
                             ({{ $category->services->count() }})
                         </a>
                     </li>
@@ -15,7 +16,7 @@
         <div class="service-sidebar__single">
             <div class="">
 
-                <h3>Get A Quote</h3>
+                <h3>Request FREE Callback</h3>
 
                 <form action="{{ route('contact.send') }}" method="post">
                     @csrf

@@ -1,63 +1,159 @@
-<div class="container-fluid py-5 wow fadeInUp" data-wow-delay="0.1s">
-    <div class="container py-5">
-        <div class="section-title text-center position-relative pb-3 mb-5 mx-auto" style="max-width: 600px;">
-            <h5 class="fw-bold text-primary text-uppercase">Why Choose Us</h5>
-            <h1 class="mb-0">We Are Here to Grow Your Business Exponentially</h1>
+<section class="features-section-two">
+
+    <div class="auto-container">
+
+      {{--  <div class="anim-icons">
+
+            <span class="icon twist-line-1 wow zoomIn"></span>
+
+            <span class="icon twist-line-2 wow zoomIn" data-wow-delay="1s"></span>
+
+            <span class="icon twist-line-3 wow zoomIn" data-wow-delay="2s"></span>
+
+        </div>  --}}
+
+            <div class="sec-title text-center">
+                                <span class="title">
+                    A Premium Summit Experience
+                </span>
+                                <h2>Event Overview</h2>
+<p></p>
+                
+
+        <div class="row">
+
+            <!-- Title Block -->
+
+           {{--  <div class="title-block col-lg-4 col-md-6 col-sm-12 wow fadeInUp">
+
+                <div class="inner-box">
+
+                    <div class="sec-title">
+
+                        <span class="title">A Premium Summit Experience</span>
+
+                        <h4>Event Overview</h4>
+
+                    </div>
+
+                </div>
+
+            </div>  --}}
+
+
+
+            <!-- Feature Block -->
+
+            <div class="feature-block-two col-lg-4 col-md-6 col-sm-12 wow fadeInUp">
+
+                <div class="inner-box h-100">
+
+                    <div class="icon-box"><span class="icon flaticon-lecture"></span></div>
+
+                    <h4><a href="javascript:void()">Full Day Premium
+Summit</a></h4>
+
+                    <div class="text">An immersive experience
+designed for deep dives and
+high-level discourse.</div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Feature Block -->
+
+            <div class="feature-block-two col-lg-4 col-md-6 col-sm-12 wow fadeInUp">
+
+                <div class="inner-box h-100">
+
+                    <div class="icon-box"><span class="icon flaticon-employee-1"></span></div>
+
+                    <h4><a href="javascript:void">Powerful Keynote Sessions</a></h4>
+
+                    <div class="text">Sharp insights and big ideas shaping the future of Law, AI & Tech.</div>
+
+                </div>
+
+            </div>
+
+            <!-- Feature Block -->
+
+            <div class="feature-block-two col-lg-4 col-md-6 col-sm-12 wow fadeInUp">
+
+                <div class="inner-box h-100">
+
+                    <div class="icon-box"><span class="icon flaticon-employee"></span></div>
+
+                    <h4><a href="javascript:void">Engaging Fireside Chats</a></h4>
+
+                    <div class="text">Candid perspectives and experience from the frontlines of legal tech.</div>
+
+                </div>
+
+            </div>
+
+            <!-- Feature Block -->
+
+            <div class="feature-block-two col-lg-4 col-md-6 col-sm-12 wow fadeInUp" data-wow-delay="400ms">
+
+                <div class="inner-box h-100">
+
+                    <div class="icon-box"><span class="icon flaticon-user"></span></div>
+
+                    <h4><a href="#">Interactive Panel
+Discussions</a></h4>
+
+                    <div class="text">Engaging debates and
+diverse perspectives on
+critical topics.</div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Feature Block -->
+
+            <div class="feature-block-two col-lg-4 col-md-6 col-sm-12 wow fadeInUp" data-wow-delay="800ms">
+
+                <div class="inner-box h-100">
+
+                    <div class="icon-box"><span class="icon flaticon-tv"></span></div>
+
+                    <h4><a href="#">Law, AI  & Tech Solution Providers</a></h4>
+
+                    <div class="text">Discover cutting-edge solutions and
+explore new technologies.</div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Feature Block -->
+
+            <div class="feature-block-two col-lg-4 col-md-6 col-sm-12 wow fadeInUp" data-wow-delay="1200ms">
+
+                <div class="inner-box h-100">
+
+                    <div class="icon-box"><span class="icon flaticon-diamond"></span></div>
+
+                    <h4><a href="javscript::void">Elite Networking Opportunities</a></h4>
+
+                    <div class="text">Exclusive Knowledge Summit with dedicated networking lounge for unparalleled connections.</div>
+
+                </div>
+
+            </div>
+
+
         </div>
-        <div class="row g-5">
-            <div class="col-lg-4">
-                <div class="row g-5">
-                    <div class="col-12 wow zoomIn" data-wow-delay="0.2s">
-                        <div class="bg-primary rounded d-flex align-items-center justify-content-center mb-3"
-                            style="width: 60px; height: 60px;">
-                            <i class="fa fa-cubes text-white"></i>
-                        </div>
-                        <h4>Best In Industry</h4>
-                        <p class="mb-0">Setting the benchmark for excellence and innovation in its respective
-                            industry.
-                        </p>
-                    </div>
-                    <div class="col-12 wow zoomIn" data-wow-delay="0.6s">
-                        <div class="bg-primary rounded d-flex align-items-center justify-content-center mb-3"
-                            style="width: 60px; height: 60px;">
-                            <i class="fa fa-award text-white"></i>
-                        </div>
-                        <h4>10+ Services</h4>
-                        <p class="mb-0">Delivering a diverse range of top-notch professional services exceeding
-                            industry standards.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4  wow zoomIn" data-wow-delay="0.9s" style="min-height: 350px;">
-                <div class="position-relative h-100">
-                    <img class="position-absolute w-100 h-100 rounded wow zoomIn" data-wow-delay="0.1s"
-                        src="{{ asset('public/assets/img/feature.jpg') }}" style="object-fit: cover;">
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="row g-5">
-                    <div class="col-12 wow zoomIn" data-wow-delay="0.4s">
-                        <div class="bg-primary rounded d-flex align-items-center justify-content-center mb-3"
-                            style="width: 60px; height: 60px;">
-                            <i class="fa fa-users-cog text-white"></i>
-                        </div>
-                        <h4>Professional Staff</h4>
-                        <p class="mb-0">Highly skilled and experienced personnel dedicated to delivering exceptional
-                            professional services.
-                        </p>
-                    </div>
-                    <div class="col-12 wow zoomIn" data-wow-delay="0.8s">
-                        <div class="bg-primary rounded d-flex align-items-center justify-content-center mb-3"
-                            style="width: 60px; height: 60px;">
-                            <i class="fa fa-phone-alt text-white"></i>
-                        </div>
-                        <h4>24/7 Support</h4>
-                        <p class="mb-0">Exceptional and responsive support tailored to meet your needs seamlessly.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </div>
-</div>
+
+</section>

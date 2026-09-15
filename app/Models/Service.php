@@ -24,11 +24,24 @@ class Service extends Model
         'featured',
         'published',
         'disable_comment',
-        'views'
+        'views',
+        'timeline',
+        'date',
     ];
+
+    // protected $casts = [
+    //     'timeline' => 'array'
+    // ];
+
+    protected $casts = [
+        'date' => 'datetime',
+    ];
+
 
     public function scategories()
     {
         return $this->belongsToMany(Scategory::class);
     }
+
+
 }

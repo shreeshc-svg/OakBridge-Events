@@ -17,6 +17,27 @@
 @stop
 
 @section('content')
+    @if (count($errors) > 0)
+        <div class="alert alert-dismissable alert-danger mt-3">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Whoops!</strong> There were some problems with your input.<br>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>{{ session('success') }}</strong>
+        </div>
+    @endif
     <div class="container-fluid">
         <div class="row px-3 pt-3 justify-content-between">
             <div class="col-md-4 ">
@@ -29,11 +50,12 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label>tag name*</label>
-                                    <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror"
-                                        placeholder="tag Name" value="{{ old('title') }}" >
-                                        @error('title')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
+                                    <input type="text" name="title" id="title"
+                                        class="form-control @error('title') is-invalid @enderror" placeholder="tag Name"
+                                        value="{{ old('title') }}">
+                                    @error('title')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -41,7 +63,8 @@
                                 <div class="form-group">
                                     <label for="slug" class="form-label bg-light">Slug <small>Unique url of the
                                             tag</small></label>
-                                    <input type="text" name="slug" class="form-control bg-light @error('slug') is-invalid @enderror" id="slug">
+                                    <input type="text" name="slug"
+                                        class="form-control bg-light @error('slug') is-invalid @enderror" id="slug">
                                     @error('slug')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -161,37 +184,37 @@
     {{-- Succes and error notification alert --}}
     <script>
         $(document).ready(function() {
-        // show error message
-        @if ($errors->any())
-            //var errorMessage = @json($errors->any()); // Get the first validation error message
-            var Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 5500
-            });
+            // show error message
+            @if ($errors->any())
+                //var errorMessage = @json($errors->any()); // Get the first validation error message
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 5500
+                });
 
-            Toast.fire({
-            icon: 'error',
-            title: 'There are form validation errors. Please fix them.'
-            });
-        @endif
+                Toast.fire({
+                    icon: 'error',
+                    title: 'There are form validation errors. Please fix them.'
+                });
+            @endif
 
-        // success message
-        @if (session('success'))
-            var successMessage = @json(session('success')); // Get the first sucess message
-            var Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 5500
-            });
+            // success message
+            @if (session('success'))
+                var successMessage = @json(session('success')); // Get the first sucess message
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 5500
+                });
 
-            Toast.fire({
-            icon: 'success',
-            title: successMessage
-            });
-        @endif
+                Toast.fire({
+                    icon: 'success',
+                    title: successMessage
+                });
+            @endif
         });
     </script>
 

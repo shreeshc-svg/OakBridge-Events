@@ -17,6 +17,14 @@
 @stop
 
 @section('content')
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>{{ session('success') }}</strong>
+        </div>
+    @endif
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
@@ -44,6 +52,10 @@
                                             Image
                                         </th>
 
+                                        <th style="width: 10%">
+                                            Type
+                                        </th>
+
                                         <th style="width: 20%" class="text-center">
                                             Action
                                         </th>
@@ -66,7 +78,7 @@
                                                 </small>
                                             </td>
                                             <td>
-                                            {{ $team->position }}
+                                                {{ $team->position }}
                                             </td>
                                             <td>
                                                 @if ($team->image)
@@ -81,6 +93,11 @@
                                             </td>
 
 
+                                             <td>
+                                                {{ $team->year }}
+                                            </td>
+
+
                                             <td class="project-actions text-right d-flex">
 
                                                 <div>
@@ -92,8 +109,7 @@
                                                     </a>
                                                 </div>
                                                 <div>
-                                                    <form action="{{ route('team.destroy', $team->id) }}"
-                                                        method="POST">
+                                                    <form action="{{ route('team.destroy', $team->id) }}" method="POST">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button
@@ -138,37 +154,37 @@
     {{-- Success and error notification and alert --}}
     <script>
         $(document).ready(function() {
-        // show error message
-        @if ($errors->any())
-            //var errorMessage = @json($errors->any()); // Get the first validation error message
-            var Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 5500
-            });
+            // show error message
+            @if ($errors->any())
+                //var errorMessage = @json($errors->any()); // Get the first validation error message
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 5500
+                });
 
-            Toast.fire({
-            icon: 'error',
-            title: 'There are form validation errors. Please fix them.'
-            });
-        @endif
+                Toast.fire({
+                    icon: 'error',
+                    title: 'There are form validation errors. Please fix them.'
+                });
+            @endif
 
-        // success message
-        @if (session('success'))
-            var successMessage = @json(session('success')); // Get the first sucess message
-            var Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 5500
-            });
+            // success message
+            @if (session('success'))
+                var successMessage = @json(session('success')); // Get the first sucess message
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 5500
+                });
 
-            Toast.fire({
-            icon: 'success',
-            title: successMessage
-            });
-        @endif
+                Toast.fire({
+                    icon: 'success',
+                    title: successMessage
+                });
+            @endif
 
         });
     </script>

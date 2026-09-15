@@ -1,167 +1,237 @@
 @extends('frontend.layouts.app')
-@if ($service->meta_title)
-    @section('title', $service->meta_title . ' ' . '-' . ' ' . $setting->site_title)
-@else
-    @section('title', $setting->bname . ' ' . '-' . ' ' . $service->title)
-@endif
-@if ($service->meta_description)
-    @section('description', $service->meta_description)
-@else
-    @section('description', Str::limit($service->excerpt, 200))
-@endif
-@section('keywords', $service->meta_keyword)
+@section('title', $service->title . ' ' . '-' . ' ' . $setting->site_title)
+@section('keywords', $setting->site_keywords)
+@section('description', $setting->site_description)
 @section('content')
 
 
-    <!-- Header Start -->
-    <div class="container-fluid bg-breadcrumb">
-        <div class="bg-breadcrumb-single"></div>
-        <div class="container text-center py-5" style="max-width: 900px;">
-            <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">{{ $service->title }}</h4>
-            <ol class="breadcrumb justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item active text-primary">{{ $service->title }}</li>
-            </ol>
+
+    <!--Page Title-->
+    {{-- <section class="page-title" style="background-image:url({{ asset('public/assets/images/background/5.jpg') }});"> --}}
+    <section class="page-title"
+        style="background-image: url({{ asset('public/assets/images/background/bread2.webp') }}); background-size: cover; background-position: center;">
+        <div class="auto-container">
+            <h1>{{ $service->title }}</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="{{ route('home') }}">Home</a></li>
+                <li>{{ $service->title }}</li>
+            </ul>
         </div>
-    </div>
-    <!-- Header End -->
+    </section>
+    <!--End Page Title-->
+    <section class="event-detail">
 
-    <!-- BLOG DETAILS START -->
-    <div class="rv-blog-details pt-120 pb-120 pt-5 ">
-        <div class="container">
-            <div class="row justify-content-center ">
-                <div class="col-lg-8">
-                    <div class="rv-blog-details-left">
-                        @if ($service->image)
-                            <div class="rv-blog-details__img">
-                                <img class="w-100" src="{{ asset('public/uploads/images/service/' . $service->image) }}"
-                                    alt="blog banner">
-                            </div>
-                        @endif
+        <div class="auto-container">
 
-                        <div class="d-flex py-3">
-                            <span class=""><i class="fa fa-calendar" aria-hidden="true"></i>
-                                <span>{{ date('d, M Y') }}</span>
-                            </span>
-                            <span class="mx-3"><i class="fa fa-folder" aria-hidden="true"></i>
-                                <span>
-                                    @foreach ($service->scategories as $category)
-                                        {{ $service->title }}
-                                    @endforeach
-                                </span>
-                            </span>
+            <div class="image-box">
 
-                        </div>
+              {{--  <figure class="image wow fadeIn animated" style="visibility: visible; animation-name: fadeIn;"><a
+                        href="images/resource/event-detail.jpg" class="lightbox-image"><img
+                            src="{{ asset('public/uploads/images/service/' . $service->image) }}" alt=""></a>
+                </figure>--}}
 
-                        <h2 class="rv-blog-details__title">{{ $service->title }}</h2>
-
-                        <div class="">
-                            {!! $service->body !!}
-                        </div>
+            </div> 
 
 
-                    </div>
-                </div>
 
-                <div class="col-lg-4 col-md-8 col-10 col-xxs-12 px-md-5">
-                    <div class="rv-blog-details-right rv-blog-details-search">
-                        <h3 class="rv-blog-details-right__title">Search</h3>
-                        <form action="{{ route('service') }}" method="get">
-                            <div class="input-group">
-                                <input type="text" class="form-control p-3" placeholder="Keyword" name="search">
-                                <button type="submit" class="btn btn-primary "><i class="fa fa-search"
-                                        aria-hidden="true"></i></button>
-                            </div>
-                        </form>
-                    </div>
+            <div class="content-box">
+                <ul class="upper-info">
 
-                    <div class="p-3 card mt-4">
-                        <h3 class="mb-0">Categories</h3>
-                        <hr>
-                        @foreach ($service_categories as $category)
-                            <p class=" h5">
-                                <a href="{{ route('service', $category->slug) }}"class="text-secondary">
-                                    <span class="">{{ $category->title }}
-                                        ({{ $category->services->count() }})
-                                    </span>
-                                </a>
-                            </p>
-                        @endforeach
+                    <li><span
+                            class="icon far fa-clock"></span>{{ \Carbon\Carbon::parse($service->date)->format('H:i D, d M Y ') }}
+                        </span>
 
-                    </div>
+                    </li>
 
-                    <div class="rv-blog-details-right rv-blog-details-recents wow fadeInRight mt-4 card p-3 mb-5">
-                        <h3 class="rv-blog-details-right__title mb-3">Apply Now</h3>
-                        <div class="rv-recent-blog ">
-                            <form action="{{ route('job.notification') }}" method="POST">
-                                @csrf
-                                <div class="row g-3">
-                                    <div class="col-lg-12 ">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control" name="name"
-                                                placeholder="Your Name" required>
-                                            @error('name')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                            <label for="name">Your Name</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12 ">
-                                        <div class="form-floating">
-                                            <input type="email" class="form-control" name="email"
-                                                placeholder="Your Email" required>
-                                            @error('email')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                            <label for="email">Your Email</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12 col-xl-12">
-                                        <div class="form-floating">
-                                            <input type="phone" class="form-control" name="phone" placeholder="Phone"
-                                                required>
-                                            @error('phone')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                            <label for="phone">Your Phone</label>
-                                        </div>
-                                    </div>
+                    <li><span class="icon fa fa-map-marker-alt"></span>{{ $setting->address }}</li>
 
-                                    <div class="col-12">
-                                        <div class="form-floating">
-                                            <textarea class="form-control" placeholder="Leave a message here" name="message" style="height: 160px" required></textarea>
-                                            @error('message')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                            <label for="message">Message</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <button class="btn btn-primary w-100 py-3">Send Message</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                </ul>
 
-                    </div>
-                </div>
+               {{-- <h2>{{ $service->title }}</h2>
+
+                <p style="color:#666666 font-size:16px">{!! $service->body !!}</p>  --}}
+                
+
+                {{-- download pdf option here --}}
+                {{-- <div class="btn-box w-100 text-center">
+                    <a href="#" class="theme-btn btn-style-three"><span class="btn-title">Download Schedule</span></a>
+                </div> --}}
+
+
             </div>
+
+
         </div>
-    </div>
-    <!-- BLOG DETAILS END -->
+
+
+    </section>
+
+    <section class="schedule-section">
+
+        <div class="anim-icons">
+
+            <span class="icon icon-circle-4 wow zoomIn" style="visibility: hidden; animation-name: none;"></span>
+
+            <span class="icon icon-circle-3 wow zoomIn animated"
+                style="visibility: visible; animation-name: zoomIn;"></span>
+
+        </div>
+
+
+
+        <div class="auto-container">
+
+            <div class="sec-title text-center">
+
+                <span class="title">Event Agenda</span>
+
+                <h2>Schedule</h2>
+
+            </div>
+
+
+
+            <div class="schedule-tabs tabs-box">
+
+
+
+
+                <div class="tabs-content">
+
+
+
+                    <!--Tab-->
+
+                    <div class="tab active-tab" id="tab-1">
+
+                        <div class="schedule-timeline">
+
+                            <!-- schedule Block -->
+
+                            @foreach (json_decode($service->timeline, true) as $timeline)
+                                <div class="schedule-block @if ($loop->even) even @endif">
+
+                                    <div class="inner-box">
+
+                                        <div class="inner">
+
+                                            <div class="date">{{ $timeline['from'] }} <br> {{ $timeline['to'] }}</div>
+
+                                            <div class="speaker-info">
+
+
+
+                                                <h5 class="name">{{ $timeline['title'] }}</h5>
+
+                                                <span class="designation">{{ $timeline['subheadline'] }} </span>
+
+                                            </div>
+
+
+                                            {{-- <div class="text pt-3">{{ $timeline['body'] }}</div>
+                                            
+                                            
+                                                                                      
+                                            <div class="text pt-3">{!! preg_replace('/;\s*/', '<br>–', $timeline['body']) !!}</div> --}}
+                                            
+{{-- <div class="text pt-3">
+    {!! preg_replace('/^–\s*/', '', preg_replace('/;?\s*([^;]+?),\s*(.*?)(?=(;|$))/', '– $1, <i>$2</i><br>', $timeline['body'])) !!}
+</div> --}}
+
+<div class="text pt-3">
+    @php
+        $startsWithDash = strpos($timeline['body'], '–') === 0;
+        
+        $formatted = preg_replace_callback('/;?\s*([^;]+?),\s*(.*?)(?=(;|$))/', function($matches) {
+            $title = $matches[1];
+            $description = $matches[2];
+            
+            // Don't italicize if it contains "DIGITAL"
+            if (strpos($description, 'DIGITAL') !== false || strpos($description, 'Driving Innovation') !== false) {
+                return '– ' . $title . ', ' . $description . '<br>';
+            }
+            
+            return '– ' . $title . ', <i>' . $description . '</i><br>';
+        }, $timeline['body']);
+        
+        // Always trim the generated dash
+        $formatted = ltrim($formatted, '– ');
+        
+        // Add it back if original had it
+        if ($startsWithDash) {
+            $formatted = '– ' . $formatted;
+        }
+    @endphp
+    {!! $formatted !!}
+</div>
+
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            @endforeach
+
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+                </div>
+
+            </div>
+
+        </div>
+        
+        <div class="btn-box w-100 text-center">
+
+                    <a href="#" data-toggle="modal" data-target="#exampleModal" class="theme-btn btn-style-one"><span
+                            class="btn-title">Register Now</span></a>
+                            
+                      <a href="/public/uploads/Agenda_29_Nov.pdf" download 
+       class="theme-btn btn-style-three ml-3">
+        <span class="btn-title">Download Agenda</span>
+    </a>
+
+                </div>
+
+    </section>
+
+    {{-- <section class="call-to-action" style="background-image: url({{ asset('public/assets/images/background/11.jpg') }});">
+
+        <div class="auto-container">
+
+            <div class="content-box">
+
+                <div class="text">Join Us at Vidhi Utsav 2025! </div>
+
+                <h2>Discover the intersection of law, literature, and knowledge at Vidhi Utsav!</h2>
+
+                <div class="btn-box">
+
+                    <a href="#" data-toggle="modal" data-target="#exampleModal" class="theme-btn btn-style-one"><span
+                            class="btn-title">Register Now</span></a>
+
+                </div>
+                 
+                 
+                
+
+            </div>
+
+        </div>
+
+    </section> --}}
+
 
 
 @stop
+
 @section('js')
-    @if ($errors->any())
-        <script>
-            $(document).ready(function() {
-                // Scroll to the error section
-                var marginTop = 250;
-                $('html, body').animate({
-                    scrollTop: $('#error-section').offset().top - marginTop
-                }, 'slow');
-            });
-        </script>
-    @endif
+
 @stop

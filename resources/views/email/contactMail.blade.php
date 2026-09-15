@@ -23,5 +23,4 @@ IP: {{ $details['ip'] }}<br>
 Link: <a href="{{ $details['url'] }}">{{ $details['url'] }}</a><br><br>
 
 
-
 Thanks

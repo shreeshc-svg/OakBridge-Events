@@ -3,18 +3,37 @@
 @section('title', 'Create Post')
 
 @section('content_header')
-    <div class="d-flex justify-content-between px-md-3 align-items-center">
-        <div>
-            <a href="{{ route('post.index') }}" class="btn btn-primary">Back</a>
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Create Post</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                <li class="breadcrumb-item active">Post Create</li>
+            </ol>
         </div>
     </div>
 @stop
 
 @section('content')
+    @if (count($errors) > 0)
+        <div class="alert alert-dismissable alert-danger mt-3">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Whoops!</strong> There were some problems with your input.<br>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="">
         <form action="{{ route('post.store') }}" method="post" enctype="multipart/form-data">
             @csrf
-            <div class="row px-3 py-3">
+            <div class="row">
                 <div class="col-md-8">
                     <div class="card card-light">
                         <div class="card-header">
@@ -53,7 +72,7 @@
                                 <label for="">Post Description
                                 </label>
 
-                                <textarea style="height: 600px;" id="editor" name="body" value="{{ old('body') }}"> {{ old('body') }}</textarea>
+                                <textarea style="height: 600px;" id="summernote" name="body" value="{{ old('body') }}"> {{ old('body') }}</textarea>
                                 @error('body')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -97,7 +116,8 @@
                         </div>
                         <div class="card-body">
                             <div class="form-group">
-                                <textarea class="form-control" name="excerpt" id="" value="{{ old('excerpt') }}" cols="30" rows="5">{{ old('excerpt') }}</textarea>
+                                <textarea class="form-control" name="excerpt" id="" value="{{ old('excerpt') }}" cols="30"
+                                    rows="5">{{ old('excerpt') }}</textarea>
                                 @error('excerpt')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -297,14 +317,102 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="/public/css/admin_custom.css">
-    <link href="{{ asset('public/ckeditor/plugins/codesnippet/lib/highlight/styles/default.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+    <style>
+        /* summer note */
+        .modal-header .close,
+        .modal-header .mailbox-attachment-close {
+            padding: 0rem;
+            margin: 0 auto;
+        }
+
+        .modal-header {
+            display: -ms-flexbox;
+            display: block;
+            -ms-flex-align: start;
+            align-items: flex-start;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            border-top-left-radius: calc(0.3rem - 1px);
+            border-top-right-radius: calc(0.3rem - 1px);
+        }
+    </style>
 
 @stop
 
 @section('js')
 
-    <script src="{{ asset('public/ckeditor/ckeditor.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+
+    {{-- summer note --}}
+    <script>
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                height: 400,
+
+                callbacks: {
+                    onImageUpload: function(files) {
+                        uploadImage(files[0]);
+                    },
+                    onMediaDelete: function(target) {
+                        deleteImage(target[0].src);
+                        if (target[0].nodeName === 'VIDEO') {
+                            // Check if the deleted element is a video
+                            target.remove(); // Remove the video element
+                        }
+                    },
+
+                }
+            });
+
+            function uploadImage(file) {
+                let formData = new FormData();
+                formData.append('image', file);
+
+                $.ajax({
+                    url: '{{ route('summer.upload.image') }}',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        let imageUrl = response.url;
+                        $('#summernote').summernote('editor.insertImage', imageUrl);
+                    },
+                    error: function(error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+            function deleteImage(imageSrc) {
+                console.log('Deleting image with source URL:', imageSrc);
+
+                $.ajax({
+                    url: '{{ route('summer.delete.image') }}',
+                    type: 'POST',
+                    data: {
+                        imageSrc: imageSrc
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.log(response.message);
+                    },
+                    error: function(error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+        });
+    </script>
 
     {{-- view image while uploading --}}
     <script>
@@ -340,15 +448,6 @@
     </script>
 
 
-    {{-- ck editor image updoad --}}
-    <script>
-        CKEDITOR.replace('editor', {
-            filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-            filebrowserUploadMethod: "form",
-            height: 500,
-            allowedContent: true
-        });
-    </script>
 
     <script>
         // In your Javascript (external .js resource or <script> tag)
@@ -362,48 +461,8 @@
         $(document).ready(function() {
             $('#category').select2({
                 allowClear: true,
-                 maximumSelectionLength: 1
+                maximumSelectionLength: 1
             });
-        });
-    </script>
-
-    {{-- disable multiple select2 --}}
-
-    {{-- Success and error notification --}}
-    <script>
-        $(document).ready(function() {
-            // show error message
-            @if ($errors->any())
-                //var errorMessage = @json($errors->any()); // Get the first validation error message
-                var Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 7500
-                });
-
-                Toast.fire({
-                    icon: 'error',
-                    title: 'There are form validation errors. Please fix them.'
-                });
-            @endif
-
-            // success message
-            @if (session('success'))
-                var successMessage = @json(session('success')); // Get the first sucess message
-                var Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 6500
-                });
-
-                Toast.fire({
-                    icon: 'success',
-                    title: successMessage
-                });
-            @endif
-
         });
     </script>
 

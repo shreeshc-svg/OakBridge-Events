@@ -5,12 +5,12 @@
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>All Job</h1>
+            <h1>Events</h1>
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="{{ route('service.create') }}">+ Add New</a> |</li>
-                <li class=""> &nbsp; <a href="{{ route('service.trash') }}">View Trash</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a> |</li>
+                <li class=""> &nbsp; <a href="#">Events</a></li>
             </ol>
         </div>
     </div>
@@ -52,16 +52,16 @@
                                             {{-- <th style="width: 10%">
                                                 Category
                                             </th> --}}
-
+                                            {{--
                                             <th style="width: 10%">
                                                 Featured
-                                            </th>
+                                            </th> --}}
 
 
                                             <th style="width: 15%" class="text-center">
                                                 Status
                                             </th>
-                                            <th style="width: 18%">
+                                            <th style="width: 12%">
                                                 Action
                                             </th>
                                         </tr>
@@ -100,13 +100,13 @@
                                                         @endif
                                                     @endforeach
                                                 </td> --}}
-                                                <td>
+                                                {{-- <td>
                                                     @if ($service->featured)
                                                         Yes
                                                     @else
                                                         No
                                                     @endif
-                                                </td>
+                                                </td> --}}
                                                 {{-- <td>
                                                     @if ($service->disable_comment)
                                                         Disabled

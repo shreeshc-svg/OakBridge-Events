@@ -11,55 +11,96 @@
 @section('description', $setting->site_description)
 @section('keywords', $setting->site_keywords)
 @section('content')
-    <!-- Header Start -->
-    <div class="container-fluid bg-breadcrumb">
-        <div class="bg-breadcrumb-single"></div>
-        <div class="container text-center py-5" style="max-width: 900px;">
-            <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Our Blogs</h4>
-            <ol class="breadcrumb justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item active text-primary">Blog</li>
-            </ol>
+    <!--Page Title-->
+
+    {{-- <section class="page-title" style="background-image:url({{ asset('public/assets/images/background/5.jpg') }});"> --}}
+    <section class="page-title"
+        style="background-image:linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url({{ asset('public/assets/images/background/bread.webp') }}); background-size: cover; background-position: center;">
+
+        <div class="auto-container">
+
+            <h1>Blogs</h1>
+
+            <ul class="bread-crumb clearfix">
+
+                <li><a href="{{ route('home') }}">Home</a></li>
+
+                <li>Blogs</li>
+
+            </ul>
+
         </div>
-    </div>
-    <!-- Header End -->
 
-    <!-- Blog Start -->
-    <div class="container-fluid blog py-5">
-        <div class="container py-5">
-            <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
-                <h4 class="text-primary">Our Blogs</h4>
-                <h1 class="display-4">Latest Articles & News from the Blogs</h1>
-            </div>
-            <div class="row g-4 justify-content-center">
+    </section>
+
+    <!--End Page Title-->
+
+
+
+    <!-- News Section -->
+
+    <section class="news-section alternate">
+
+        <div class="auto-container">
+
+            <div class="row">
+
+
+
+                <!-- News Block Three -->
+
                 @foreach ($posts as $post)
-                    <div class="col-md-6 col-lg-6 col-xl-4 wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="blog-item bg-light rounded p-4"
-                            style="background-image: url({{ asset('uploads/images/post' . $post->image) }});">
-                            <div class="project-img">
-                                <img src="{{ asset('public/uploads/images/post/' . $post->image) }}"
-                                    class="img-fluid w-100 rounded" alt="Image">
+                    <div class="news-block col-lg-4 col-md-6 col-sm-12 wow fadeInRight">
 
-                                {{-- <div class="blog-plus-icon">
-                                    <a href="{{ asset('public/uploads/images/post/' . $post->image) }}"
-                                        data-lightbox="blog-1" class="btn btn-primary btn-md-square rounded-pill"><i
-                                            class="fas fa-plus fa-1x"></i></a>
-                                </div> --}}
+                        <div class="inner-box">
+
+                            <div class="image-box">
+
+                                <figure class="image"><a href="{{ route('blog.detail', $post->slug) }}"><img
+                                            src="{{ asset('public/uploads/images/post/' . $post->image) }}"
+                                            alt=""></a>
+                                </figure>
+
                             </div>
-                            <div class="my-4">
-                                <a href="{{ route('blog.detail', $post->slug) }}"
-                                    class="h4">{{ Str::limit($post->title, 50) }}</a>
-                                <p>{{ Str::limit($post->excerpt, 140) }}</p>
+
+                            <div class="lower-content">
+
+                                <ul class="post-info">
+
+                                    <li><span class="far fa-user"></span> Admin</li>
+
+                                    <li><span class="far fa-folder"></span>
+                                        @foreach ($post->categories as $category)
+                                            {{ $category->title }}@if (!$loop->last)
+                                                ,
+                                            @endif
+                                        @endforeach
+                                    </li>
+
+                                </ul>
+
+                                <h4><a href="{{ route('blog.detail', $post->slug) }}">{{ $post->title }}</a></h4>
+
+                                <div class="btn-box"><a href="{{ route('blog.detail', $post->slug) }}"
+                                        class="read-more">Read More</a>
+                                </div>
+
                             </div>
-                            <a class="btn btn-primary rounded-pill py-2 px-4"
-                                href="{{ route('blog.detail', $post->slug) }}">Explore More</a>
+
                         </div>
+
                     </div>
                 @endforeach
+
             </div>
+
+            {{ $posts->links() }}
+
         </div>
-    </div>
-    <!-- Blog End -->
+
+    </section>
+
+    <!--End News Section -->
 
 
 

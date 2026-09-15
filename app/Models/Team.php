@@ -14,10 +14,11 @@ class Team extends Model
         'image',
         'position',
         'social',
-        'bio'
+        'bio',
+        'year',
     ];
 
-    // protected $casts = [
-    //     'social' => 'array',
-    // ];
+    protected $casts = [
+        'social' => 'array',
+    ];
 }

@@ -17,3 +17,8 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Backups and database dumps (never commit - contain user data, and backup.zip is over GitHub's 100 MB limit)
+/backup.zip
+/*.sql
+*.sql.gz

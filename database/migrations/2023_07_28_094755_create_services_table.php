@@ -40,6 +40,7 @@ return new class extends Migration
 
             // views
             $table->bigInteger('views')->default(0);
+            $table->json('timeline')->nuallable();
             $table->softDeletes();
             $table->timestamps();
         });

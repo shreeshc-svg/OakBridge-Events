@@ -116,7 +116,7 @@
                 imagesInputName: 'src',
                 preloadedInputName: 'old',
                 maxSize: 8 * 1024 * 1024,
-                maxFiles: 18
+                maxFiles: 200
             });
 
         });

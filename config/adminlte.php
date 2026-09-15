@@ -335,6 +335,11 @@ return [
             // 'can'  => 'manage-blog',
         ],
         [
+            'text' => 'Booking',
+            'route'  => 'booking.index',
+            'icon' => 'fas fa-ticket-alt',
+        ],
+        [
             'text'    => 'Posts',
             'url'  => 'admin/post/*',
             'icon'    => 'fas fa-fw fa-book',
@@ -368,15 +373,15 @@ return [
             'icon' => 'fas fa-tags',
         ],
         [
-            'text'    => 'Job',
+            'text'    => 'Events',
             'url'  => '["admin/service/*","admin/scategory/*"]',
-            'icon'    => 'fas fa-fw fa-book',
+            'icon'    => 'fas fa-fw fa-shopping-bag',
             'submenu' => [
-                [
-                    'text' => 'Job Categories',
-                    'route'  => 'scategory.index',
-                    'icon' => 'fas fa-folder',
-                ],
+                // [
+                //     'text' => 'Product Categories',
+                //     'route'  => 'scategory.index',
+                //     'icon' => 'fas fa-folder',
+                // ],
                 [
                     'text' => 'Add New',
                     'icon'    => 'fas fa-fw fa-plus',
@@ -387,39 +392,44 @@ return [
                     'icon'    => 'fas fa-fw fa-eye',
                     'route'  => 'service.index',
                 ],
-                [
-                    'text' => 'View Trash',
-                    'icon'    => 'fas fa-fw fa-trash',
-                    'route'  => 'service.trash',
-                ],
 
             ],
         ],
+        [
+            'text' => 'Gallery',
+            'route' => 'gallery.update',
+            'icon' => 'far fa-images'
+        ],
         // [
-        //     'text' => 'Gallery',
-        //     'route' => 'gallery.update',
-        //     'icon' => 'far fa-images'
+        //     'text' => 'Vidhi Samman',
+        //     'route' => 'vidhi.index',
+        //     'icon' => 'far fa-image'
         // ],
         [
-            'text'    => 'Faq',
-            'url'  => 'admin/faq/*',
-            'icon'    => 'fas fa-question',
-            'submenu' => [
-                [
-                    'text' => 'Create faq',
-                    'icon'    => 'fas fa-fw fa-plus',
-                    'route'  => 'faq.create',
-                ],
-                [
-                    'text' => 'View All',
-                    'icon'    => 'fas fa-fw fa-eye',
-                    'route'  => 'faq.index',
-                ],
-            ]
-
+            'text' => 'Videos',
+            'route' => 'video.index',
+            'icon' => 'fa fa-video'
         ],
+        // [
+        //     'text'    => 'Faq',
+        //     'url'  => 'admin/faq/*',
+        //     'icon'    => 'fas fa-question',
+        //     'submenu' => [
+        //         [
+        //             'text' => 'Create faq',
+        //             'icon'    => 'fas fa-fw fa-plus',
+        //             'route'  => 'faq.create',
+        //         ],
+        //         [
+        //             'text' => 'View All',
+        //             'icon'    => 'fas fa-fw fa-eye',
+        //             'route'  => 'faq.index',
+        //         ],
+        //     ]
+
+        // ],
         [
-            'text'    => 'Team',
+            'text'    => 'Speakers / Adivisors',
             'url'  => 'admin/team/*',
             'icon'    => 'fas fa-users',
             'submenu' => [

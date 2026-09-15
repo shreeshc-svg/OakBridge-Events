@@ -33,7 +33,7 @@ class TestimonialController extends Controller
     {
         $data = $request->validate([
             'title'     => 'required',
-            'slug'      => 'nullable',
+            'slug'      => 'required',
             'image'     => 'nullable|image|mimes:jpg,png,jpeg,gif,svg,webp|max:2048',
             'location'  => 'required',
             'video'     => 'nullable',
@@ -90,7 +90,7 @@ class TestimonialController extends Controller
     {
         $data = $request->validate([
             'title'     => 'required',
-            'slug'      => 'nullable',
+            'slug'      => 'required',
             'image'     => 'nullable|image|mimes:jpg,png,jpeg,gif,svg,webp|max:2048',
             'location'  => 'required',
             'video'     => 'nullable',

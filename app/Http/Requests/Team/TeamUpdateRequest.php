@@ -27,6 +27,7 @@ class TeamUpdateRequest extends FormRequest
             'image' => 'sometimes|nullable|image|mimes:png,jpg,webp,jpeg|max:2048',
             'social' => 'sometimes|nullable',
             'bio' => 'nullable',
+            'year' => 'required',
         ];
     }
 }

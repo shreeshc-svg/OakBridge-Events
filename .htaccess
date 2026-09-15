@@ -3,10 +3,9 @@
     RewriteEngine On
     RewriteBase /
 
-    # Redirect to HTTPS and www (if not already)
-    RewriteCond %{HTTP_HOST} ^autispedia.in$ [NC,OR]
+    RewriteCond %{HTTP_HOST} ^oakbridge.events$ [NC,OR]
     RewriteCond %{HTTPS} off
-    RewriteRule ^(.*)$ https://www.autispedia.in/$1 [NC,L,R=301]
+    RewriteRule ^(.*)$ https://www.oakbridge.events/$1 [NC,L,R=301]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

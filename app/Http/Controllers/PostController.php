@@ -157,7 +157,6 @@ class PostController extends Controller
             'image'             => 'nullable|image|mimes:jpg,png,jpeg,gif,svg,webp|max:2048',
             'excerpt'           => 'nullable',
             'body'              => 'required',
-            'video'              => 'nullable',
             'meta_title'        => 'nullable',
             'meta_description'  => 'nullable',
             'meta_keyword'      => 'nullable',
@@ -175,7 +174,6 @@ class PostController extends Controller
         $post->slug                 = $request->slug;
         $post->excerpt              = $request->excerpt;
         $post->body                 = $request->body;
-        $post->video                 = $request->video;
         $post->user_id              = Auth::user()->id;
         $post->meta_title           = $request->meta_title;
         $post->meta_description     = $request->meta_description;
@@ -214,7 +212,7 @@ class PostController extends Controller
 
         //  $tags = $request->tag;
         //  $post->tags()->sync($tags);
-         return redirect()->route('post.index')->with('success','Post has beeen updated successfully.');
+         return redirect()->route('post.index')->with('success','Post has been updated successfully.');
 
     }
 

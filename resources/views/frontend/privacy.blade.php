@@ -1,254 +1,249 @@
 @extends('frontend.layouts.app')
-@section('title', 'Privacy Policy' . ' ' . '-' . '' . $setting->site_title)
-@section('keywords', $setting->site_keywords)
-@section('description', $setting->site_description)
+@section('title', 'Privacy Policy | India Law, AI & Tech Summit 2025')
+@section('keywords', 'legal tech, law ai, tech summit, legal tech summit, new technology, technology summit, legal tech leaders, india law ai, ai in law, ai legal tech')
+@section('description', 'Read the Privacy Policy of India Law, AI & Tech Summit 2025 to understand how we collect, use, and protect your data. Your privacy and security are our top priorities.')
 @section('content')
 
     <!--====== Start Breadcrumb Section ======-->
-    <section class="page-banner bg_cover p-r z-1 text-white"
-        style="background-image: url(public/assets/images/bg/breadcrumbs-bg.jpg);">
-        <div class="container">
-            <h1 class="page-title">Privacy Policy</h1>
-            <div class="page-breadcrumb">
-                <ul class="breadcrumb-link">
-                    <li><a href="{{ route('home') }}">Home</a></li>
-                    <li class="active">Privacy Policy</li>
-                </ul>
-            </div>
+
+    {{-- <section class="page-title" style="background-image:url({{ asset('public/assets/images/background/5.jpg') }});"> --}}
+    <section class="page-title"
+        style="background-image: url({{ asset('public/assets/images/background/bread2.webp') }}); background-size: cover; background-position: center;">
+
+        <div class="auto-container">
+
+            <h1>Privacy Policy</h1>
+
+            <ul class="bread-crumb clearfix">
+
+                <li><a href="{{ route('home') }}">Home</a></li>
+
+                <li>Privacy Policy</li>
+
+            </ul>
+
         </div>
+
     </section>
     <!--====== End Breadcrumb Section ======-->
 
-    <section class="about-section-shape pt-100 pb-70 p-r z-1">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="about-two_content-box content-box-gap wow fadeInRight mb-50"
-                        style="visibility: visible; animation-name: fadeInRight;">
-                        <div class="section-title mb-30 text-center">
-                            <span class="sub-title"><span class="line line1"></span>Policy</span>
-                            <h2>Privacy Policy</h2>
-                        </div>
-                        <div class="text-justify mb-30">
-                            <h5>Your privacy is important to us</h5>
+    <section class="container py-5">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-4">PRIVACY POLICY – ILATS Website</h1>
 
-                            <p>&nbsp;</p>
+                <h2 class="mt-4">TERMS OF USE</h2>
+                <p>
+                    The India Law, AI & Tech Summit online portal, an initiative of OakBridge Publishing Pvt Ltd,
+                    has been created to provide information to the general public. The documents and information displayed
+                    on this website are for reference purposes only and do not purport to be legal documents.
+                    OakBridge Publishing Pvt Ltd does not warrant the accuracy or completeness of the information, text,
+                    graphics, links or other items contained within the India Law, AI & Tech Summit online portal. As a result of updates
+                    and corrections, the web contents are subject to change regularly.
+                </p>
+                <p>
+                    The information posted on this website could include hypertext links or pointers to information created
+                    and maintained by non-government/private organisations. These links and pointers are solely provided for
+                    your information and convenience. When you select a link to an outside website, you are subject to the
+                    privacy and security policies of the owners/sponsors of the outside website.
+                </p>
+                <p>
+                    These terms and conditions shall be governed by and construed in accordance with the Indian Laws. Any
+                    dispute arising under these terms and conditions shall be subject to the jurisdiction of the courts of
+                    India.
+                </p>
 
-                            <p style="text-align:justify">It is Garage Vaala's policy to respect your privacy regarding any
-                                information we may collect while operating our website. This Privacy Policy applies to
-                                www.garagevaala.com (hereinafter, "us", "we", or "www.garagevaala.com"). We respect your
-                                privacy and are committed to protecting personally identifiable information you may provide
-                                us through the Website. We have adopted this privacy policy ("Privacy Policy") to explain
-                                what information may be collected on our Website, how we use this information, and under
-                                what circumstances we may disclose the information to third parties. This Privacy Policy
-                                applies only to information we collect through the Website and does not apply to our
-                                collection of information from other sources.</p>
+                <h2 class="mt-4">PURPOSE</h2>
+                <p>
+                    India Law, AI & Tech Summit is committed to protecting any personal information that we may receive while you access our
+                    website. We believe it is important for you to know how we treat information about you that we may
+                    receive when you engage with us. This Privacy Policy is devised to help you feel more confident about
+                    the privacy and security of your personal details.
+                    'You' shall mean you, the user of the website and ‘yourself’ interpreted accordingly. 'We' / 'Us' means
+                    India Law, AI & Tech Summit and 'our' is interpreted accordingly. 'Users' means the users of the website collectively
+                    and/or individually as the context allows.
+                </p>
 
-                            <p style="text-align:justify">This Privacy Policy, together with the Terms of service posted on
-                                our Website, set forth the general rules and policies governing your use of our Website.
-                                Depending on your activities when visiting our Website, you may be required to agree to
-                                additional terms of service.</p>
+                <h2 class="mt-4">ELIGIBILITY</h2>
+                <p>
+                    The website is intended for all persons who are interested in learning about India Law, AI & Tech Summit and seeking registration and knowledge related to the festival.
+                </p>
 
-                            <p>&nbsp;</p>
+                <h2 class="mt-4">INFORMATION WE COLLECT</h2>
+                <p>
+                    The India Law, AI & Tech Summit website does not automatically capture any specific personal information from you, (like
+                    name, phone number or e-mail address), that allows us to identify you individually. If the Portal
+                    requests you to provide personal information, you will be informed of the particular purposes for which
+                    the information is gathered and adequate security measures will be taken to protect your personal
+                    information. We receive information that:
+                </p>
+                <ul>
+                    <li>you directly provide to us such as personal information you provide when you visit the website, and
+                    </li>
+                    <li>information that is passively or automatically collected from you, such as information collected
+                        from the browser or device you used to access our website or services. In this Privacy Policy, we
+                        refer to all this as the ‘User Information’.</li>
+                </ul>
 
-                            <h5 style="text-align:justify">1. Website Visitors</h5>
+                <h3 class="mt-4">Information You Provide To Us</h3>
+                <p>
+                    There are portions of this website where we may need to collect personal information from you for a
+                    specific purpose. For e.g., you can register, apply for partner services, and seek out enabler connects.
+                    In the course of these various offerings, we often seek to collect from you various forms of
+                    information, such as name, address, e-mail address, telephone number and business details.
+                </p>
 
-                            <p>&nbsp;</p>
+                <h3 class="mt-4">Information That is Automatically Collected</h3>
+                <p>
+                    In general, you can visit this website without telling us who you are or revealing any information about
+                    yourself. We gather certain information about the User, such as Internet protocol (IP) addresses, domain
+                    name, browser type, operating system, the date and time of the visit and the pages visited. We make no
+                    attempt to link these addresses with the identity of individuals visiting our site unless an attempt to
+                    damage the site has been detected.
+                </p>
+                <p>
+                    We do not automatically capture any specific personal information from you, (like name, phone number or
+                    e-mail address), that allows us to identify you individually. If the Portal requests you to provide
+                    personal information, you will be informed of the particular purposes for which the information is
+                    gathered and adequate security measures will be taken to protect your personal information.
+                </p>
 
-                            <p style="text-align:justify">Like most website operators, Garage Vaala collects
-                                non-personally-identifying information of the sort that web browsers and servers typically
-                                make available, such as the browser type, language preference, referring site, and the date
-                                and time of each visitor request. Garage Vaala's purpose in collecting non-personally
-                                identifying information is to better understand how Garage Vaala's visitors use its website.
-                                From time to time, Garage Vaala may release non-personally-identifying information in the
-                                aggregate, e.g., by publishing a report on trends in the usage of its website.</p>
+                <h2 class="mt-4">HOW WE MAY USE YOUR INFORMATION</h2>
+                <p>
+                    By entering your user information, You accept that we may retain your user information and that it may
+                    be held by us or any partners that process it on our behalf. We, along with our partners, shall be
+                    entitled to use your user information for the following purposes:
+                </p>
+                <ul>
+                    <li>Provide and communicate with you about feedback, follow up on programs you’ve applied for or queries
+                        submitted to the team,</li>
+                    <li>Fulfil your requests regarding the services, including without limitation responding to your
+                        inquiries, communicating with you about our products or services that we believe may be of interest
+                        to you,</li>
+                    <li>Enforce the legal terms (including without limitation our policies and terms of service) that govern
+                        your use of our services, and/or for the purposes for which you provided the information,</li>
+                    <li>Provide technical support for the website or in connection with our services and offerings,</li>
+                    <li>Prevent fraud or potentially illegal activities (including, without limitation, copyright
+                        infringement) on or through our website or services,</li>
+                    <li>Protect the safety of our other subscribers or users,</li>
+                    <li>Perform analysis regarding how you use the services or any part thereof such as market research,
+                        including statistical analysis of user behaviour which we may disclose to third parties in
+                        depersonalised, aggregated form,</li>
+                    <li>In order to enable us to comply with any requirements imposed on us by law,</li>
+                    <li>In order to send you periodic communications (this may include e-mail), about features, products and
+                        services, events and special offers. Such communications from us may include the promotion of
+                        programs being organized by third parties on our website.</li>
+                </ul>
 
-                            <p style="text-align:justify">Garage Vaala also collects potentially personally-identifying
-                                information like Internet Protocol (IP) addresses for logged in users and for users leaving
-                                comments on https://www.garagevaala.com blog posts. Garage Vaala only discloses logged in
-                                user and commenter IP addresses under the same circumstances that it uses and discloses
-                                personally-identifying information as described below.</p>
+                <h2 class="mt-4">COOKIES AND WEB BEACONS</h2>
+                <p>
+                    You should be aware that information and data may be automatically collected through the use of cookies
+                    or web beacons or similar tracking technologies. "Cookies" are text files placed in your computer
+                    browser that store basic information that a website can use to recognise repeat site visits and as an
+                    example, recall your name if this has been previously supplied. We may use this to understand your
+                    service and internet usage, observe behaviour and compile aggregate data in order to improve or
+                    customize our products, services offerings or the website, target the advertising and assess the general
+                    effectiveness of such advertising. Cookies do not attach to your system and damage your files. If you do
+                    not want information collected through the use of cookies, there is a simple procedure in most browsers
+                    that allows you to deny or accept the cookie feature. Note, however, that "personalised" services may be
+                    affected if the cookie option is disabled.
+                </p>
+                <p>
+                    We and our partners may also use "web beacons" or clear GIFs, or similar technologies, which are small
+                    pieces of code placed on our Website or in an email, to monitor the behaviour and collect data about the
+                    visitors viewing Our Website or email. For example, web beacons may be used to count the users who visit
+                    a web page or to deliver a cookie to the browser of a visitor viewing that website. Web beacons may also
+                    be used to provide information on the effectiveness of our email campaigns (e.g., open rates, clicks,
+                    forwards, etc.).
+                </p>
 
-                            <p>&nbsp;</p>
+                <h2 class="mt-4">SECURITY AND DATA STORING</h2>
+                <p>
+                    Security is very important to us. All security procedures are in place to protect the confidentiality,
+                    integrity and availability of your user information. We maintain strict physical, electronic, and
+                    administrative safeguards to protect your user information including your personal information from
+                    unauthorized or inappropriate access.
+                </p>
+                <p>
+                    We follow generally accepted standards to collect, store and protect personal data, including the use of
+                    encryption. We retain personal data for as long as it is needed to provide the services you have
+                    requested, and thereafter for legal and service purposes. These may include retention periods mandated
+                    by legal, contractual, or similar obligations; for resolving, preserving, enforcing or defending our
+                    legal and contractual rights; needed to maintain adequate and accurate business and financial records or
+                    how you access, update, or delete your data etc.
+                </p>
 
-                            <h5 style="text-align:justify">2. Personally-Identifying Information</h5>
+                <h2 class="mt-4">INFORMATION SHARING AND DISCLOSURES</h2>
+                <p>
+                    Generally accepted best practices shall be used to protect any information provided to this website to
+                    protect from loss, misuse, unauthorized access or disclosure, alteration, or destruction. We may
+                    disclose the user information as follows:
+                </p>
+                <ul>
+                    <li>To service providers or partners that we have engaged to perform business-related functions on our
+                        behalf. This may include service providers that:</li>
+                    <ul>
+                        <li>Conduct research and analytics.</li>
+                        <li>Create content.</li>
+                        <li>Provide customer, technical or operational support.</li>
+                        <li>Conduct or support marketing (such as email or advertising platforms).</li>
+                        <li>Fulfil orders and user requests.</li>
+                        <li>Host our services, forums and online communities.</li>
+                        <li>Administer the website.</li>
+                        <li>Maintain databases.</li>
+                        <li>Otherwise, support our services.</li>
+                    </ul>
+                    <li>Any answers submitted by you for a specific program or innovation challenge will be shared with the
+                        partners who are a part of that specific innovation hunt.</li>
+                    <li>In response to legal process, for example, in response to a court order or a subpoena, a law
+                        enforcement or government agency's request or similar request.</li>
+                    <li>With third parties in order to investigate, prevent, or take action (in our sole discretion)
+                        regarding potentially illegal activities, suspected fraud, situations involving potential threats to
+                        any person, us, or the website, or violations of our policies, the law or our terms of use, to
+                        verify or enforce compliance with the policies governing our website.</li>
+                    <li>We may share the user information with our affiliates or group companies, so they can provide,
+                        improve and communicate with you about their own, or their marketing partners’ products and
+                        services.</li>
+                    <li>We reserve the right to disclose and transfer the user information outside India. We will comply
+                        with all relevant Data Protection legislation in relation to the period for which we retain any user
+                        information.</li>
+                </ul>
 
-                            <p>&nbsp;</p>
+                <h2 class="mt-4">LINKED SERVICES</h2>
+                <p>
+                    Our website may contain links to or integrations with other services such as Facebook, X (formerly
+                    Twitter), LinkedIn, and other media services and platforms whose information practices may be different
+                    from ours. Visitors should consult these other services' privacy notices as we have no control over
+                    information that is submitted to, or collected by these third parties.
+                </p>
 
-                            <p style="text-align:justify">Certain visitors to Garage Vaala's websites choose to interact
-                                with Garage Vaala in ways that require Garage Vaala to gather personally-identifying
-                                information. The amount and type of information that Garage Vaala gathers depends on the
-                                nature of the interaction. For example, we ask visitors who leave a comment at
-                                https://www.garagevaala.com to provide a username and email address.</p>
+                <h2 class="mt-4">Acceptance of the Policy</h2>
+                <p>
+                    By visiting our website, signing up or logging into the website, and uploading information on our
+                    website; you acknowledge and unconditionally accept the policy. If you do not agree with this Policy, do
+                    not use our website and services or provide here any of your personal data.
+                </p>
 
-                            <p>&nbsp;</p>
+                <h2 class="mt-4">GOVERNING LAW AND JURISDICTION</h2>
+                <p>
+                    This Privacy Policy is governed by and operated in accordance with the laws of India. If any of the
+                    parties wish to seek legal recourse, they may do so by using the courts of law in New Delhi.
+                </p>
 
-                            <h5 style="text-align:justify">3. Security</h5>
+                <h2 class="mt-4">GRIEVANCE REDRESSAL</h2>
+                <p>
+                    If you have any grievances, kindly address them to Bhupendra Yadav, Grievance Redressal Officer, at: <a
+                        href="mailto:bhupendra.y@oakbridge.in">bhupendra.y@oakbridge.in</a>
+                </p>
 
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">The security of your Personal Information is important to us, but
-                                remember that no method of transmission over the Internet, or method of electronic storage
-                                is 100% secure. While we strive to use commercially acceptable means to protect your
-                                Personal Information, we cannot guarantee its absolute security.</p>
-
-                            <p>&nbsp;</p>
-
-                            <h5 style="text-align:justify">4. Advertisements</h5>
-
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">Ads appearing on our website may be delivered to users by
-                                advertising partners, who may set cookies. These cookies allow the ad server to recognize
-                                your computer each time they send you an online advertisement to compile information about
-                                you or others who use your computer. This information allows ad networks to, among other
-                                things, deliver targeted advertisements that they believe will be of most interest to you.
-                                This Privacy Policy covers the use of cookies by Garage Vaala and does not cover the use of
-                                cookies by any advertisers.</p>
-
-                            <p>&nbsp;</p>
-
-                            <h5 style="text-align:justify">5. Links To External Sites</h5>
-
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">Our Service may contain links to external sites that are not
-                                operated by us. If you click on a third party link, you will be directed to that third
-                                party's site. We strongly advise you to review the Privacy Policy and terms of service of
-                                every site you visit.<br>
-                                We have no control over, and assume no responsibility for the content, privacy policies or
-                                practices of any third party sites, products or services.</p>
-
-                            <p>&nbsp;</p>
-
-                            <h5 style="text-align:justify">6. Garage Vaala uses Google AdWords for remarketing</h5>
-
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">Garage Vaala uses the remarketing services to advertise on third
-                                party websites (including Google) to previous visitors to our site. It could mean that we
-                                advertise to previous visitors who haven't completed a task on our site, for example using
-                                the contact form to make an enquiry. This could be in the form of an advertisement on the
-                                Google search results page, or a site in the Google Display Network. Third-party vendors,
-                                including Google, use cookies to serve ads based on someone's past visits. Of course, any
-                                data collected will be used in accordance with our own privacy policy and Google's privacy
-                                policy.<br>
-                                You can set preferences for how Google advertises to you using the Google Ad Preferences
-                                page, and if you want to you can opt out of interest-based advertising entirely by cookie
-                                settings or permanently using a browser plugin.</p>
-
-                            <p>&nbsp;</p>
-
-                            <h5 style="text-align:justify">7. Protection of Certain Personally-Identifying Information</h5>
-
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">Garage Vaala discloses potentially personally-identifying and
-                                personally-identifying information only to those of its employees, contractors and
-                                affiliated organizations that (i) need to know that information in order to process it on
-                                Garage Vaala's behalf or to provide services available at Garage Vaala's website, and (ii)
-                                that have agreed not to disclose it to others. Some of those employees, contractors and
-                                affiliated organizations may be located outside of your home country; by using Garage
-                                Vaala's website, you consent to the transfer of such information to them. Garage Vaala will
-                                not rent or sell potentially personally-identifying and personally-identifying information
-                                to anyone. Other than to its employees, contractors and affiliated organizations, as
-                                described above, Garage Vaala discloses potentially personally-identifying and
-                                personally-identifying information only in response to a subpoena, court order or other
-                                governmental request, or when Garage Vaala believes in good faith that disclosure is
-                                reasonably necessary to protect the property or rights of Garage Vaala, third parties or the
-                                public at large.<br>
-                                If you are a registered user of https://www.garagevaala.com and have supplied your email
-                                address, Garage Vaala may occasionally send you an email to tell you about new features,
-                                solicit your feedback, or just keep you up to date with what's going on with Garage Vaala
-                                and our products. We primarily use our blog to communicate this type of information, so we
-                                expect to keep this type of email to a minimum. If you send us a request (for example via a
-                                support email or via one of our feedback mechanisms), we reserve the right to publish it in
-                                order to help us clarify or respond to your request or to help us support other users.
-                                Garage Vaala takes all measures reasonably necessary to protect against the unauthorized
-                                access, use, alteration or destruction of potentially personally-identifying and
-                                personally-identifying information.</p>
-
-                            <p>&nbsp;</p>
-
-                            <h5 style="text-align:justify">8. Aggregated Statistics</h5>
-
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">Garage Vaala may collect statistics about the behavior of visitors
-                                to its website. Garage Vaala may display this information publicly or provide it to others.
-                                However, Garage Vaala does not disclose your personally-identifying information.</p>
-
-                            <p>&nbsp;</p>
-
-                            <h5 style="text-align:justify">9. Cookies</h5>
-
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">To enrich and perfect your online experience, Garage Vaala uses
-                                "Cookies", similar technologies and services provided by others to display personalized
-                                content, appropriate advertising and store your preferences on your computer.<br>
-                                A cookie is a string of information that a website stores on a visitor's computer, and that
-                                the visitor's browser provides to the website each time the visitor returns. Garage Vaala
-                                uses cookies to help Garage Vaala identify and track visitors, their usage of
-                                https://www.garagevaala.com, and their website access preferences. Garage Vaala visitors who
-                                do not wish to have cookies placed on their computers should set their browsers to refuse
-                                cookies before using Garage Vaala's websites, with the drawback that certain features of
-                                Garage Vaala's websites may not function properly without the aid of cookies.<br>
-                                By continuing to navigate our website without changing your cookie settings, you hereby
-                                acknowledge and agree to Garage Vaala's use of cookies.</p>
-
-                            <p>&nbsp;</p>
-
-                            <h5 style="text-align:justify">10. E-commerce</h5>
-
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">Those who engage in transactions with Garage Vaala – by purchasing
-                                Garage Vaala's services or products, are asked to provide additional information, including
-                                as necessary the personal and financial information required to process those transactions.
-                                In each case, Garage Vaala collects such information only insofar as is necessary or
-                                appropriate to fulfill the purpose of the visitor's interaction with Garage Vaala. Garage
-                                Vaala does not disclose personally-identifying information other than as described below.
-                                And visitors can always refuse to supply personally-identifying information, with the caveat
-                                that it may prevent them from engaging in certain website-related activities.</p>
-
-                            <p>&nbsp;</p>
-
-                            <h5 style="text-align:justify">11. Business Transfers</h5>
-
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">If Garage Vaala, or substantially all of its assets, were
-                                acquired, or in the unlikely event that Garage Vaala goes out of business or enters
-                                bankruptcy, user information would be one of the assets that is transferred or acquired by a
-                                third party. You acknowledge that such transfers may occur, and that any acquirer of Garage
-                                Vaala may continue to use your personal information as set forth in this policy.</p>
-
-                            <p>&nbsp;</p>
-
-                            <h5 style="text-align:justify">12. Privacy Policy Changes</h5>
-
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">Although most changes are likely to be minor, Garage Vaala may
-                                change its Privacy Policy from time to time, and in Garage Vaala's sole discretion. Garage
-                                Vaala encourages visitors to frequently check this page for any changes to its Privacy
-                                Policy. Your continued use of this site after any change in this Privacy Policy will
-                                constitute your acceptance of such change.</p>
-
-                            <p>&nbsp;</p>
-
-                            <h5 style="text-align:justify">13. Contact Information &amp; Credit</h5>
-
-                            <p>&nbsp;</p>
-
-                            <p style="text-align:justify">If you have any questions about our Privacy Policy, please contact
-                                us via email info@garagevaala.com</p>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="mt-4">UPDATES</h2>
+                <p>
+                    We may change this privacy policy from time to time and You should check these regularly. Your use of
+                    the Website will be deemed an acceptance of the privacy policy existing at that time.
+                </p>
             </div>
         </div>
     </section>
+
 
 @stop

@@ -3,8 +3,16 @@
 @section('title', 'Create Product')
 
 @section('content_header')
-    <div class="px-3">
-        <a href="{{ route('service.index') }}" class="btn btn-primary">Back</a>
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Add Product</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                <li class="breadcrumb-item active">Add Product</li>
+            </ol>
+        </div>
     </div>
 @stop
 
@@ -25,11 +33,11 @@
     <div class="">
         <form action="{{ route('service.store') }}" method="post" enctype="multipart/form-data">
             @csrf
-            <div class="row px-3 py-3">
+            <div class="row">
                 <div class="col-md-8">
                     <div class="card card-light">
                         <div class="card-header">
-                            <h3 class="card-title">Add Job
+                            <h3 class="card-title">Add Product
                             </h3>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
@@ -51,7 +59,7 @@
                             <div class="form-group">
                                 <label for="inputStatus">Slug
                                 </label>
-                                <small>&nbsp;&nbsp;Unique url of the Job
+                                <small>&nbsp;&nbsp;Unique url of the Product
                                 </small>
                                 <input class="form-control bg-light @error('slug') is-invalid @enderror" type="text"
                                     id="slug" name="slug" placeholder="slug here.." value="{{ old('slug') }}">
@@ -60,10 +68,10 @@
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label for="">Job Description
+                                <label for="">Product Description
                                 </label>
 
-                                <textarea style="height: 600px;" id="editor" name="body"></textarea>
+                                <textarea style="height: 600px;" id="summernote" name="body" value="{{ old('body') }}"> {{ old('body') }}</textarea>
                                 @error('body')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -107,7 +115,8 @@
                         </div>
                         <div class="card-body">
                             <div class="form-group">
-                                <textarea class="form-control" name="excerpt" id="" value="{{ old('excerpt') }}" cols="30" rows="5">{{ old('excerpt') }}</textarea>
+                                <textarea class="form-control" name="excerpt" id="" value="{{ old('excerpt') }}" cols="30"
+                                    rows="5">{{ old('excerpt') }}</textarea>
                             </div>
                         </div>
 
@@ -131,7 +140,7 @@
                             <div class="form-group">
                                 <label for="">SEO Title
                                 </label>
-                                <input placeholder="Job title here for seo..." type="text" class="form-control"
+                                <input placeholder="Product title here for seo..." type="text" class="form-control"
                                     name="meta_title" id="" value="{{ old('meta_title') }}">
                             </div>
                         </div>
@@ -139,7 +148,7 @@
                             <div class="form-group">
                                 <label for="">SEO Description
                                 </label>
-                                <textarea placeholder="Job description here for seo..." class="form-control" name="meta_description" id=""
+                                <textarea placeholder="Product description here for seo..." class="form-control" name="meta_description" id=""
                                     cols="0" rows="4" value="{{ old('meta_description') }}">{{ old('meta_description') }}</textarea>
                             </div>
                         </div>
@@ -159,7 +168,7 @@
                     <div class="sticky-top">
                         <div class="card card-primary sticky-bottom">
                             <div class="card-header">
-                                <h3 class="card-title">Job Details
+                                <h3 class="card-title">Product Details
                                 </h3>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse"
@@ -170,10 +179,10 @@
                                 </div>
                             </div>
                             <div class="card-body pb-0">
-                                <div class="form-group select2-dark">
+                                {{-- <div class="form-group select2-dark">
                                     <label>Category
                                     </label>
-                                    <small>&nbsp;&nbsp;Select category for Job</small>
+                                    <small>&nbsp;&nbsp;Select category for Product</small>
 
                                     <select id="category" name="scategory[]" class="select2" multiple=""
                                         data-placeholder="Search Category" style="width: 100%;" required>
@@ -193,7 +202,7 @@
                                             @endforeach
                                         @endif
                                     </select>
-                                </div>
+                                </div> --}}
                                 <div class="form-group">
                                     <label for="inputStatus">Status
                                     </label>
@@ -219,7 +228,7 @@
                                         </small>
                                     </div>
                                 </div> --}}
-                                <div class="form-group">
+                                {{-- <div class="form-group">
                                     <div class="custom-control custom-switch">
                                         <input type="checkbox" class="custom-control-input" id="featured"
                                             name="featured" value="1" {{ old('featured') == 1 ? 'checked' : '' }}>
@@ -227,7 +236,7 @@
                                         </label><br>
                                         <small>Featured will be shown on home page on priorty</small>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="form-group pt-0 pb-0 text-right">
                                     <button type="submit" class="btn btn-primary">Publish
                                     </button>
@@ -272,14 +281,102 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="/public/css/admin_custom.css">
-    <link href="{{ asset('public/ckeditor/plugins/codesnippet/lib/highlight/styles/default.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+    <style>
+        /* summer note */
+        .modal-header .close,
+        .modal-header .mailbox-attachment-close {
+            padding: 0rem;
+            margin: 0 auto;
+        }
+
+        .modal-header {
+            display: -ms-flexbox;
+            display: block;
+            -ms-flex-align: start;
+            align-items: flex-start;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            border-top-left-radius: calc(0.3rem - 1px);
+            border-top-right-radius: calc(0.3rem - 1px);
+        }
+    </style>
 
 @stop
 
 @section('js')
 
-    <script src="{{ asset('public/ckeditor/ckeditor.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+
+    {{-- summer note --}}
+    <script>
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                height: 400,
+
+                callbacks: {
+                    onImageUpload: function(files) {
+                        uploadImage(files[0]);
+                    },
+                    onMediaDelete: function(target) {
+                        deleteImage(target[0].src);
+                        if (target[0].nodeName === 'VIDEO') {
+                            // Check if the deleted element is a video
+                            target.remove(); // Remove the video element
+                        }
+                    },
+
+                }
+            });
+
+            function uploadImage(file) {
+                let formData = new FormData();
+                formData.append('image', file);
+
+                $.ajax({
+                    url: '{{ route('summer.upload.image') }}',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        let imageUrl = response.url;
+                        $('#summernote').summernote('editor.insertImage', imageUrl);
+                    },
+                    error: function(error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+            function deleteImage(imageSrc) {
+                console.log('Deleting image with source URL:', imageSrc);
+
+                $.ajax({
+                    url: '{{ route('summer.delete.image') }}',
+                    type: 'POST',
+                    data: {
+                        imageSrc: imageSrc
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.log(response.message);
+                    },
+                    error: function(error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+        });
+    </script>
 
     {{-- view image while uploading --}}
     <script>
@@ -314,16 +411,6 @@
         });
     </script>
 
-
-    {{-- ck editor image updoad --}}
-    <script>
-        CKEDITOR.replace('editor', {
-            filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-            filebrowserUploadMethod: "form",
-            height: 500,
-            allowedContent: true
-        });
-    </script>
 
     <script>
         // In your Javascript (external .js resource or <script> tag)

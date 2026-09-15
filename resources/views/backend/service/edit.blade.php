@@ -1,22 +1,25 @@
 @extends('adminlte::page')
 
-@section('title', 'Edit Product')
+@section('title', 'Edit Event')
 
 @section('content_header')
-    <div class="d-flex justify-content-between px-md-3 align-items-center">
-        <div class="pt-3 px-2">
-            <a href="{{ route('service.index') }}" class="btn btn-primary">Back</a>
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Edit Event</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                <li class="breadcrumb-item active">Edit Event</li>
+            </ol>
         </div>
     </div>
 @stop
-@section('css')
-    <link rel="stylesheet" href="/css/admin_custom.css">
-    <link href="{{ asset('ckeditor/plugins/codesnippet/lib/highlight/styles/default.css') }}" rel="stylesheet">
-@stop
+
 
 @section('content')
 
-    <div class="container-fluid mt-n3">
+    <div class="container-fluid">
         @if (session()->has('success'))
             <div class="alert alert-dismissable alert-success">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -43,11 +46,11 @@
         <form action="{{ route('service.update', $service->id) }}" method="post" enctype="multipart/form-data">
             {{ csrf_field() }}
             @method('PUT')
-            <div class="row px-3 py-3">
+            <div class="row ">
                 <div class="col-md-8">
                     <div class="card card-light">
                         <div class="card-header">
-                            <h3 class="card-title">Edit Job
+                            <h3 class="card-title">Edit Event
                             </h3>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
@@ -78,9 +81,9 @@
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label for="">Service Description
+                                <label for="">Eventd Description
                                 </label>
-                                <textarea style="height: 600px;" id="editor" name="body" value="{{ $service->body }}" name="body" required />{{ $service->body }}</textarea>
+                                <textarea style="height: 600px;" id="summernote" name="body" value="{{ $service->body }}" name="body" required />{{ $service->body }}</textarea>
                                 @error('body')
                                     <li class="text-danger">{{ $message }}</li>
                                 @enderror
@@ -131,6 +134,220 @@
 
                     </div>
                     <!-- /.card -->
+                    {{-- <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Timeline</h3>
+                            <small>&nbsp;&nbsp;Timeline entries</small>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body pt-3 pb-0">
+                            <div>
+                                <label>From</label>
+                                <input type="text" class="form-control" id="timelineFrom" />
+                            </div>
+                            <div>
+                                <label>To</label>
+                                <input type="text" class="form-control" id="timelineTo" />
+                            </div>
+                            <div>
+                                <label>Title</label>
+                                <input type="text" class="form-control" id="timelineTitle" />
+                            </div>
+                            <div>
+                                <label>Subheadline</label>
+                                <input type="text" class="form-control" id="timelineSubheadline" />
+                            </div>
+                            <div>
+                                <label>Body</label>
+                                <textarea class="form-control" rows="4" id="timelineBody"></textarea>
+                            </div>
+                            <button class="btn btn-primary btn-sm my-3" type="button" id="addTimeline">Add Timeline
+                                Entry</button>
+
+                            <div id="timelineList">
+                                <!-- Existing timeline entries, if validation fails -->
+                                @if (old('timeline'))
+                                    @foreach (json_decode(old('timeline')) as $key => $timeline)
+                                        <div class="timeline-item">
+                                            <strong>{{ $timeline->title }}</strong>
+                                            <p>{{ $timeline->body }}</p>
+                                            <button type="button" class="removeTimeline btn btn-danger btn-sm mb-3"
+                                                data-index="{{ $key }}">Remove</button>
+                                        </div>
+                                        <hr>
+                                    @endforeach
+                                @endif
+                            </div>
+
+                            <!-- Hidden input to store the final JSON object -->
+                            <input type="hidden" name="timeline" id="timelineData" />
+                        </div>
+                    </div> --}}
+
+
+                    {{-- <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Timeline</h3>
+                            <small>&nbsp;&nbsp;Timeline entries</small>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body pt-3 pb-0">
+                            <div>
+                                <label>From</label>
+                                <input type="text" class="form-control" id="timelineFrom" />
+                            </div>
+                            <div>
+                                <label>To</label>
+                                <input type="text" class="form-control" id="timelineTo" />
+                            </div>
+                            <div>
+                                <label>Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="timelineTitle" />
+                            </div>
+                            <div>
+                                <label>Subheadline</label>
+                                <input type="text" class="form-control" id="timelineSubheadline" />
+                            </div>
+                            <div>
+                                <label>Body <span class="text-danger">*</span></label>
+                                <textarea class="form-control" rows="4" id="timelineBody"></textarea>
+                            </div>
+                            <button class="btn btn-primary btn-sm my-3" type="button" id="addTimeline">Add Timeline
+                                Entry</button>
+
+                            <div id="timelineList">
+                                <!-- Existing timeline entries, if validation fails -->
+                                @if (old('timeline'))
+                                    @foreach (json_decode(old('timeline')) as $key => $timeline)
+                                        <div class="timeline-item">
+                                            <strong>{{ $timeline->title }}</strong>
+                                            <em>{{ $timeline->subheadline }}</em>
+                                            <p><strong>From:</strong> {{ $timeline->from }}</p>
+                                            <p><strong>To:</strong> {{ $timeline->to }}</p>
+                                            <p><strong>Body:</strong> {{ $timeline->body }}</p>
+                                            <button type="button" class="removeTimeline btn btn-danger btn-sm mb-3"
+                                                data-index="{{ $key }}">Remove</button>
+                                        </div>
+                                        <hr>
+                                    @endforeach
+                                @endif
+                            </div>
+
+                            <!-- Hidden input to store the final JSON object -->
+                            <input type="hidden" name="timeline" id="timelineData" />
+                        </div>
+                    </div> --}}
+
+
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Timeline</h3>
+                            <small>&nbsp;&nbsp;Timeline entries</small>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body pt-3 pb-0">
+                            <div class="mb-3">
+                                <label class="mb-0">From</label>
+                                <input type="text" class="form-control" id="timelineFrom" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="mb-0">To</label>
+                                <input type="text" class="form-control" id="timelineTo" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="mb-0">Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="timelineTitle" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="mb-0">Subheadline</label>
+                                <input type="text" class="form-control" id="timelineSubheadline" />
+                            </div>
+                            <div class="mb-2">
+                                <label class="mb-0">Body <span class="text-danger">*</span></label>
+                                <textarea class="form-control" rows="4" id="timelineBody"></textarea>
+                            </div>
+                            <button class="btn btn-primary btn-sm my-3" type="button" id="addTimeline">Add Timeline
+                                Entry</button>
+
+                            <div id="timelineList">
+                                <!-- Existing timeline entries, if validation fails -->
+                                @if (old('timeline'))
+                                    @foreach (json_decode(old('timeline')) as $key => $timeline)
+                                        <div class="timeline-item">
+                                            <strong>{{ $timeline->title }}</strong>
+                                            <em>{{ $timeline->subheadline }}</em>
+                                            <p><strong>From:</strong> {{ $timeline->from }}</p>
+                                            <p><strong>To:</strong> {{ $timeline->to }}</p>
+                                            <p><strong>Body:</strong> {{ $timeline->body }}</p>
+                                            <button type="button" class="removeTimeline btn btn-danger btn-sm mb-3"
+                                                data-index="{{ $key }}">Remove</button>
+                                            <button type="button" class="editTimeline btn btn-primary btn-sm mb-3 ml-2"
+                                                data-index="{{ $key }}">Edit</button>
+                                        </div>
+                                        <hr>
+                                    @endforeach
+                                @endif
+                            </div>
+
+                            <!-- Hidden input to store the final JSON object -->
+                            <input type="hidden" name="timeline" id="timelineData" />
+                        </div>
+                    </div>
+
+                    <!-- Modal for Editing Timeline Entry -->
+                    <!-- Modal for Editing Timeline Entry -->
+                    <div class="modal fade" id="editTimelineModal" tabindex="-1"
+                        aria-labelledby="editTimelineModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header p-2">
+                                    <h5 class="modal-title" id="editTimelineModalLabel">Edit Timeline Entry</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div>
+                                        <label>From</label>
+                                        <input type="text" class="form-control" id="editTimelineFrom" />
+                                    </div>
+                                    <div>
+                                        <label>To</label>
+                                        <input type="text" class="form-control" id="editTimelineTo" />
+                                    </div>
+                                    <div>
+                                        <label>Title <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="editTimelineTitle" />
+                                    </div>
+                                    <div>
+                                        <label>Subheadline</label>
+                                        <input type="text" class="form-control" id="editTimelineSubheadline" />
+                                    </div>
+                                    <div>
+                                        <label>Body <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" rows="4" id="editTimelineBody"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" id="updateTimeline">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- seo --}}
                     <div class="card card-light">
                         <div class="card-header">
@@ -139,7 +356,8 @@
                             <small>&nbsp;&nbsp;Search engine details
                             </small>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"
+                                    title="Collapse">
                                     <i class="fas fa-minus" aria-hidden="true">
                                     </i>
                                 </button>
@@ -191,7 +409,7 @@
                     <div class="sticky-top">
                         <div class="card card-info sticky-bottom">
                             <div class="card-header">
-                                <h3 class="card-title">Service Details
+                                <h3 class="card-title">Event Details
                                 </h3>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse"
@@ -202,7 +420,7 @@
                                 </div>
                             </div>
                             <div class="card-body pb-0">
-                                <div class="form-group select2-dark">
+                                {{-- <div class="form-group select2-dark">
                                     <label>Category
                                     </label>
                                     <small>&nbsp;&nbsp;</small>
@@ -228,7 +446,15 @@
                                             @endforeach
                                         @endif
                                     </select>
+                                </div> --}}
+
+                                <div class="form-group">
+                                    <label for="event_datetime">Event Date and Time</label>
+                                    <input type="datetime-local" id="event_datetime" name="date" class="form-control"
+                                        value="{{ \Carbon\Carbon::parse($service->date)->format('Y-m-d\TH:i') }}"
+                                        required>
                                 </div>
+
                                 <div class="form-group">
                                     <label for="inputStatus">Status
                                     </label>
@@ -254,7 +480,7 @@
                                         </small>
                                     </div>
                                 </div> --}}
-                                <div class="form-group">
+                                {{-- <div class="form-group">
                                     <div class="custom-control custom-switch">
                                         <input type="checkbox" class="custom-control-input" id="featured"
                                             name="featured" value="1"
@@ -264,10 +490,10 @@
                                         <br>
                                         <small>Featured will be shown on home page on priorty</small>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="form-group pt-0 pb-0 text-right">
                                     <button onclick="return confirm('Are you sure you want to update this Service?');"
-                                        type="submit" class="btn btn-primary">Publish
+                                        type="submit" class="btn btn-danger">Update
                                     </button>
                                 </div>
                             </div>
@@ -292,7 +518,7 @@
                                     <input name="image" accept="image/*" type="file" id="imgInp">
                                     @if ($service->image)
                                         <img style="width: 175px; margin-top:10px; border:1px solid black;" id="blah"
-                                            src="{{ asset('public/uploads/images/Service/' . $service->image) }}"
+                                            src="{{ asset('public/uploads/images/service/' . $service->image) }}"
                                             alt="your image">
                                     @else
                                         <img style="width: 175px; margin-top:10px; border:1px solid black;" id="blah"
@@ -312,13 +538,101 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="/public/css/admin_custom.css">
-    <link href="{{ asset('public/ckeditor/plugins/codesnippet/lib/highlight/styles/default.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+    {{-- <style>
+        /* summer note */
+        .modal-header .close,
+        .modal-header .mailbox-attachment-close {
+            padding: 0rem;
+            margin: 0 auto;
+        }
+
+        .modal-header {
+            display: -ms-flexbox;
+            display: block;
+            -ms-flex-align: start;
+            align-items: flex-start;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            border-top-left-radius: calc(0.3rem - 1px);
+            border-top-right-radius: calc(0.3rem - 1px);
+        }
+    </style> --}}
 
 @stop
 
 @section('js')
-    <script src="{{ asset('public/ckeditor/ckeditor.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+
+    {{-- summer note --}}
+    <script>
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                height: 400,
+
+                callbacks: {
+                    onImageUpload: function(files) {
+                        uploadImage(files[0]);
+                    },
+                    onMediaDelete: function(target) {
+                        deleteImage(target[0].src);
+                        if (target[0].nodeName === 'VIDEO') {
+                            // Check if the deleted element is a video
+                            target.remove(); // Remove the video element
+                        }
+                    },
+
+                }
+            });
+
+            function uploadImage(file) {
+                let formData = new FormData();
+                formData.append('image', file);
+
+                $.ajax({
+                    url: '{{ route('summer.upload.image') }}',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        let imageUrl = response.url;
+                        $('#summernote').summernote('editor.insertImage', imageUrl);
+                    },
+                    error: function(error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+            function deleteImage(imageSrc) {
+                console.log('Deleting image with source URL:', imageSrc);
+
+                $.ajax({
+                    url: '{{ route('summer.delete.image') }}',
+                    type: 'POST',
+                    data: {
+                        imageSrc: imageSrc
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.log(response.message);
+                    },
+                    error: function(error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+        });
+    </script>
     {{-- view image while uploading --}}
     <script>
         imgInp.onchange = evt => {
@@ -363,53 +677,314 @@
     </script>
 
 
-    {{-- ck editor image updoad --}}
-    {{-- ck editor image updoad --}}
-    <script>
-        CKEDITOR.replace('editor', {
-            filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-            filebrowserUploadMethod: "form",
-            height: 500,
-            allowedContent: true,
-            removePlugins: 'iframe',
+
+    {{-- <script>
+        let timelineArray = [];
+
+        // Populate the timelineArray from old data in the hidden input
+        @if (old('timeline'))
+            timelineArray = @json(json_decode(old('timeline')));
+        @endif
+
+        // Display old timeline data
+        function displayTimeline() {
+            $('#timelineList').empty(); // Clear existing timeline items
+            timelineArray.forEach((timeline, idx) => {
+                let timelineHtml = `<div class="timeline-item card p-2">
+            <strong>${timeline.title || 'No Title'}</strong><br>
+            <em>${timeline.subheadline || 'No Subheadline'}</em><br>
+            <p><strong>From:</strong> ${timeline.from || 'No From Time'}</p>
+            <p><strong>To:</strong> ${timeline.to || 'No To Time'}</p>
+            <p><strong>Body:</strong> ${timeline.body || 'No Body'}</p>
+            <button type="button" class="removeTimeline btn btn-danger btn-sm mb-1 ml-auto" data-index="${idx}">Remove</button>
+        </div>`;
+                $('#timelineList').append(timelineHtml);
+            });
+
+            // Update hidden input with JSON
+            $('#timelineData').val(JSON.stringify(timelineArray));
+        }
+
+        // Initial display of timeline entries if there are old values
+        displayTimeline();
+
+        // Add new timeline entry to array and show in real-time
+        $('#addTimeline').on('click', function() {
+            let from = $('#timelineFrom').val() || null;
+            let to = $('#timelineTo').val() || null;
+            let title = $('#timelineTitle').val() || null;
+            let subheadline = $('#timelineSubheadline').val() || null;
+            let body = $('#timelineBody').val() || null;
+
+            // Ensure that at least one of the fields is filled out before adding
+            if (from || to || title || subheadline || body) {
+                let timeline = {
+                    from: from,
+                    to: to,
+                    title: title,
+                    subheadline: subheadline,
+                    body: body
+                };
+                timelineArray.push(timeline);
+
+                // Clear input fields
+                $('#timelineFrom').val('');
+                $('#timelineTo').val('');
+                $('#timelineTitle').val('');
+                $('#timelineSubheadline').val('');
+                $('#timelineBody').val('');
+
+                // Rebuild the timeline list
+                displayTimeline();
+            }
+        });
+
+        // Remove timeline entry from the array and UI
+        $(document).on('click', '.removeTimeline', function() {
+            let index = $(this).data('index');
+            timelineArray.splice(index, 1); // Remove from array
+
+            // Rebuild timeline list
+            displayTimeline();
+        });
+
+        // Submit form (AJAX or regular submission)
+        $('#timelineForm').on('submit', function(e) {
+            // Optional: Perform validation or additional logic here
         });
     </script>
 
-    {{-- Sucess and error notification alert --}}
     <script>
-        $(document).ready(function() {
-            // show error message
-            @if ($errors->any())
-                //var errorMessage = @json($errors->any()); // Get the first validation error message
-                var Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 5500
-                });
+        @if (isset($tour->timeline) && !old('timeline'))
+            timelineArray = @json(json_decode($tour->timeline));
+        @endif
+    </script> --}}
 
-                Toast.fire({
-                    icon: 'error',
-                    title: 'There are form validation errors. Please fix them.'
-                });
-            @endif
+    {{-- <script>
+        let timelineArray = [];
 
-            // success message
-            @if (session('success'))
-                var successMessage = @json(session('success')); // Get the first sucess message
-                var Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 5500
-                });
+        // Populate the timelineArray from old data in the hidden input
+        @if (old('timeline'))
+            timelineArray = @json(json_decode(old('timeline')));
+        @endif
 
-                Toast.fire({
-                    icon: 'success',
-                    title: successMessage
-                });
-            @endif
+        // Display old timeline data
+        function displayTimeline() {
+            $('#timelineList').empty(); // Clear existing timeline items
+            timelineArray.forEach((timeline, idx) => {
+                let timelineHtml = `<div class="timeline-item card p-2">
+                    <strong>${timeline.title || 'No Title'}</strong><br>
+                    <em>${timeline.subheadline || 'No Subheadline'}</em><br>
+                    <p><strong>From:</strong> ${timeline.from || 'No From Time'}</p>
+                    <p><strong>To:</strong> ${timeline.to || 'No To Time'}</p>
+                    <p><strong>Body:</strong> ${timeline.body || 'No Body'}</p>
+                    <button type="button" class="removeTimeline btn btn-danger btn-sm mb-1 ml-auto" data-index="${idx}">Remove</button>
+                </div>`;
+                $('#timelineList').append(timelineHtml);
+            });
 
+            // Update hidden input with JSON
+            $('#timelineData').val(JSON.stringify(timelineArray));
+        }
+
+        // Initial display of timeline entries if there are old values
+        displayTimeline();
+
+        // Add new timeline entry to array and show in real-time
+        $('#addTimeline').on('click', function() {
+            let from = $('#timelineFrom').val() || null;
+            let to = $('#timelineTo').val() || null;
+            let title = $('#timelineTitle').val().trim() || null; // Trim whitespace
+            let subheadline = $('#timelineSubheadline').val() || null;
+            let body = $('#timelineBody').val().trim() || null; // Trim whitespace
+
+            // Validation for title and body
+            if (!title || !body) {
+                alert('Title and Body are required.');
+                return; // Prevent adding if either field is empty
+            }
+
+            // Add the timeline entry only if title and body are provided
+            let timeline = {
+                from: from,
+                to: to,
+                title: title,
+                subheadline: subheadline,
+                body: body
+            };
+            timelineArray.push(timeline);
+
+            // Clear input fields
+            $('#timelineFrom').val('');
+            $('#timelineTo').val('');
+            $('#timelineTitle').val('');
+            $('#timelineSubheadline').val('');
+            $('#timelineBody').val('');
+
+            // Rebuild the timeline list
+            displayTimeline();
+        });
+
+        // Remove timeline entry from the array and UI
+        $(document).on('click', '.removeTimeline', function() {
+            let index = $(this).data('index');
+            timelineArray.splice(index, 1); // Remove from array
+
+            // Rebuild timeline list
+            displayTimeline();
+        });
+
+        // Submit form (AJAX or regular submission)
+        $('#timelineForm').on('submit', function(e) {
+            // Ensure that title and body are not empty
+            let title = $('#timelineTitle').val().trim();
+            let body = $('#timelineBody').val().trim();
+
+            if (!title || !body) {
+                e.preventDefault(); // Prevent form submission
+                alert('Title and Body are required.');
+            }
         });
     </script>
+
+    <script>
+        @if (isset($tour->timeline) && !old('timeline'))
+            timelineArray = @json(json_decode($tour->timeline));
+        @endif
+    </script> --}}
+
+
+
+    <script>
+        // Initialize timelineArray with data from the database or old input
+        let timelineArray = [];
+
+        // Check if old timeline data exists (for when the form is submitted and errors are found)
+        @if (old('timeline'))
+            timelineArray = @json(json_decode(old('timeline')));
+        @elseif (isset($service->timeline))
+            // If the timeline data is available from the database
+            timelineArray = @json(json_decode($service->timeline));
+        @endif
+
+        // Function to display the timeline entries
+        function displayTimeline() {
+            $('#timelineList').empty(); // Clear existing timeline items
+            timelineArray.forEach((timeline, idx) => {
+                let timelineHtml = `<div class="timeline-item card p-2">
+                    <strong>${timeline.title || 'NA'}</strong><br>
+                    <em>${timeline.subheadline || 'NA'}</em><br>
+                    <p><strong>From:</strong> ${timeline.from || 'NA'}</p>
+                    <p><strong>To:</strong> ${timeline.to || 'NA'}</p>
+                    <p><strong>Body:</strong> ${timeline.body || 'NA'}</p>
+                    <button type="button" class="removeTimeline btn btn-danger btn-sm mb-3 ml-2" data-index="${idx}">Remove</button>
+                    <button type="button" class="editTimeline btn btn-primary btn-sm mb-3 ml-2" data-index="${idx}">Edit</button>
+                </div>`;
+                $('#timelineList').append(timelineHtml);
+            });
+
+            // Update hidden input with JSON
+            $('#timelineData').val(JSON.stringify(timelineArray));
+        }
+
+        // Initial display of timeline entries if there are old values or data from the database
+        displayTimeline();
+
+        // Add new timeline entry to array and show in real-time
+        $('#addTimeline').on('click', function() {
+            let from = $('#timelineFrom').val() || null;
+            let to = $('#timelineTo').val() || null;
+            let title = $('#timelineTitle').val().trim() || null; // Trim whitespace
+            let subheadline = $('#timelineSubheadline').val() || null;
+            let body = $('#timelineBody').val().trim() || null; // Trim whitespace
+
+            // Validation for title and body
+            if (!title || !body) {
+                alert('Title and Body are required.');
+                return; // Prevent adding if either field is empty
+            }
+
+            // Add the timeline entry only if title and body are provided
+            let timeline = {
+                from: from,
+                to: to,
+                title: title,
+                subheadline: subheadline,
+                body: body
+            };
+            timelineArray.push(timeline);
+
+            // Clear input fields
+            $('#timelineFrom').val('');
+            $('#timelineTo').val('');
+            $('#timelineTitle').val('');
+            $('#timelineSubheadline').val('');
+            $('#timelineBody').val('');
+
+            // Rebuild the timeline list
+            displayTimeline();
+        });
+
+        // Remove timeline entry from the array and UI
+        $(document).on('click', '.removeTimeline', function() {
+            let index = $(this).data('index');
+            timelineArray.splice(index, 1); // Remove from array
+
+            // Rebuild timeline list
+            displayTimeline();
+        });
+
+        // Open modal to edit timeline entry
+        $(document).on('click', '.editTimeline', function() {
+            let index = $(this).data('index');
+            let timeline = timelineArray[index];
+
+            // Populate the modal with current values
+            $('#editTimelineFrom').val(timeline.from || '');
+            $('#editTimelineTo').val(timeline.to || '');
+            $('#editTimelineTitle').val(timeline.title || '');
+            $('#editTimelineSubheadline').val(timeline.subheadline || '');
+            $('#editTimelineBody').val(timeline.body || '');
+
+            // Store the index of the timeline entry being edited
+            $('#updateTimeline').data('index', index);
+
+            // Show the modal
+            $('#editTimelineModal').modal('show');
+        });
+
+        // Update the timeline entry in the array after editing
+        $('#updateTimeline').on('click', function() {
+            let index = $(this).data('index');
+            let from = $('#editTimelineFrom').val() || null;
+            let to = $('#editTimelineTo').val() || null;
+            let title = $('#editTimelineTitle').val().trim() || null;
+            let subheadline = $('#editTimelineSubheadline').val() || null;
+            let body = $('#editTimelineBody').val().trim() || null;
+
+            // Validation for title and body
+            if (!title || !body) {
+                alert('Title and Body are required.');
+                return; // Prevent updating if either field is empty
+            }
+
+            // Update the timeline entry in the array
+            timelineArray[index] = {
+                from: from,
+                to: to,
+                title: title,
+                subheadline: subheadline,
+                body: body
+            };
+
+            // Rebuild the timeline list
+            displayTimeline();
+
+            // Close the modal
+            $('#editTimelineModal').modal('hide');
+        });
+    </script>
+
+
+
 @stop

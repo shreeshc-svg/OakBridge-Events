@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
 use App\Models\Setting;
@@ -9,8 +10,11 @@ use App\Models\Post;
 use App\Models\Category;
 use App\Models\Tag;
 use App\Models\Service;
+use App\Models\Gallery;
 use App\Models\Team;
 use App\Models\Scategory;
+use App\Models\Video;
+use App\Models\Booking;
 use App\Models\Faq;
 use App\Mail\ContactMail;
 use App\Notifications\GrievenceNotification;
@@ -18,6 +22,12 @@ use App\Notifications\ServiceNotification;
 use App\Notifications\JobAlertNotification;
 use App\Notifications\NewsletterNotification;
 use Illuminate\Support\Facades\Notification;
+use App\Models\VidhiSamman;
+
+use App\Events\BookingCreated;
+
+use Illuminate\Support\Facades\Http;
+
 
 use Mail;
 use View;
@@ -26,7 +36,7 @@ class FrontController extends Controller
 {
     public function __construct()
     {
-        $setting = Setting::first();
+        // $setting = Setting::where('id', 1)->first();
 
         $featured_products = Service::wherePublished('1')->where('featured', '1')->latest()->take(6)->get();
         $service_categories = Scategory::whereHas('services')->withCount('services')->get();
@@ -34,25 +44,39 @@ class FrontController extends Controller
         $services_title = Service::latest()->take(5)->get();
         //dd($service_categories->toArray());
 
-        view::share('setting', $setting);
+        // upcoming events
+       $upcomingEvents = Service::where('date', '>', now())
+                         ->get();
+
+        // view::share('setting', $setting);
         view::share('featured_products', $featured_products);
         view::share('service_categories', $service_categories);
         view::share('footer_posts', $footer_posts);
 
         view::share('services_title', $services_title);
+
+        view::share('upcomingEvents', $upcomingEvents);
+
+        //dd($upcomingEvents);
     }
 
     public function index()
     {
-        $services = Service::wherePublished('1')->whereFeatured('1')->latest()->take(6)->get();
 
+
+        $services = Service::wherePublished('1')->latest()->paginate(12);
+        $speakers = Team::where('year','Speaker')->take(8)->get();
         $testimonials = Testimonial::all();
-        $faqs = faq::all();
         $teams = Team::all();
-        $posts = Post::wherePublished('1')->whereFeatured('1')->latest()->get();
 
-        return view('frontend.index', compact('services', 'testimonials', 'posts', 'faqs', 'teams'));
+        return view('frontend.index', compact('services', 'testimonials', 'speakers', 'teams'));
     }
+
+        public function legathan()
+    {
+        return view('frontend.legathan');
+    }
+
 
     public function about()
     {
@@ -62,28 +86,20 @@ class FrontController extends Controller
         return view('frontend.about', compact('testimonials', 'teams'));
     }
 
-    public function service(Request $request)
+    public function events(Request $request, $date = null)
     {
-        $category = $request['category'] ?? '';
+        // Base query for all services
+        $services = Service::wherePublished('1');
 
-        $search = $request['search'] ?? '';
-
-        $services = Service::wherePublished('1')->latest()->paginate(12);
-
-        $categories = Scategory::all();
-
-        if ($search) {
-            $services = Service::wherePublished('1')->where('title', 'LIKE', '%' . $search . '%')->latest()->paginate(12);
+        // Apply date filter if the date is provided
+        if ($date) {
+            $services->whereDate('date', $date);
         }
 
-        if ($category) {
-            $services = Service::wherePublished('1')->whereHas('scategories', function ($query) use ($category) {
-                $query->where('slug', $category);
-            })->latest()->paginate(12);
-        }
+        // Paginate the results
+        $services = $services->latest()->paginate(12);
 
-
-        return view('frontend.service', compact('services', 'search', 'category', 'categories'));
+        return view('frontend.events', compact('services', 'date'));
     }
 
 
@@ -102,9 +118,16 @@ class FrontController extends Controller
         return view('frontend.service-detail', compact('service', 'categories', 'recently'));
     }
 
-    public function pricing()
+    public function speakers()
     {
-        return view('frontend.pricing');
+        $speakers = Team::where('year','Speaker')->get();
+        return view('frontend.speakers',compact('speakers'));
+    }
+
+    public function speakerDetail(Request $request)
+    {
+        $speaker = Team::whereId($request->id)->firstOrFail();
+        return view('frontend.speaker-detail',compact('speaker'));
     }
 
     public function blog(Request $request)
@@ -204,8 +227,14 @@ class FrontController extends Controller
 
         Mail::to(Setting::findOrFail(1)->email)->send($contactMail);
 
-        return redirect()->route('thanks')->with('message', 'We have received your message. One of our colleagues will get back in touch with you soon!
+        return redirect()->route('contact.thanks')->with('message', 'We have received your message. One of our colleagues will get back in touch with you soon!
         Have a great day!');
+    }
+
+
+    public function contactThanks()
+    {
+        return view('frontend.contact-thanks');
     }
 
     public function thanks()
@@ -214,38 +243,11 @@ class FrontController extends Controller
         return view('frontend.thanks');
     }
 
-    public function benefits()
-    {
-        return view('frontend.benefits');
-    }
-
-    public function subscription()
-    {
-        return view('frontend.subscription');
-    }
-
-    public function jobNotification(Request $request)
-    {
-
-        $data = $request->validate([
-            'name' => 'required|string|max:50',
-            'email'    => 'required|string|email|max:50',
-            'phone' => 'required|string|max:20',
-            'message'    => 'required|string|max:255',
-        ]);
-
-        $ip = \Request::ip();
-        $data['ip'] = $ip;
-        $data['url'] = url()->previous();
 
 
-        $setting = Setting::first();
 
-        Notification::route('mail',  $setting->email)->notify(new JobAlertNotification($data));
 
-        return redirect()->route('thanks')->with('message', 'We have received your message. One of our colleagues will get back in touch with you soon!
-        Have a great day!');
-    }
+
 
     public function newsLetter(Request $request)
     {
@@ -285,32 +287,139 @@ class FrontController extends Controller
 
     public function gallery()
     {
-        return view('frontend.gallery');
+        $images = Gallery::all();
+        return view('frontend.gallery',compact('images'));
     }
-    public function grievence()
+
+    public function videos()
     {
-        return view('frontend.grievence');
+        $videos = Video::all();
+        return view('frontend.videos',compact('videos'));
+    }
+
+    public function vidhiSamman()
+    {
+        $sarvoch2024 = VidhiSamman::where('year', '2024')->where('category', 'Sarvoch Vidhi Samman')->get();
+        $vishist2024 = VidhiSamman::where('year', '2024')->where('category', 'Vishist Vidhi Samman')->get();
+        $vidhi2024 = VidhiSamman::where('year', '2024')->where('category', 'Vidhi Samman')->get();
+
+        $sarvoch2025 = VidhiSamman::where('year', '2025')->where('category', 'Sarvoch Vidhi Samman')->get();
+        $vishist2025 = VidhiSamman::where('year', '2025')->where('category', 'Vishist Vidhi Samman')->get();
+        $vidhi2025 = VidhiSamman::where('year', '2025')->where('category', 'Vidhi Samman')->get();
+
+        return view('frontend.vidhi-samman', compact(
+            'sarvoch2024',
+            'vishist2024',
+            'vidhi2024',
+            'sarvoch2025',
+            'vishist2025',
+            'vidhi2025'
+        ));
     }
 
 
-    public function grievenceForm(Request $request)
+
+    public function ticket()
     {
+        return view('frontend.ticket');
+    }
+
+    public function advisors()
+    {
+        $advisors = Team::where('year','Advisor')->get();
+        return view('frontend.advisors',compact('advisors'));
+    }
+    
+    
+    public function bookTicket(Request $request)
+    {
+       
         $data = $request->validate([
-            'name' => 'required|string|max:75',
-            'email' => 'required|string|email|max:75',
-            'phone' => 'required|string|max:30',
-            'employer' => 'required|string|max:100',
-            'country' => 'required|string|max:50',
-            'city' => 'required|string|max:50',
-            'date' => 'required|date|before_or_equal:today|max:75',
-            'subject' => 'required|string|max:75',
-            'message' => 'required|string|max:255',
-        ]);
+        'name' => 'required|string|max:100',
+        'email' => 'required|string|email|max:100|unique:bookings,email', // made email unique
+        'phone' => 'required|digits:10|unique:bookings,phone', // made phone no. unique
+        'company'  => 'required|string|max:100',
+        'designation'  => 'required|string|max:100',
+        'event'      => 'required|string|',
+        'date'      => 'required|date'
+    ]);
 
-        $setting = Setting::first();
-        Notification::route('mail', $setting->email)->notify(new GrievenceNotification($data));
 
-        return redirect()->route('thanks')->with('message', 'We have received your message. One of our colleagues will get back in touch with you soon!
-        Have a great day!');
+    // Fetch the last booking_id from the Booking table
+    $lastBooking = DB::table('bookings')->latest('id')->first();
+
+    if ($lastBooking) {
+        // Extract the numeric part of the last booking_id and increment it
+        $lastNumber = (int)substr($lastBooking->booking_id, 2); // Remove 'VD' prefix
+        $newBookingId = 'VD' . str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT); // Use 4 digits instead of 5
+    } else {
+        // If no bookings exist, start with VD9001
+        $newBookingId = 'VD9167';
     }
+
+
+    $data['booking_id'] = $newBookingId;
+
+
+    $booking =  Booking::create([
+        'booking_id' => $data['booking_id'],
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'phone' => $data['phone'],
+        'company' => $data['company'],
+        'designation' => $data['designation'],
+        'date' => $data['date'],
+    ]);
+
+
+    $data['ip']=  \Request::ip();
+
+
+
+    // // send whatsapp message via curl
+    $response = Http::withHeaders([
+        'Authorization' => 'Basic ak9udkt1QnhLTnFac01scllFN2NVenhOUTZYcXhZS1J4VE5VcnBQU29jdzo=',
+        'Content-Type' => 'application/json',
+    ])->post('https://api.interakt.ai/v1/public/message/', [
+        'countryCode' => '+91',
+            'phoneNumber' => $data['phone'],
+        //'fullPhoneNumber' => '918447525204', // Optional
+        // 'campaignId' => 'YOUR_CAMPAIGN_ID', // Optional
+        'callbackData' => 'some text here',
+        'type' => 'Template',
+        'template' => [
+            //'name' => 'new_registration_vu_2025',
+            'name' => 'new_reg_tba_events',
+            'languageCode' => 'en',
+            // "headerValues"=> [
+            //         "https://www.lafashioncloset.com/wp-content/uploads/2021/12/la-fashion-logo.png"
+            // ],
+            'bodyValues' => [
+                $data['name'],
+               // $data['event'],
+               // $data['date'],
+            ],
+
+        ],
+    ]);
+
+
+    //  event(new BookingCreated($data));
+
+    // Handle the response
+    if ($response->successful()) {
+        $eventName = $request->input('event');
+        $request->session()->flash('eventName', $eventName);
+        // return redirect()->away('https://oakbridgepublishing.mojo.page/ilats-2025');
+        return redirect()->route('thanks');
+    } else {
+        // return $response->body(); // Or get the raw response
+        return back();
+    }
+
+    }
+
+
+
+
 }

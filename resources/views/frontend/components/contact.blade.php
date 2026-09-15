@@ -1,7 +1,7 @@
 <div class="col-lg-6 wow fadeInLeft" data-wow-delay="0.1s">
     <div class="contact-item">
         <div class="pb-5">
-            <h4 class="text-primary">Contact Us</h4>
+            <h4 class="text-primary">Event Info</h4>
             <h1 class="display-4 mb-4">Get In Touch With Us</h1>
             <p class="mb-0">Fill out the form below, and let’s start the journey towards enhancing your team with
                 top-tier candidates. Our experts are here to assist you every step of the way.
@@ -67,10 +67,10 @@
             <div class="bg-primary btn-lg-square rounded-circle p-2"><i class="fa fa-envelope-open text-white"></i>
             </div>
 
-                <div class="ms-4">
-                    <h4>Email</h4>
-                    <p class="mb-0">skyleadtravels@gmail.com</p>
-                </div>
+            <div class="ms-4">
+                <h4>Email</h4>
+                <p class="mb-0">skyleadtravels@gmail.com</p>
+            </div>
 
         </div>
     </div>

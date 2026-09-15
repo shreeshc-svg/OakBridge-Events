@@ -1,266 +1,105 @@
 @extends('frontend.layouts.app')
-@section('title', 'Gallery' . ' ' . '-' . '' . $setting->site_title)
-@section('description', $setting->site_description)
-@section('keywords', $setting->site_keywords)
+@section('title', 'OakBridge Events Gallery | Highlights from the India Law, AI & Tech Summit 2025')
+@section('keywords', 'legal tech, law ai, tech summit, legal tech summit, new technology, technology summit, legal tech leaders, india law ai, ai in law, ai legal tech photos, summit legal tech images')
+@section('description', 'The India Law AI Tech Summit 2025 envisions Indias premier annual forum for legal innovation. A dynamic experience designed for maximum engagement and unparalled access celebrating Law AI Tech pioneers leaders and innovators driving Law AI Tech revolution.')
 @section('content')
-    <!-- BREADCRUMB STARTS HERE -->
-    <div class="rv-breadcrumb pt-120 pb-120">
-        <div class="container">
-            <h1 class="rv-breadcrumb__title">Image Gallery</h1>
+    <style>
+        .gallery-image {
+            cursor: pointer;
+            /* Show pointer cursor on hover */
+        }
+    </style>
 
-            <ul class="rv-breadcrumb__nav d-flex justify-content-center">
-                <li><a href="{{ route('home') }}"><i class="fa-solid fa-sharp fa-home"></i> Home</a></li>
-                <li class="current-page"><span class="dvdr"> &#47;</span><span>Gallery</span></li>
+
+    <!--Page Title-->
+    {{-- <section class="page-title"
+         style="background-image:linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url({{ asset('public/assets/images/background/bread2.webp') }}); background-size: cover; background-position: center;"> --}}
+         <section class="page-title"
+         style="background-image: url({{ asset('public/assets/images/background/bread2.webp') }}); background-size: cover; background-position: center;">
+        {{-- <section class="page-title" style="background-image:url({{ asset('public/assets/images/background/5.jpg') }});"> --}}
+        <div class="auto-container">
+            <h1>Image Gallery</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="{{ route('home') }}">Home</a></li>
+                <li>Image Gallery</li>
             </ul>
         </div>
-    </div>
-    <!-- BREADCRUMB ENDS HERE -->
-
-
-    <!-- BLOG SECTION STARTS HERE ↓ -->
-    <div class="rv-blog-details pt-120 pb-120">
+    </section>
+    <!--End Page Title-->
+    <section class="py-5">
         <div class="container">
             <div class="row">
-                <div class="row">
-                    <div class="col-md-4 col-xs-6 thumb">
-                        <a class="thumbnail" href="#" data-image-id="" data-toggle="modal" data-title=""
-                           data-image="{{ asset('public/assets/img/gallery/1-min.webp') }}"
-                           data-target="#image-gallery">
-                            <img class="img-thumbnail"
-                                 src="{{ asset('public/assets/img/gallery/1-min.webp') }}"
-                                 alt="Another alt text">
-                        </a>
+                @foreach ($images as $key => $image)
+                    <div class="col-md-4 mb-4">
+                        <img src="{{ asset('public/uploads/images/our-gallery/' . $image->name) }}" alt="Gallery Image"
+                            class="img-fluid gallery-image" data-index="{{ $key }}"
+                            data-src="{{ asset('public/uploads/images/our-gallery/' . $image->name) }}">
                     </div>
-                    <div class="col-md-4 col-xs-6 thumb">
-                        <a class="thumbnail" href="#" data-image-id="" data-toggle="modal" data-title=""
-                           data-image="{{ asset('public/assets/img/gallery/2-min.webp') }}"
-                           data-target="#image-gallery">
-                            <img class="img-thumbnail"
-                                 src="{{ asset('public/assets/img/gallery/2-min.webp') }}"
-                                 alt="Another alt text">
-                        </a>
-                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
 
-                    <div class="col-md-4 col-xs-6 thumb">
-                        <a class="thumbnail" href="#" data-image-id="" data-toggle="modal" data-title=""
-                           data-image="{{ asset('public/assets/img/gallery/3-min.webp') }}"
-                           data-target="#image-gallery">
-                            <img class="img-thumbnail"
-                                 src="{{ asset('public/assets/img/gallery/3-min.webp') }}"
-                                 alt="Another alt text">
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-xs-6 thumb">
-                        <a class="thumbnail" href="#" data-image-id="" data-toggle="modal" data-title=""
-                           data-image="{{ asset('public/assets/img/gallery/4-min.webp') }}"
-                           data-target="#image-gallery">
-                            <img class="img-thumbnail"
-                                 src="{{ asset('public/assets/img/gallery/4-min.webp') }}"
-                                 alt="Another alt text">
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-xs-6 thumb">
-                        <a class="thumbnail" href="#" data-image-id="" data-toggle="modal" data-title=""
-                           data-image="{{ asset('public/assets/img/gallery/5-min.webp') }}"
-                           data-target="#image-gallery">
-                            <img class="img-thumbnail"
-                                 src="{{ asset('public/assets/img/gallery/5-min.webp') }}"
-                                 alt="Another alt text">
-                        </a>
-                    </div>
-
-
-
-                    <div class="col-md-4 col-xs-6 thumb">
-                        <a class="thumbnail" href="#" data-image-id="" data-toggle="modal" data-title=""
-                           data-image="{{ asset('public/assets/img/gallery/6-min.webp') }}"
-                           data-target="#image-gallery">
-                            <img class="img-thumbnail"
-                                 src="{{ asset('public/assets/img/gallery/6-min.webp') }}"
-                                 alt="Another alt text">
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-xs-6 thumb">
-                        <a class="thumbnail" href="#" data-image-id="" data-toggle="modal" data-title=""
-                           data-image="{{ asset('public/assets/img/gallery/7-min.webp') }}"
-                           data-target="#image-gallery">
-                            <img class="img-thumbnail"
-                                 src="{{ asset('public/assets/img/gallery/7-min.webp') }}"
-                                 alt="Another alt text">
-                        </a>
-                    </div>
-                    <div class="col-md-4 col-xs-6 thumb">
-                        <a class="thumbnail" href="#" data-image-id="" data-toggle="modal" data-title=""
-                           data-image="{{ asset('public/assets/img/gallery/8-min.webp') }}"
-                           data-target="#image-gallery">
-                            <img class="img-thumbnail"
-                                 src="{{ asset('public/assets/img/gallery/8-min.webp') }}"
-                                 alt="Another alt text">
-                        </a>
-                    </div>
-
-
-
-                    <div class="col-md-4 col-xs-6 thumb">
-                        <a class="thumbnail" href="#" data-image-id="" data-toggle="modal" data-title=""
-                           data-image="{{ asset('public/assets/img/gallery/9-min.webp') }}"
-                           data-target="#image-gallery">
-                            <img class="img-thumbnail"
-                                 src="{{ asset('public/assets/img/gallery/9-min.webp') }}"
-                                 alt="Another alt text">
-                        </a>
-                    </div>
-
+    <!-- Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-
-
-                <div class="modal fade" id="image-gallery" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" id="image-gallery-title"></h4>
-                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <img id="image-gallery-image" class="img-responsive col-md-12" src="">
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary float-left" id="show-previous-image"><i class="fa fa-arrow-left"></i>
-                                </button>
-
-                                <button type="button" id="show-next-image" class="btn btn-secondary float-right"><i class="fa fa-arrow-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" class="img-fluid" alt="Modal Image">
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-secondary" id="prevImage">Previous</button>
+                    <button type="button" class="btn btn-secondary" id="nextImage">Next</button>
                 </div>
             </div>
         </div>
-        </div>
-    </div>
     </div>
 
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const images = document.querySelectorAll(".gallery-image");
+            const modal = document.getElementById("imageModal");
+            const modalImage = document.getElementById("modalImage");
+            const nextButton = document.getElementById("nextImage");
+            const prevButton = document.getElementById("prevImage");
 
-    <!-- BLOG DETAILS END -->
-    <!-- BLOG SECTION ENDS HERE ↑ -->
+            let currentIndex = 0;
 
-@stop
-@section('css')
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<style>
- .btn:focus, .btn:active, button:focus, button:active {
-  outline: none !important;
-  box-shadow: none !important;
-}
+            images.forEach((image, index) => {
+                image.addEventListener("click", function() {
+                    currentIndex = index;
+                    showImage();
+                    $(modal).modal("show");
+                });
+            });
 
-#image-gallery .modal-footer{
-  display: block;
-}
+            nextButton.addEventListener("click", function() {
+                currentIndex = (currentIndex + 1) % images.length;
+                showImage();
+            });
 
-.thumb{
-  margin-top: 15px;
-  margin-bottom: 15px;
-}
-</style>
+            prevButton.addEventListener("click", function() {
+                currentIndex = (currentIndex - 1 + images.length) % images.length;
+                showImage();
+            });
+
+            function showImage() {
+                const currentImage = images[currentIndex];
+                modalImage.src = currentImage.dataset.src;
+            }
+        });
+    </script>
+
 @stop
 
 @section('js')
-<script>
-   let modalId = $('#image-gallery');
-
-$(document)
-  .ready(function () {
-
-    loadGallery(true, 'a.thumbnail');
-
-    //This function disables buttons when needed
-    function disableButtons(counter_max, counter_current) {
-      $('#show-previous-image, #show-next-image')
-        .show();
-      if (counter_max === counter_current) {
-        $('#show-next-image')
-          .hide();
-      } else if (counter_current === 1) {
-        $('#show-previous-image')
-          .hide();
-      }
-    }
-
-    /**
-     *
-     * @param setIDs        Sets IDs when DOM is loaded. If using a PHP counter, set to false.
-     * @param setClickAttr  Sets the attribute for the click handler.
-     */
-
-    function loadGallery(setIDs, setClickAttr) {
-      let current_image,
-        selector,
-        counter = 0;
-
-      $('#show-next-image, #show-previous-image')
-        .click(function () {
-          if ($(this)
-            .attr('id') === 'show-previous-image') {
-            current_image--;
-          } else {
-            current_image++;
-          }
-
-          selector = $('[data-image-id="' + current_image + '"]');
-          updateGallery(selector);
-        });
-
-      function updateGallery(selector) {
-        let $sel = selector;
-        current_image = $sel.data('image-id');
-        $('#image-gallery-title')
-          .text($sel.data('title'));
-        $('#image-gallery-image')
-          .attr('src', $sel.data('image'));
-        disableButtons(counter, $sel.data('image-id'));
-      }
-
-      if (setIDs == true) {
-        $('[data-image-id]')
-          .each(function () {
-            counter++;
-            $(this)
-              .attr('data-image-id', counter);
-          });
-      }
-      $(setClickAttr)
-        .on('click', function () {
-          updateGallery($(this));
-        });
-    }
-  });
-
-// build key actions
-$(document)
-  .keydown(function (e) {
-    switch (e.which) {
-      case 37: // left
-        if ((modalId.data('bs.modal') || {})._isShown && $('#show-previous-image').is(":visible")) {
-          $('#show-previous-image')
-            .click();
-        }
-        break;
-
-      case 39: // right
-        if ((modalId.data('bs.modal') || {})._isShown && $('#show-next-image').is(":visible")) {
-          $('#show-next-image')
-            .click();
-        }
-        break;
-
-      default:
-        return; // exit this handler for other keys
-    }
-    e.preventDefault(); // prevent the default action (scroll / move caret)
-  });
-</script>
 
 @stop

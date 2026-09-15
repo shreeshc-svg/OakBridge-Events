@@ -13,6 +13,10 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\SummerNoteController;
+use App\Http\Controllers\VideoController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\VidhiSammanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,10 +58,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
     // Services
     Route::resource('service', ServiceController::class);
-    Route::get('service-trash', [ServiceController::class, 'trashView'])->name('service.trash');
-    Route::get('service-restore/{id}', [ServiceController::class, 'restore'])->name('service.restore');
-    //deleted permanently
-    Route::delete('service-delete/{id}', [ServiceController::class, 'force_delete'])->name('service.force.delete');
+    // Route::get('service-trash', [ServiceController::class, 'trashView'])->name('service.trash');
+    // Route::get('service-restore/{id}', [ServiceController::class, 'restore'])->name('service.restore');
+    // //deleted permanently
+    // Route::delete('service-delete/{id}', [ServiceController::class, 'force_delete'])->name('service.force.delete');
 
     // upload image via ckeditor
     Route::post('/upload', [PostController::class, 'ckeditor'])->name('ckeditor.upload');
@@ -84,6 +88,19 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::resource('faq', FaqController::class);
 
     Route::resource('team', TeamController::class);
+    Route::resource('video', VideoController::class);
+    Route::resource('booking', BookingController::class);
+    // Route::resource('vidhi', VidhiSammanController::class);
+    Route::get('vidhi', [VidhiSammanController::class,'index'])->name('vidhi.index');
+    Route::post('vidhi', [VidhiSammanController::class,'store'])->name('vidhi.store');
+    Route::get('vidhi/edit/{id}', [VidhiSammanController::class,'edit'])->name('vidhi.edit');
+    Route::post('vidhi/edit/{id}', [VidhiSammanController::class,'update'])->name('vidhi.update');
+    Route::delete('vidhi/destroy/{id}', [VidhiSammanController::class,'destroy'])->name('vidhi.destroy');
+
+
+    //summernote image
+    Route::post('summernote',[SummerNoteController::class,'summerUpload'])->name('summer.upload.image');
+    Route::post('summernote/delete',[SummerNoteController::class,'summerDelete'])->name('summer.delete.image');
 });
 
 
@@ -108,31 +125,43 @@ Route::get('cookies', [FrontController::class, 'cookies'])->name('cookies');
 // term & conditino
 Route::get('terms-conditions', [FrontController::class, 'termCondition'])->name('term.condition');
 
+// Route::get('/', [FrontController::class, 'ticket'])->name('home');
 Route::get('/', [FrontController::class, 'index'])->name('home');
 Route::get('/about', [FrontController::class, 'about'])->name('about');
 
-Route::get('/Jobs/{category?}', [FrontController::class, 'service'])->name('service');
-Route::get('/job/{slug}', [FrontController::class, 'serviceDetail'])->name('service.detail');
+Route::get('/products/{category?}', [FrontController::class, 'service'])->name('service');
+Route::get('/event/{slug}', [FrontController::class, 'serviceDetail'])->name('service.detail');
 Route::get('/blog', [FrontController::class, 'blog'])->name('blog');
 
 Route::get('/post/{slug}', [FrontController::class, 'blogDetail'])->name('blog.detail');
 
 Route::get('/contact', [FrontController::class, 'contact'])->name('contact');
+Route::get('/events/{date?}', [FrontController::class, 'events'])->name('events');
 
-// Route::get('/testimonial',[FrontController::class, 'testimonial'])->name('testimonial');
+
+Route::get('/testimonials',[FrontController::class, 'testimonial'])->name('testimonial');
 Route::get('/faq', [FrontController::class, 'faq'])->name('faq');
+Route::get('/image-gallery', [FrontController::class, 'gallery'])->name('image.gallery');
+Route::get('/videos', [FrontController::class, 'videos'])->name('videos');
+// Route::get('/vidhi-samman', [FrontController::class, 'vidhiSamman'])->name('vidhi.samman');
 
 
 Route::get('/thanks', [FrontController::class, 'thanks'])->name('thanks');
+Route::get('/thank-you', [FrontController::class, 'contactThanks'])->name('contact.thanks');
 // Route::get('/benefits',[FrontController::class,'benefits'])->name('benefits');
 // Route::get('/subscription',[FrontController::class,'subscription'])->name('subscription');
-// Route::get('/subscription',[FrontController::class,'subscription'])->name('subscription');
-// Route::get('/pricing',[FrontController::class, 'pricing'])->name('pricing');
+Route::get('/ticket',[FrontController::class,'ticket'])->name('ticket');
+Route::get('/advisors',[FrontController::class,'advisors'])->name('advisors');
+Route::get('/speakers',[FrontController::class, 'speakers'])->name('speakers');
+Route::get('/speaker/{id}',[FrontController::class, 'speakerDetail'])->name('speaker.detail');
 Route::get('/gallery', [FrontController::class, 'gallery'])->name('gallery');
 
 Route::get('/grievence', [FrontController::class, 'grievence'])->name('grievence');
 Route::post('/grievence', [FrontController::class, 'grievenceForm'])->name('grievence.form');
 Route::post('/job-notification', [FrontController::class, 'jobNotification'])->name('job.notification');
+
+Route::post('book-ticket',[FrontController::class,'bookTicket'])->name('book.ticket');
+Route::get('legathon',[FrontController::class,'legathan'])->name('legathan');
 
 
 

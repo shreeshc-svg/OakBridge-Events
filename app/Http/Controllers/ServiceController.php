@@ -30,6 +30,7 @@ class ServiceController extends Controller
      */
     public function create()
     {
+        //abort(404);
         $scategories = Scategory::where('parent_id',null)->orderby('title','asc')->get();
         // $scategories = Scategory::all();
 
@@ -54,6 +55,7 @@ class ServiceController extends Controller
             'published' => 'nullable',
             'disable_comment' => 'nullable',
             'views' => 'nullable',
+            'timeline'          => 'nullable|json',
 
 
         ]);
@@ -126,8 +128,12 @@ class ServiceController extends Controller
             'published'         => 'nullable',
             'disable_comment'   => 'nullable',
             'views'             => 'nullable',
+            'date'               => 'date',
+            'timeline'          => 'nullable|json',
 
         ]);
+
+       // dd($data);
 
         $service = Service::where('id',$service->id)->firstOrFail();
 
@@ -142,6 +148,8 @@ class ServiceController extends Controller
         $service->meta_keyword         = $request->meta_keyword;
         $service->featured             = $request->featured == true ? '1': '0';
         $service->published            = $request->published;
+        $service->timeline            = $request->timeline;
+        $service->date                 = $request->date;
         $service->disable_comment      = $request->disable_comment == true ? '1': '0';
 
 
@@ -173,7 +181,7 @@ class ServiceController extends Controller
 
        //  $tags = $request->tag;
        //  $post->tags()->sync($tags);
-        return redirect()->route('service.index')->with('success','Service has beeen updated successfully.');
+        return redirect()->route('service.index')->with('success','Event has beeen updated successfully.');
 
     }
 
@@ -190,9 +198,11 @@ class ServiceController extends Controller
 
     public function destroy(Service $service)
     {
+        //abort(404);
         $tour = Service::findOrFail($service->id);
-        $tour->delete();
-        return back()->with('success', 'Service Succesfully moved to trash!');
+        //$tour->delete();
+         $tour->forceDelete();
+        return back()->with('success', 'Service Succesfully deleted!');
     }
 
     public function trashView(Request $request)
