@@ -19,6 +19,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\VidhiSammanController;
 use App\Http\Controllers\HeroBannerController;
 use App\Http\Controllers\MarketingStripController;
+use App\Http\Controllers\RegistrationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     // scrolling marketing strip under the hero banner
     Route::get('marketing-strip', [MarketingStripController::class, 'edit'])->name('strip.edit');
     Route::post('marketing-strip', [MarketingStripController::class, 'update'])->name('strip.update');
+    // open / close event registration
+    Route::get('registration', [RegistrationController::class, 'edit'])->name('registration.edit');
+    Route::post('registration', [RegistrationController::class, 'update'])->name('registration.update');
     // profile
     Route::get('profile', [ProfileController::class, 'profile'])->name('profile');
     //password update

@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
         }
            $setting = Setting::where('id', 1)->first();
         view::share('setting', $setting);
+        View::share(\App\Http\Controllers\RegistrationController::viewData($setting));
 
         
       

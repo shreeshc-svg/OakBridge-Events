@@ -100,7 +100,7 @@
                     <source media="(max-width: 575.98px)" srcset="{{ $heroMobile }}">
                 @endif
                 <img class="pt-4 pt-sm-0 img-fluid w-100" src="{{ $heroImage }}" alt="{{ $heroAlt }}"
-                    @if ($heroClick === 'register') style="cursor: pointer" data-toggle="modal" data-target="#exampleModal" @endif>
+                    @if ($heroClick === 'register' && $registrationOpen) style="cursor: pointer" data-toggle="modal" data-target="#exampleModal" @endif>
             </picture>
             @if ($heroClick === 'link' && !empty($setting->hero_link))
                 </a>
@@ -265,8 +265,10 @@
                             <li>Regulators, Law and Policymakers, Judiciary</li>
 
                         </ul>
+                        @if ($registrationOpen)
                         <div class="btn-box"><a href="#" data-toggle="modal" data-target="#exampleModal"
                                 class="theme-btn btn-style-three"><span class="btn-title">Register Now</span></a></div>
+                        @endif
                     </div>
 
                 </div>
@@ -421,6 +423,7 @@
 
 
     <!-- Register Section -->
+    @if ($registrationOpen)
 
     <section class="register-section">
 
@@ -479,6 +482,7 @@
 
     </section>
 
+    @endif
     <!--End Register Section -->
 
 

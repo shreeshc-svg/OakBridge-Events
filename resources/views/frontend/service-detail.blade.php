@@ -190,8 +190,10 @@
         
         <div class="btn-box w-100 text-center">
 
+                    @if ($registrationOpen)
                     <a href="#" data-toggle="modal" data-target="#exampleModal" class="theme-btn btn-style-one"><span
                             class="btn-title">Register Now</span></a>
+                    @endif
                             
                       <a href="/public/uploads/Agenda_29_Nov.pdf" download 
        class="theme-btn btn-style-three ml-3">

@@ -1,3 +1,6 @@
+@if (! $registrationOpen)
+ <div class="alert alert-info my-2">{{ $registrationClosedMessage }}</div>
+@else
  <form id="registerForm" action="{{ route('book.ticket') }}" method="post">
      @csrf
 
@@ -104,4 +107,4 @@
         `;
     });
 </script>
-
+@endif
