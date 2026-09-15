@@ -1,5 +1,5 @@
 @php $formId = 'menu-' . $item->id; @endphp
-<tr class="{{ $child ? 'is-child' : '' }} {{ $item->is_active ? '' : 'is-hidden' }}">
+<tr class="{{ $child ? 'is-child' : '' }} {{ $item->is_active ? '' : 'is-hidden' }}" data-visibility-row>
     <td>
         <input form="{{ $formId }}" type="text" name="label" value="{{ $item->label }}"
             class="form-control form-control-sm" maxlength="60" required>
@@ -32,8 +32,16 @@
     <td class="text-center">
         <input form="{{ $formId }}" type="checkbox" name="new_tab" value="1" @checked($item->new_tab) aria-label="Open in new tab">
     </td>
-    <td class="text-center">
-        <input form="{{ $formId }}" type="checkbox" name="is_active" value="1" @checked($item->is_active) aria-label="Show">
+    <td>
+        @include('backend.partials.visibility-switch', [
+            'action' => route('menus.toggle', $item),
+            'id' => 'vis-menu-' . $item->id,
+            'visible' => (bool) $item->is_active,
+            'name' => $item->label,
+        ])
+        @if ($child && $parentHidden)
+            <small class="text-muted d-block">Hidden with its dropdown</small>
+        @endif
     </td>
     <td class="text-nowrap">
         <form id="{{ $formId }}" action="{{ route('menus.update', $item) }}" method="post" class="d-inline">

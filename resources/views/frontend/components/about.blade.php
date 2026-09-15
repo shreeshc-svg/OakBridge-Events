@@ -4,6 +4,7 @@
     $teamSection = \App\Support\PageContent::get('about.team');
     $organizers = \App\Models\Team::where('year', 'Organizer')->orderBy('id')->get();
 @endphp
+@if (\App\Support\SiteSections::isVisible('about.organizer'))
 <section class="py-5">
     <div class="auto-container">
         <div class="row">
@@ -16,8 +17,9 @@
         </div>
     </div>
 </section>
+@endif
 
-@if ($organizers->count())
+@if ($organizers->count() && \App\Support\SiteSections::isVisible('about.team'))
     <section class="speakers-section-three">
         <div class="auto-container">
             <div class="sec-title text-center">

@@ -42,6 +42,20 @@ class MenuController extends Controller
         return back()->with('success', 'Link "' . $item->label . '" saved.')->with('tab', $item->location);
     }
 
+    /** Show or hide one link straight away (the switch in each row). */
+    public function toggle(Request $request, MenuItem $item)
+    {
+        $request->validate(['visible' => 'required|boolean']);
+        $item->update(['is_active' => $request->boolean('visible')]);
+
+        $message = '"' . $item->label . '" is now ' . ($item->is_active ? 'shown' : 'hidden') . '.';
+        if ($request->expectsJson()) {
+            return response()->json(['visible' => (bool) $item->is_active, 'message' => $message]);
+        }
+
+        return back()->with('success', $message)->with('tab', $item->location);
+    }
+
     public function destroy(MenuItem $item)
     {
         $item->delete();
@@ -66,7 +80,8 @@ class MenuController extends Controller
 
         $data['url'] = trim((string) ($data['url'] ?? '')) ?: '#';
         $data['new_tab'] = $request->boolean('new_tab');
-        $data['is_active'] = $request->boolean('is_active');
+        // the Show switch on existing links saves on its own (see toggle), so keep the current value here
+        $data['is_active'] = ($item && ! $request->has('is_active')) ? (bool) $item->is_active : $request->boolean('is_active');
         $data['parent_id'] = $data['parent_id'] ?? null;
 
         if ($item && (int) $data['parent_id'] === (int) $item->id) {
