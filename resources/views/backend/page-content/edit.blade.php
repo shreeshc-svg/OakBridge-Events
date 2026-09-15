@@ -16,6 +16,19 @@
         <p class="text-muted">{{ $def['hint'] }}</p>
     @endif
 
+    @if (\App\Support\SiteSections::find($key))
+        <div class="callout callout-info py-2 d-flex align-items-center flex-wrap">
+            <span class="mr-3">Show this section on the site:</span>
+            @include('backend.partials.visibility-switch', [
+                'action' => route('page-content.visibility', $key),
+                'id' => 'vis-section',
+                'visible' => \App\Support\SiteSections::isVisible($key),
+                'name' => $def['label'],
+            ])
+            <small class="text-muted ml-3">Saves straight away. Hidden sections keep their text.</small>
+        </div>
+    @endif
+
     <form action="{{ route('page-content.update', $key) }}" method="post" enctype="multipart/form-data" id="contentForm">
         @csrf
         <div class="card card-primary card-outline">
@@ -133,6 +146,9 @@
 @stop
 
 @section('js')
+    @if (\App\Support\SiteSections::find($key))
+        @include('backend.partials.visibility-switch-js')
+    @endif
     @include('backend.partials.rich-editor')
     <script>
         (function() {

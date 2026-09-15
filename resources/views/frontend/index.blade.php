@@ -109,6 +109,7 @@
 
 
     {{-- Intro: Admin > Page Content > Homepage > Intro and highlight cards --}}
+    @if (\App\Support\SiteSections::isVisible('home.intro'))
     @php $intro = \App\Support\PageContent::get('home.intro'); @endphp
     <section class="py-5" style="background-color: #f8f9fa;">
         <div class="container">
@@ -141,16 +142,20 @@
             @endif
         </div>
     </section>
+    @endif
 
     <!-- Features Section Two -->
 
+    @if (\App\Support\SiteSections::isVisible('home.overview'))
     @include('frontend.components.why-choose')
+    @endif
 
     <!--End Features Section -->
 
 
 
     {{-- Who should attend: Admin > Page Content > Homepage --}}
+    @if (\App\Support\SiteSections::isVisible('home.audience'))
     @php $audience = \App\Support\PageContent::get('home.audience'); @endphp
     <section class="why-choose-us">
         <div class="auto-container">
@@ -187,9 +192,11 @@
             </div>
         </div>
     </section>
+    @endif
 
     <!-- Speakers Section -->
 
+    @if (\App\Support\SiteSections::isVisible('home.speakers'))
     @php $speakersSection = \App\Support\PageContent::get('home.speakers'); @endphp
     <section class="speakers-section-three">
 
@@ -294,6 +301,7 @@
         </div>
 
     </section>
+    @endif
 
     <!-- End Speakers Section -->
 
@@ -302,7 +310,9 @@
 
     <!-- Pricing Section -->
 
+    @if (\App\Support\SiteSections::isVisible('home.programme'))
     @include('frontend.components.events')
+    @endif
 
     <!--End Pricing Section -->
 
@@ -312,14 +322,16 @@
 
     <!--Clients Section-->
 
+    @if (\App\Support\SiteSections::isVisible('home.sponsors'))
     @include('frontend.components.sponsors')
+    @endif
 
     <!--End Clients Section-->
 
 
 
     <!-- Register Section -->
-    @if ($registrationOpen)
+    @if ($registrationOpen && \App\Support\SiteSections::isVisible('home.register'))
 
     <section class="register-section">
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PageSection;
 use App\Support\PageContent;
+use App\Support\SiteSections;
 use App\Support\Uploads;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,10 @@ class PageContentController extends Controller
 {
     public function index()
     {
-        return view('backend.page-content.index', ['pages' => PageContent::pages()]);
+        return view('backend.page-content.index', [
+            'pages' => PageContent::pages(),
+            'toggles' => SiteSections::all(),
+        ]);
     }
 
     public function edit(string $key)
@@ -103,5 +107,21 @@ class PageContentController extends Controller
         }
 
         return redirect()->route('page-content.edit', $key)->with('success', $def['label'] . ' reset to the original content.');
+    }
+
+    /** Show or hide a section (the switches on Page Content). */
+    public function visibility(Request $request, string $key)
+    {
+        $section = SiteSections::find($key) ?? abort(404);
+        $request->validate(['visible' => 'required|boolean']);
+        $visible = $request->boolean('visible');
+        SiteSections::setVisible($key, $visible);
+
+        $message = $section['label'] . ($visible ? ' is now shown on the site.' : ' is now hidden from the site.');
+        if ($request->expectsJson()) {
+            return response()->json(['visible' => $visible, 'message' => $message]);
+        }
+
+        return back()->with('success', $message);
     }
 }

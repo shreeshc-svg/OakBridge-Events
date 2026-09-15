@@ -65,6 +65,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::get('page-content/{key}', [PageContentController::class, 'edit'])->name('page-content.edit');
     Route::post('page-content/{key}', [PageContentController::class, 'update'])->name('page-content.update');
     Route::post('page-content/{key}/reset', [PageContentController::class, 'reset'])->name('page-content.reset');
+    Route::post('page-content/{key}/visibility', [PageContentController::class, 'visibility'])->name('page-content.visibility');
 
     Route::get('sponsors', [SponsorController::class, 'index'])->name('sponsors.index');
     Route::post('sponsors/groups', [SponsorController::class, 'storeGroup'])->name('sponsors.groups.store');
@@ -88,6 +89,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::post('menus', [MenuController::class, 'store'])->name('menus.store');
     Route::post('menus/{item}', [MenuController::class, 'update'])->name('menus.update');
     Route::delete('menus/{item}', [MenuController::class, 'destroy'])->name('menus.destroy');
+    Route::post('menus/{item}/toggle', [MenuController::class, 'toggle'])->name('menus.toggle');
     // profile
     Route::get('profile', [ProfileController::class, 'profile'])->name('profile');
     //password update
