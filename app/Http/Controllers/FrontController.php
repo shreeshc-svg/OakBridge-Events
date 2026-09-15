@@ -45,7 +45,9 @@ class FrontController extends Controller
         //dd($service_categories->toArray());
 
         // upcoming events
-       $upcomingEvents = Service::where('date', '>', now())
+       $upcomingEvents = Service::wherePublished('1')
+                         ->where('date', '>', now())
+                         ->orderBy('date')
                          ->get();
 
         // view::share('setting', $setting);
@@ -345,9 +347,21 @@ class FrontController extends Controller
         'phone' => 'required|digits:10|unique:bookings,phone', // made phone no. unique
         'company'  => 'required|string|max:100',
         'designation'  => 'required|string|max:100',
-        'event'      => 'required|string|',
-        'date'      => 'required|date'
+        'event'      => 'required|string|max:255',
+        'date'      => 'nullable'
     ]);
+
+    // Use the event the visitor actually picked (and its real date) - the
+    // hidden date field in the form is not reliable.
+    $chosenEvent = Service::wherePublished('1')
+        ->where('title', $data['event'])
+        ->where('date', '>', now())
+        ->orderBy('date')
+        ->first();
+    if (! $chosenEvent) {
+        return back()->withInput()->withErrors(['event' => 'Please choose an event from the list.']);
+    }
+    $data['date'] = $chosenEvent->date->format('Y-m-d H:i:s');
 
 
     // Fetch the last booking_id from the Booking table
@@ -374,6 +388,8 @@ class FrontController extends Controller
         'company' => $data['company'],
         'designation' => $data['designation'],
         'date' => $data['date'],
+        'service_id' => $chosenEvent->id,
+        'event' => $chosenEvent->title,
     ]);
 
 

@@ -131,6 +131,9 @@
                                                         </a>
                                                     </div>
                                                     <div>
+                                                        <a class="btn btn-primary btn-sm mr-1" href="{{ route('schedules.edit', $service->id) }}">
+                                                            <i class="fas fa-calendar-alt"></i> Schedule
+                                                        </a>
                                                         <a class="btn btn-info btn-sm"
                                                             href="{{ route('service.edit', $service->id) }}">
                                                             <i class="fas fa-pencil-alt">

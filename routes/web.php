@@ -25,6 +25,7 @@ use App\Http\Controllers\SponsorController;
 use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\ScheduleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,6 +79,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
     Route::get('seo', [SeoController::class, 'index'])->name('seo.index');
     Route::post('seo', [SeoController::class, 'update'])->name('seo.update');
+
+    Route::get('schedules', [ScheduleController::class, 'index'])->name('schedules.index');
+    Route::get('schedules/{service}', [ScheduleController::class, 'edit'])->name('schedules.edit');
+    Route::post('schedules/{service}', [ScheduleController::class, 'update'])->name('schedules.update');
 
     Route::get('menus', [MenuController::class, 'index'])->name('menus.index');
     Route::post('menus', [MenuController::class, 'store'])->name('menus.store');

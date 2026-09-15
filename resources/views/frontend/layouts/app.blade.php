@@ -601,6 +601,7 @@
             $errors->has('designation') ||
             $errors->has('company') ||
             $errors->has('registration_closed') ||
+            $errors->has('event') ||
             $errors->has('date')))
         <script>
             document.addEventListener('DOMContentLoaded', function() {

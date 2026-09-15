@@ -27,6 +27,10 @@ class Service extends Model
         'views',
         'timeline',
         'date',
+        'end_time',
+        'venue',
+        'agenda_file',
+        'seat_target',
     ];
 
     // protected $casts = [
@@ -37,6 +41,17 @@ class Service extends Model
         'date' => 'datetime',
     ];
 
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'service_id');
+    }
+
+    /** Sessions in the Admin > Events > Schedules format (see App\Support\Schedule). */
+    public function sessions(): array
+    {
+        return \App\Support\Schedule::sessions($this->timeline);
+    }
 
     public function scategories()
     {

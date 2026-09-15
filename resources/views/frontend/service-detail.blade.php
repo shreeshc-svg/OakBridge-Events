@@ -36,15 +36,14 @@
 
             <div class="content-box">
                 <ul class="upper-info">
-
-                    <li><span
-                            class="icon far fa-clock"></span>{{ \Carbon\Carbon::parse($service->date)->format('H:i D, d M Y ') }}
-                        </span>
-
-                    </li>
-
-                    <li><span class="icon fa fa-map-marker-alt"></span>{{ $setting->address }}</li>
-
+                    {{-- date, timings and venue: Admin > Events > Schedules --}}
+                    @if ($service->date)
+                        <li><span class="icon far fa-calendar"></span>{{ $service->date->format('D, d M Y') }}</li>
+                        <li><span class="icon far fa-clock"></span>{{ $service->date->format('g:i A') }}@if ($service->end_time) – {{ \App\Support\Schedule::formatTime($service->end_time) }}@endif</li>
+                    @endif
+                    @if ($service->venue ?: $setting->address)
+                        <li><span class="icon fa fa-map-marker-alt"></span>{{ $service->venue ?: $setting->address }}</li>
+                    @endif
                 </ul>
 
                {{-- <h2>{{ $service->title }}</h2>
@@ -111,70 +110,50 @@
 
                             <!-- schedule Block -->
 
-                            @foreach (json_decode($service->timeline ?? '[]', true) ?: [] as $timeline)
+                            @forelse ($service->sessions() as $timeline)
                                 <div class="schedule-block @if ($loop->even) even @endif">
-
                                     <div class="inner-box">
-
                                         <div class="inner">
-
                                             <div class="date">{{ $timeline['from'] }} <br> {{ $timeline['to'] }}</div>
-
                                             <div class="speaker-info">
-
-
-
                                                 <h5 class="name">{{ $timeline['title'] }}</h5>
-
                                                 <span class="designation">{{ $timeline['subheadline'] }} </span>
-
                                             </div>
-
-
-                                            {{-- <div class="text pt-3">{{ $timeline['body'] }}</div>
-                                            
-                                            
-                                                                                      
-                                            <div class="text pt-3">{!! preg_replace('/;\s*/', '<br>–', $timeline['body']) !!}</div> --}}
-                                            
-{{-- <div class="text pt-3">
-    {!! preg_replace('/^–\s*/', '', preg_replace('/;?\s*([^;]+?),\s*(.*?)(?=(;|$))/', '– $1, <i>$2</i><br>', $timeline['body'])) !!}
-</div> --}}
-
-<div class="text pt-3">
-    @php
-        $startsWithDash = strpos($timeline['body'], '–') === 0;
-        
-        $formatted = preg_replace_callback('/;?\s*([^;]+?),\s*(.*?)(?=(;|$))/', function($matches) {
-            $title = $matches[1];
-            $description = $matches[2];
-            
-            // Don't italicize if it contains "DIGITAL"
-            if (strpos($description, 'DIGITAL') !== false || strpos($description, 'Driving Innovation') !== false) {
-                return '– ' . $title . ', ' . $description . '<br>';
-            }
-            
-            return '– ' . $title . ', <i>' . $description . '</i><br>';
-        }, $timeline['body']);
-        
-        // Always trim the generated dash
-        $formatted = ltrim($formatted, '– ');
-        
-        // Add it back if original had it
-        if ($startsWithDash) {
-            $formatted = '– ' . $formatted;
-        }
-    @endphp
-    {!! $formatted !!}
-</div>
-
-
+                                            <div class="text pt-3">
+                                                @if ($timeline['legacy'])
+                                                    {{-- sessions not yet re-saved in the schedule editor keep their original formatting --}}
+                                                    @php
+                                                        $legacyBody = (string) $timeline['body'];
+                                                        $startsWithDash = strpos($legacyBody, '–') === 0;
+                                                        $formatted = preg_replace_callback('/;?\s*([^;]+?),\s*(.*?)(?=(;|$))/', function ($matches) {
+                                                            $title = e($matches[1]);
+                                                            $description = e($matches[2]);
+                                                            if (strpos($description, 'DIGITAL') !== false || strpos($description, 'Driving Innovation') !== false) {
+                                                                return '– ' . $title . ', ' . $description . '<br>';
+                                                            }
+                                                            return '– ' . $title . ', <i>' . $description . '</i><br>';
+                                                        }, $legacyBody);
+                                                        $formatted = ltrim($formatted, '– ');
+                                                        if ($startsWithDash) {
+                                                            $formatted = '– ' . $formatted;
+                                                        }
+                                                    @endphp
+                                                    {!! $formatted !!}
+                                                @else
+                                                    @foreach ($timeline['speakers'] as $speaker)
+                                                        – {{ $speaker['name'] }}@if ($speaker['role']), <i>{{ $speaker['role'] }}</i>@endif<br>
+                                                    @endforeach
+                                                    @if ($timeline['notes'])
+                                                        {!! nl2br(e($timeline['notes'])) !!}
+                                                    @endif
+                                                @endif
+                                            </div>
                                         </div>
-
                                     </div>
-
                                 </div>
-                            @endforeach
+                            @empty
+                                <p class="text-center text-muted">{{ $schedulePage['empty_message'] }}</p>
+                            @endforelse
 
                         </div>
 
@@ -196,8 +175,9 @@
                 <a href="#" data-toggle="modal" data-target="#exampleModal" class="theme-btn btn-style-one"><span
                         class="btn-title">{{ $schedulePage['register_label'] }}</span></a>
             @endif
-            @if ($schedulePage['agenda_label'] && $schedulePage['agenda_file'])
-                <a href="{{ \App\Support\Uploads::url($schedulePage['agenda_file']) }}" download
+            @php $agendaFile = $service->agenda_file ?: $schedulePage['agenda_file']; @endphp
+            @if ($schedulePage['agenda_label'] && $agendaFile)
+                <a href="{{ \App\Support\Uploads::url($agendaFile) }}" download
                     class="theme-btn btn-style-three ml-3">
                     <span class="btn-title">{{ $schedulePage['agenda_label'] }}</span>
                 </a>
