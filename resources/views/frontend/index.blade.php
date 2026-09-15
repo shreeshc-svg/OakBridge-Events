@@ -79,8 +79,33 @@
 
     </section> --}}
 
+    {{-- Hero banner: managed from Admin > Hero Banner --}}
+    @php
+        $heroDir = 'public/uploads/images/hero/';
+        $heroEnabled = $setting->hero_enabled ?? true;
+        $heroClick = $setting->hero_click ?? 'register';
+        $heroImage = !empty($setting->hero_image)
+            ? asset($heroDir . $setting->hero_image)
+            : asset('public/assets/images/website_banner.webp');
+        $heroMobile = !empty($setting->hero_image_mobile) ? asset($heroDir . $setting->hero_image_mobile) : null;
+        $heroAlt = $setting->hero_alt ?? '';
+    @endphp
     <section class="pt-5 pt-sm-0">
-        <img style="cursor: pointer" data-toggle="modal" data-target="#exampleModal" class="pt-4 pt-sm-0 img-fluid w-100" src="{{ asset('public/assets/images/website_banner.webp') }}" alt="">
+        @if ($heroEnabled)
+            @if ($heroClick === 'link' && !empty($setting->hero_link))
+                <a href="{{ $setting->hero_link }}" @if ($setting->hero_new_tab) target="_blank" rel="noopener" @endif>
+            @endif
+            <picture>
+                @if ($heroMobile)
+                    <source media="(max-width: 575.98px)" srcset="{{ $heroMobile }}">
+                @endif
+                <img class="pt-4 pt-sm-0 img-fluid w-100" src="{{ $heroImage }}" alt="{{ $heroAlt }}"
+                    @if ($heroClick === 'register') style="cursor: pointer" data-toggle="modal" data-target="#exampleModal" @endif>
+            </picture>
+            @if ($heroClick === 'link' && !empty($setting->hero_link))
+                </a>
+            @endif
+        @endif
     </section>
 
     <!--End Banner Section -->

@@ -17,6 +17,7 @@ use App\Http\Controllers\SummerNoteController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\VidhiSammanController;
+use App\Http\Controllers\HeroBannerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
     Route::get('settings', [SettingController::class, 'index'])->name('setting');
     Route::post('settings', [SettingController::class, 'update'])->name('setting.update');
+    // homepage hero banner
+    Route::get('hero-banner', [HeroBannerController::class, 'edit'])->name('hero.edit');
+    Route::post('hero-banner', [HeroBannerController::class, 'update'])->name('hero.update');
     // profile
     Route::get('profile', [ProfileController::class, 'profile'])->name('profile');
     //password update

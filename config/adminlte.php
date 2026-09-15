@@ -335,6 +335,11 @@ return [
             // 'can'  => 'manage-blog',
         ],
         [
+            'text' => 'Hero Banner',
+            'route'  => 'hero.edit',
+            'icon' => 'fas fa-fw fa-image',
+        ],
+        [
             'text' => 'Booking',
             'route'  => 'booking.index',
             'icon' => 'fas fa-ticket-alt',
