@@ -135,92 +135,39 @@
     <!-- End Coming Soon -->
 
 
+    {{-- Intro: Admin > Page Content > Homepage > Intro and highlight cards --}}
+    @php $intro = \App\Support\PageContent::get('home.intro'); @endphp
     <section class="py-5" style="background-color: #f8f9fa;">
         <div class="container">
             <div class="sec-title text-center">
-
-                <span class="title">
-                    Forging the Future of Law, AI & Tech
-                </span>
-
-                <!--<h2>Introduction</h2>-->
-                <p style="color:#444444">
-                    The India Law, AI & Tech Summit envisions India’s premier annual forum for legal innovation. A dynamic
-                    experience designed for maximum engagement and unparalled access, celebrating Law, AI & Tech
-                    pioneers, leaders, and innovators driving Law, AI & Tech revolution.
-                </p>
-
+                @if ($intro['eyebrow'])
+                    <span class="title">{{ $intro['eyebrow'] }}</span>
+                @endif
+                @if ($intro['body'])
+                    <div class="page-rich-text" style="color:#444444">{!! $intro['body'] !!}</div>
+                @endif
             </div>
-            <div class="row g-4">
-                <div class="col-lg-6 col-md-6 mb-3">
-                    <div class="card h-100  p-4 shadow-sm">
-                        <div class=" text-center">
-                            <div class="mb-3" style="font-size: 2.5rem; color: #b8860b;">
-                                <i class="fa fa-medal"></i>
+            @if (count($intro['items']))
+                <div class="row g-4">
+                    @foreach ($intro['items'] as $card)
+                        <div class="col-lg-6 col-md-6 mb-3">
+                            <div class="card h-100 p-4 shadow-sm">
+                                <div class="text-center">
+                                    @if ($card['icon'])
+                                        <div class="mb-3" style="font-size: 2.5rem; color: #b8860b;">
+                                            <i class="{{ $card['icon'] }}"></i>
+                                        </div>
+                                    @endif
+                                    <h4 class="card-title mb-1" style="color: #333; font-weight: 600;">{{ $card['title'] }}</h4>
+                                    <p class="card-text" style="color: #666666">{{ $card['text'] }}</p>
+                                </div>
                             </div>
-                            <h4 class="card-title mb-1" style="color: #333; font-weight: 600;">
-                                Establishing India's Premier Law, AI & Tech Event
-                            </h4>
-                            <p class="card-text" style="color: #666666">
-                                Creating the definitive annual event for Law, Technology and Innovation in the region.
-                            </p>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
-
-                <div class="col-lg-6 col-md-6 mb-3">
-                    <div class="card h-100 p-4 shadow-sm">
-                        <div class=" text-center">
-                            <div class="mb-3" style="font-size: 2.5rem; color: #b8860b;">
-                                <i class="fa fa-handshake"></i>
-                            </div>
-                            <h4 class="card-title mb-1" style="color: #333; font-weight: 600;">
-                                Uniting Key Stakeholders
-                            </h4>
-                            <p class="card-text" style="color: #666666">
-                                Bringing together Top Law Firms, General Counsels, Policymakers, Technologists, and
-                                Innovators to foster collaboration.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-6 mb-3">
-                    <div class="card h-100  p-4  shadow-sm">
-                        <div class="y text-center">
-                            <div class="mb-3" style="font-size: 2.5rem; color: #b8860b;">
-                                <i class="fa fa-globe"></i>
-                            </div>
-                            <h4 class="card-title mb-1" style="color: #333; font-weight: 600;">
-                                Shaping the Future of Law Roadmap
-                            </h4>
-                            <p class="card-text" style="color: #666666">
-                                Influencing the adoption and evolution of AI & Tech solutions across India's legal
-                                landscape.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-6 mb-3">
-                    <div class="card h-100  p-4  shadow-sm">
-                        <div class=" text-center">
-                            <div class="mb-3" style="font-size: 2.5rem; color: #b8860b;">
-                                <i class="fa fa-book"></i>
-                            </div>
-                            <h4 class="card-title mb-1" style="color: #333; font-weight: 600;">
-                                Envisioning the 'Davos of Law, AI & Tech'
-                            </h4>
-                            <p class="card-text" style="color: #666666">
-                                Becoming the essential annual gathering for Thought Leadership and Networking in Law, AI & Tech.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endif
         </div>
     </section>
-
 
     <!-- Features Section Two -->
 
@@ -230,79 +177,56 @@
 
 
 
+    {{-- Who should attend: Admin > Page Content > Homepage --}}
+    @php $audience = \App\Support\PageContent::get('home.audience'); @endphp
     <section class="why-choose-us">
-
         <div class="auto-container">
-
             <div class="row align-items-center">
-
                 <div class="content-column col-lg-6 col-md-12 col-sm-12 ">
-
                     <div class="inner-column">
-
                         <div class="sec-title">
-
-                            <span class="title">A Curated Gathering of Legal Luminaries & Innovators</span>
-
-                            <h2>Who Should Attend?</h2>
-                            {{--
-                            <div class="text">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmtempor
-                                incididunt labore et dolore magna aliqu enim ad minim veniam quis nostrud exercitation
-                                ullamco laboris nisi ut aliquip</div> --}}
-
+                            @if ($audience['eyebrow'])
+                                <span class="title">{{ $audience['eyebrow'] }}</span>
+                            @endif
+                            <h2>{{ $audience['heading'] }}</h2>
                         </div>
-
-                        <ul class="list-style-one">
-
-                            <li>Managing Partners/Sr Partners of Top Law Firms</li>
-
-                            <li>General Counsels of India's Top Corporates</li>
-
-                            <li>CTOs/CIOs of Top Law Firms & Corporates</li>
-
-                            <li>AI & Tech Solutions Providers</li>
-
-                            <li>Regulators, Law and Policymakers, Judiciary</li>
-
-                        </ul>
-                        @if ($registrationOpen)
-                        <div class="btn-box"><a href="#" data-toggle="modal" data-target="#exampleModal"
-                                class="theme-btn btn-style-three"><span class="btn-title">Register Now</span></a></div>
+                        @if (count($audience['items']))
+                            <ul class="list-style-one">
+                                @foreach ($audience['items'] as $line)
+                                    <li>{{ $line['text'] }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                        @if ($registrationOpen && $audience['button_label'])
+                            <div class="btn-box"><a href="#" data-toggle="modal" data-target="#exampleModal"
+                                    class="theme-btn btn-style-three"><span class="btn-title">{{ $audience['button_label'] }}</span></a></div>
                         @endif
                     </div>
-
                 </div>
-
-                <div class="image-column col-lg-6 col-md-12 col-sm-12 ">
-
-                    <div class="image-box">
-
-                        <figure class="image"><img src="{{ asset('public/assets/images/why.webp') }}" alt="">
-                        </figure>
-
+                @if ($audience['image'])
+                    <div class="image-column col-lg-6 col-md-12 col-sm-12 ">
+                        <div class="image-box">
+                            <figure class="image"><img src="{{ \App\Support\Uploads::url($audience['image']) }}" alt="{{ $audience['heading'] }}">
+                            </figure>
+                        </div>
                     </div>
-
-                </div>
-
+                @endif
             </div>
-
         </div>
-
     </section>
-
-
 
     <!-- Speakers Section -->
 
+    @php $speakersSection = \App\Support\PageContent::get('home.speakers'); @endphp
     <section class="speakers-section-three">
 
         <div class="auto-container">
 
             <div class="sec-title text-center">
 
-                <span class="title">{{ $setting->bname }}</span>
+                <span class="title">{{ $speakersSection['eyebrow'] ?: $setting->bname }}</span>
 
-                <h2>Distinguished Speakers</h2>
+                <h2>{{ $speakersSection['heading'] }}</h2>
 
             </div>
 
@@ -388,8 +312,7 @@
                 <div class="btn-box w-100">
 
                     <a href="{{ route('speakers') }}" class="theme-btn btn-style-three w-100"><span
-                            class="btn-title">View
-                            All</span></a>
+                            class="btn-title">{{ $speakersSection['button_label'] ?: 'View All' }}</span></a>
 
                 </div>
 
@@ -450,11 +373,10 @@
                                             src="{{ asset('public/uploads/images/logo/' . $setting->logo) }}"
                                             alt=""></span></div>
 
-                                <h2>Register Now</h2>
+                                @php $registerSection = \App\Support\PageContent::get('home.register'); @endphp
+                                <h2>{{ $registerSection['heading'] }}</h2>
 
-                                <div class="text">Be part of this vibrant summit that brings together experts and
-                                    enthusiasts on Legal Tech and AI to discuss and ideate on the profound
-                                    connections between law and tech.</div>
+                                <div class="text">{!! nl2br(e($registerSection['body'])) !!}</div>
 
                             </div>
 

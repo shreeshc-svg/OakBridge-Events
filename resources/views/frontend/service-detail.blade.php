@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
-@section('title', $service->title . ' ' . '-' . ' ' . $setting->site_title)
-@section('keywords', $setting->site_keywords)
-@section('description', $setting->site_description)
+@section('title', $service->meta_title ?: $service->title . ' - ' . $setting->site_title)
+@section('keywords', $service->meta_keyword ?: $setting->site_keywords)
+@section('description', $service->meta_description ?: $setting->site_description)
 @section('content')
 
 
@@ -83,9 +83,12 @@
 
             <div class="sec-title text-center">
 
-                <span class="title">Event Agenda</span>
+                @php $schedulePage = \App\Support\PageContent::get('schedule'); @endphp
+                @if ($schedulePage['eyebrow'])
+                    <span class="title">{{ $schedulePage['eyebrow'] }}</span>
+                @endif
 
-                <h2>Schedule</h2>
+                <h2>{{ $schedulePage['heading'] }}</h2>
 
             </div>
 
@@ -108,7 +111,7 @@
 
                             <!-- schedule Block -->
 
-                            @foreach (json_decode($service->timeline, true) as $timeline)
+                            @foreach (json_decode($service->timeline ?? '[]', true) ?: [] as $timeline)
                                 <div class="schedule-block @if ($loop->even) even @endif">
 
                                     <div class="inner-box">
@@ -189,18 +192,17 @@
         </div>
         
         <div class="btn-box w-100 text-center">
-
-                    @if ($registrationOpen)
-                    <a href="#" data-toggle="modal" data-target="#exampleModal" class="theme-btn btn-style-one"><span
-                            class="btn-title">Register Now</span></a>
-                    @endif
-                            
-                      <a href="/public/uploads/Agenda_29_Nov.pdf" download 
-       class="theme-btn btn-style-three ml-3">
-        <span class="btn-title">Download Agenda</span>
-    </a>
-
-                </div>
+            @if ($registrationOpen && $schedulePage['register_label'])
+                <a href="#" data-toggle="modal" data-target="#exampleModal" class="theme-btn btn-style-one"><span
+                        class="btn-title">{{ $schedulePage['register_label'] }}</span></a>
+            @endif
+            @if ($schedulePage['agenda_label'] && $schedulePage['agenda_file'])
+                <a href="{{ \App\Support\Uploads::url($schedulePage['agenda_file']) }}" download
+                    class="theme-btn btn-style-three ml-3">
+                    <span class="btn-title">{{ $schedulePage['agenda_label'] }}</span>
+                </a>
+            @endif
+        </div>
 
     </section>
 

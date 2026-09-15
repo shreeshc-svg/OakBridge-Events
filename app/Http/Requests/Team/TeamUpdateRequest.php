@@ -23,7 +23,7 @@ class TeamUpdateRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:75',
-            'position' => 'sometimes|required|string|max:75',
+            'position' => 'nullable|string|max:75',
             'image' => 'sometimes|nullable|image|mimes:png,jpg,webp,jpeg|max:2048',
             'social' => 'sometimes|nullable',
             'bio' => 'nullable',

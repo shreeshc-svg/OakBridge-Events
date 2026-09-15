@@ -106,3 +106,41 @@
         margin-left: 0;
     }
 }
+
+/* ------------------------------------------------------------------
+   Text edited in Admin (rich text): keep the theme's look
+------------------------------------------------------------------ */
+.page-rich-text img {
+    max-width: 100%;
+    height: auto;
+}
+
+.sec-title .page-rich-text p:last-child {
+    margin-bottom: 0;
+}
+
+/* bulleted lists shown with the theme's tick bullets (Legathon) */
+.rich-ticks ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 0 1rem;
+}
+
+.rich-ticks ul li {
+    position: relative;
+    font-size: 16px;
+    line-height: 26px;
+    color: #444444;
+    padding-left: 35px;
+    margin-bottom: 10px;
+}
+
+.rich-ticks ul li:before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 16px;
+    content: "\52";
+    font-family: "ElegantIcons";
+    color: #e1137b;
+}

@@ -20,6 +20,11 @@ use App\Http\Controllers\VidhiSammanController;
 use App\Http\Controllers\HeroBannerController;
 use App\Http\Controllers\MarketingStripController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\PageContentController;
+use App\Http\Controllers\SponsorController;
+use App\Http\Controllers\CompetitionController;
+use App\Http\Controllers\SeoController;
+use App\Http\Controllers\MenuController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +58,31 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     // open / close event registration
     Route::get('registration', [RegistrationController::class, 'edit'])->name('registration.edit');
     Route::post('registration', [RegistrationController::class, 'update'])->name('registration.update');
+
+    // website content
+    Route::get('page-content', [PageContentController::class, 'index'])->name('page-content.index');
+    Route::get('page-content/{key}', [PageContentController::class, 'edit'])->name('page-content.edit');
+    Route::post('page-content/{key}', [PageContentController::class, 'update'])->name('page-content.update');
+    Route::post('page-content/{key}/reset', [PageContentController::class, 'reset'])->name('page-content.reset');
+
+    Route::get('sponsors', [SponsorController::class, 'index'])->name('sponsors.index');
+    Route::post('sponsors/groups', [SponsorController::class, 'storeGroup'])->name('sponsors.groups.store');
+    Route::post('sponsors/groups/{group}', [SponsorController::class, 'updateGroup'])->name('sponsors.groups.update');
+    Route::delete('sponsors/groups/{group}', [SponsorController::class, 'destroyGroup'])->name('sponsors.groups.destroy');
+    Route::post('sponsors/reorder', [SponsorController::class, 'reorder'])->name('sponsors.reorder');
+    Route::post('sponsors/logos', [SponsorController::class, 'storeSponsor'])->name('sponsors.logos.store');
+    Route::post('sponsors/logos/{sponsor}', [SponsorController::class, 'updateSponsor'])->name('sponsors.logos.update');
+    Route::delete('sponsors/logos/{sponsor}', [SponsorController::class, 'destroySponsor'])->name('sponsors.logos.destroy');
+
+    Route::resource('competitions', CompetitionController::class)->except('show');
+
+    Route::get('seo', [SeoController::class, 'index'])->name('seo.index');
+    Route::post('seo', [SeoController::class, 'update'])->name('seo.update');
+
+    Route::get('menus', [MenuController::class, 'index'])->name('menus.index');
+    Route::post('menus', [MenuController::class, 'store'])->name('menus.store');
+    Route::post('menus/{item}', [MenuController::class, 'update'])->name('menus.update');
+    Route::delete('menus/{item}', [MenuController::class, 'destroy'])->name('menus.destroy');
     // profile
     Route::get('profile', [ProfileController::class, 'profile'])->name('profile');
     //password update

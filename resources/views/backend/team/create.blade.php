@@ -165,11 +165,12 @@
                             <div class="card-body pb-0">
 
                                 <div class="form-group">
-                                    <label class="mb-0" for="">Speaker/Advisor</label>
+                                    <label class="mb-0" for="">Type</label>
                                     <select name="year" class="form-control" aria-label="Default select example" required>
                                         <option value="">Choose option</option>
                                         <option value="Speaker" {{ old('year') == 'Speaker' ? 'selected' : '' }}>Speaker</option>
                                         <option value="Advisor" {{ old('year') == 'Advisor' ? 'selected' : '' }}>Advisor</option>
+                                        <option value="Organizer" {{ old('year') == 'Organizer' ? 'selected' : '' }}>Organizer team (About page)</option>
                                     </select>
                                     @error('year')
                                         <span class="text-danger">{{ $message }}</span>

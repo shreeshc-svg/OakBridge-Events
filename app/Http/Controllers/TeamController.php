@@ -37,7 +37,7 @@ class TeamController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:75',
-            'position' => 'required|string|max:75',
+            'position' => 'nullable|string|max:75',
             'image' => 'nullable|image|mimes:png,jpg,webp,jpeg|max:2048',
             'social' => 'nullable',
             'bio' => 'nullable',
