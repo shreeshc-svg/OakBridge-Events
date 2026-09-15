@@ -397,6 +397,12 @@ return [
                     'icon'    => 'fas fa-fw fa-eye',
                     'route'  => 'service.index',
                 ],
+                [
+                    'text' => 'Schedules',
+                    'icon'    => 'fas fa-fw fa-calendar-alt',
+                    'route'  => 'schedules.index',
+                    'active' => ['admin/schedules*'],
+                ],
 
             ],
         ],

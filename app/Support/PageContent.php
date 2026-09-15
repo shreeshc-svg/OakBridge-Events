@@ -152,13 +152,14 @@ class PageContent
             'schedule' => [
                 'page' => 'Schedule',
                 'label' => 'Schedule page',
-                'hint' => 'Applies to every event page. The sessions, date and SEO of each event are edited in Events.',
+                'hint' => 'Applies to every event page. Each event\'s date, timings, venue, sessions and agenda are edited in Events › Schedules.',
                 'fields' => [
                     'eyebrow' => ['type' => 'text', 'label' => 'Small title', 'default' => 'Event Agenda'],
                     'heading' => ['type' => 'text', 'label' => 'Heading', 'default' => 'Schedule'],
                     'register_label' => ['type' => 'text', 'label' => 'Register button text', 'help' => 'Shown only while registration is open.', 'default' => 'Register Now'],
                     'agenda_label' => ['type' => 'text', 'label' => 'Agenda button text', 'help' => 'Leave empty to hide the agenda button.', 'default' => 'Download Agenda'],
-                    'agenda_file' => ['type' => 'file', 'label' => 'Agenda PDF', 'default' => 'public/uploads/Agenda_29_Nov.pdf'],
+                    'agenda_file' => ['type' => 'file', 'label' => 'Default agenda PDF', 'help' => 'Used when an event has no agenda PDF of its own.', 'default' => 'public/uploads/Agenda_29_Nov.pdf'],
+                    'empty_message' => ['type' => 'text', 'label' => 'Message when an event has no sessions yet', 'default' => 'The full schedule will be announced soon.'],
                 ],
             ],
 

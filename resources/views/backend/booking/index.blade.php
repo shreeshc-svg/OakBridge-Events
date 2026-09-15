@@ -71,7 +71,10 @@
                                       <th style="width: 10%">
                                         Designation
                                     </th>
-                                    <th style="width: 25%">
+                                    <th style="width: 15%">
+                                        Event
+                                    </th>
+                                    <th style="width: 10%">
                                         Date
                                     </th>
                                     <th style="width: 29%">Action
@@ -107,6 +110,9 @@
                                         </td>
 
 
+                                        <td>
+                                            {{ $booking->event ?: '—' }}
+                                        </td>
                                         <td>
                                             {{ $booking->date }}
                                         </td>
