@@ -18,6 +18,7 @@ use App\Http\Controllers\VideoController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\VidhiSammanController;
 use App\Http\Controllers\HeroBannerController;
+use App\Http\Controllers\MarketingStripController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +46,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     // homepage hero banner
     Route::get('hero-banner', [HeroBannerController::class, 'edit'])->name('hero.edit');
     Route::post('hero-banner', [HeroBannerController::class, 'update'])->name('hero.update');
+    // scrolling marketing strip under the hero banner
+    Route::get('marketing-strip', [MarketingStripController::class, 'edit'])->name('strip.edit');
+    Route::post('marketing-strip', [MarketingStripController::class, 'update'])->name('strip.update');
     // profile
     Route::get('profile', [ProfileController::class, 'profile'])->name('profile');
     //password update

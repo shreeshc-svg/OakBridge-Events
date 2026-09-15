@@ -110,6 +110,8 @@
 
     <!--End Banner Section -->
 
+    @include('frontend.components.marketing-strip')
+
 
 
     <!-- Coming Soon -->

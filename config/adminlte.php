@@ -340,6 +340,11 @@ return [
             'icon' => 'fas fa-fw fa-image',
         ],
         [
+            'text' => 'Marketing Strip',
+            'route'  => 'strip.edit',
+            'icon' => 'fas fa-fw fa-bullhorn',
+        ],
+        [
             'text' => 'Booking',
             'route'  => 'booking.index',
             'icon' => 'fas fa-ticket-alt',
