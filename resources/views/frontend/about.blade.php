@@ -10,13 +10,13 @@
 
         <div class="auto-container">
 
-            <h1>About Us</h1>
+            <h1>{{ \App\Support\PageContent::get('about.organizer')['page_title'] }}</h1>
 
             <ul class="bread-crumb clearfix">
 
                 <li><a href="{{ route('home') }}">Home</a></li>
 
-                <li>About Us</li>
+                <li>{{ \App\Support\PageContent::get('about.organizer')['page_title'] }}</li>
 
             </ul>
 

@@ -7,7 +7,22 @@
 
     <meta charset="utf-8">
 
-    <title>@yield('title')</title>
+    @php
+        $seoTitle = \App\Support\Seo::title(trim(html_entity_decode($__env->yieldContent('title'), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        $seoDescription = \App\Support\Seo::description(trim(html_entity_decode($__env->yieldContent('description'), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        $seoKeywords = \App\Support\Seo::keywords(trim(html_entity_decode($__env->yieldContent('keywords'), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    @endphp
+    <title>{{ $seoTitle }}</title>
+    @if ($seoDescription)
+        <meta name="description" content="{{ $seoDescription }}">
+        <meta property="og:description" content="{{ $seoDescription }}">
+    @endif
+    @if ($seoKeywords)
+        <meta name="keywords" content="{{ $seoKeywords }}">
+    @endif
+    <meta property="og:title" content="{{ $seoTitle }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
 
     <!-- Stylesheets -->
 
@@ -17,7 +32,7 @@
 
     <link href="{{ asset('public/assets/css/responsive.css') }}" rel="stylesheet">
 
-    <link href="{{ asset('public/assets/css/custom.css') }}?v=2" rel="stylesheet">
+    <link href="{{ asset('public/assets/css/custom.css') }}?v=3" rel="stylesheet">
 
     <!--Color Switcher Mockup-->
 
@@ -132,65 +147,21 @@
                             <div class="collapse navbar-collapse clearfix" id="navbarSupportedContent">
 
                                 <ul class="navigation clearfix">
-
-                                    <li class="dropdown {{ Route::is('home') ? 'current' : '' }}"><a
-                                            href="{{ route('home') }}">Home</a>
-                                    </li>
-                                    <li class="dropdown {{ Route::is('speakers') ? 'current' : '' }}"><a
-                                            href="{{ route('speakers') }}">Speakers</a>
-                                    </li>
-                                   <li class="dropdown {{ Route::is('events') ? 'current' : '' }}"><a
-                                            href="https://www.oakbridge.events/event/india-law-ai-tech-summit-2025">Schedule</a>
-                                    </li>
-                                    
-                                    
-                                    {{-- <li class="dropdown {{ Route::is('about') ? 'current' : '' }}"><a
-                                            href="{{ route('about') }}">About Us</a>
-
-                                    </li> --}}
-                                     
-                                    {{-- <li><a class="dropdown {{ Route::is('home') ? 'current' : '' }}"
-                                            href="{{}}#sponsorsid">Sponsors</a>
-                                    </li> --}}
-                                    
-                                     <li><a
-                                            href="{{ route('home') }}#sponsors">Sponsors</a>
-
-                                    </li>
-                                    
-                                    <li><a
-                                            href="{{ route('home') }}#exhibitors">Exhibitors</a>
-
-                                    </li>
-                                     
-                                     
-                                    {{-- <li class="dropdown {{ Route::is('advisors') ? 'current' : '' }}"><a
-                                            href="{{ route('advisors') }}">Advisors</a>
-                                    </li> 
-
-                                    <li class="dropdown {{ Route::is('testimonial') ? 'current' : '' }}"><a
-                                            href="{{ route('testimonial') }}">Testimonials</a>
-                                    </li>--}}
-
-                                    <li class="dropdown {{ Route::is('gallery', 'videos') ? 'current' : '' }}"><a
-                                            href="#">Gallery</a>
-
-                                        <ul>
-
-                                            <li><a href="{{ route('gallery') }}">Images</a></li>
-
-                                            <li><a href="{{ route('videos') }}">Videos</a></li>
-
-
-                                        </ul>
-
-                                    </li> 
-
-
-
-                                    <li class="dropdown {{ Route::is('about') ? 'current' : '' }}"><a
-                                            href="{{ route('about') }}">About</a>
-                                    </li>
+                                    {{-- links are managed in Admin > Menus --}}
+                                    @foreach (\App\Support\SiteMenu::items('header') as $menuItem)
+                                        <li class="{{ count($menuItem['children']) ? 'dropdown' : '' }} {{ \App\Support\SiteMenu::isCurrent($menuItem) ? 'current' : '' }}">
+                                            <a href="{{ \App\Support\SiteMenu::href($menuItem['url']) }}"
+                                                @if ($menuItem['new_tab']) target="_blank" rel="noopener" @endif>{{ $menuItem['label'] }}</a>
+                                            @if (count($menuItem['children']))
+                                                <ul>
+                                                    @foreach ($menuItem['children'] as $subItem)
+                                                        <li><a href="{{ \App\Support\SiteMenu::href($subItem['url']) }}"
+                                                                @if ($subItem['new_tab']) target="_blank" rel="noopener" @endif>{{ $subItem['label'] }}</a></li>
+                                                    @endforeach
+                                                </ul>
+                                            @endif
+                                        </li>
+                                    @endforeach
 
                                     @if ($registrationOpen)
                                     <div class="btn-box d-block d-sm-none mt-4 ml-3">
@@ -275,6 +246,7 @@
 
         <!-- Main Footer -->
 
+        @php $footerContent = \App\Support\PageContent::get('footer'); @endphp
         <footer class="main-footer">
 
             <!--Widgets Section-->
@@ -306,8 +278,7 @@
 
                                         <div class="text">
 
-                                            <p>OakBridge Publishing is a new-age publishing and knowledge services organization, established with the objective of redeﬁning the craft of publishing to address the evolving requirements of today’s professionals and academia.
-                                            </p>
+                                            <p>{!! nl2br(e($footerContent['body'])) !!}</p>
 
                                         </div>
 
@@ -356,19 +327,13 @@
 
                                     <div class="footer-widget useful-links">
 
-                                        <h2 class="widget-title">Useful Links</h2>
+                                        <h2 class="widget-title">{{ $footerContent['links_title'] }}</h2>
 
                                         <ul class="user-links">
-
-                                             <li><a href="{{ route('speakers') }}">Speakers</a></li>
-                                            <li><a href="https://www.oakbridge.events/event/india-law-ai-tech-summit-2025">Schedule</a></li>
-                                           <li><a href="{{ route('home') }}#sponsorsid">Sponsors</a></li>
-                                          {{--  <li><a href="{{ route('image.gallery') }}">Gallery</a></li>
-                                            <li><a href="{{ route('testimonial') }}">Testimonials</a></li>
-                                            <li><a href="{{ route('blog') }}">Blogs</a></li> --}}
-                                            <li><a href="{{ route('contact') }}">Contact Us</a></li>
-                                            <li><a href="{{ route('privacy.policy') }}">Privacy Policy</a></li>
-
+                                            @foreach (\App\Support\SiteMenu::items('footer') as $footerLink)
+                                                <li><a href="{{ \App\Support\SiteMenu::href($footerLink['url']) }}"
+                                                        @if ($footerLink['new_tab']) target="_blank" rel="noopener" @endif>{{ $footerLink['label'] }}</a></li>
+                                            @endforeach
                                         </ul>
 
                                     </div>
@@ -395,7 +360,7 @@
 
                                     <div class="footer-widget contact-widget">
 
-                                        <h2 class="widget-title">Contact Us</h2>
+                                        <h2 class="widget-title">{{ $footerContent['contact_title'] }}</h2>
 
                                         <!--Footer Column-->
 
@@ -509,7 +474,7 @@
                     <div class="inner-container clearfix">
 
                         <div class="copyright-text">
-                                <p>&copy;2025 OakBridge Publishing</p>
+                                <p>{{ $footerContent['copyright'] }}</p>
                            {{-- <p>@{{ date('Y') }} Made with ❤️ By <a target="_blank"
                                     href="https://www.vfixtechnology.com">VFIX
                                     TECHNOLOGY</a></p>  --}}

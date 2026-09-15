@@ -16,9 +16,10 @@
 
             <div class="sec-title text-center">
 
-                <span class="title">{{ $setting->bname }}</span>
+                @php $programme = \App\Support\PageContent::get('home.programme'); @endphp
+                <span class="title">{{ $programme['eyebrow'] ?: $setting->bname }}</span>
 
-                <h2>Programme</h2>
+                <h2>{{ $programme['heading'] }}</h2>
 
             </div>
 

@@ -335,16 +335,6 @@ return [
             // 'can'  => 'manage-blog',
         ],
         [
-            'text' => 'Hero Banner',
-            'route'  => 'hero.edit',
-            'icon' => 'fas fa-fw fa-image',
-        ],
-        [
-            'text' => 'Marketing Strip',
-            'route'  => 'strip.edit',
-            'icon' => 'fas fa-fw fa-bullhorn',
-        ],
-        [
             'text' => 'Registration',
             'route'  => 'registration.edit',
             'icon' => 'fas fa-fw fa-user-check',
@@ -444,7 +434,7 @@ return [
 
         // ],
         [
-            'text'    => 'Speakers / Adivisors',
+            'text'    => 'Speakers / Advisors / Team',
             'url'  => 'admin/team/*',
             'icon'    => 'fas fa-users',
             'submenu' => [
@@ -498,6 +488,45 @@ return [
         //         ],
         //     ]
         // ],
+        ['header' => 'WEBSITE CONTENT'],
+        [
+            'text' => 'Hero Banner',
+            'route'  => 'hero.edit',
+            'icon' => 'fas fa-fw fa-image',
+        ],
+        [
+            'text' => 'Marketing Strip',
+            'route'  => 'strip.edit',
+            'icon' => 'fas fa-fw fa-bullhorn',
+        ],
+        [
+            'text' => 'Page Content',
+            'route'  => 'page-content.index',
+            'icon' => 'fas fa-fw fa-file-alt',
+            'active' => ['admin/page-content*'],
+        ],
+        [
+            'text' => 'Sponsors & Exhibitors',
+            'route'  => 'sponsors.index',
+            'icon' => 'fas fa-fw fa-handshake',
+        ],
+        [
+            'text' => 'Legathon',
+            'route'  => 'competitions.index',
+            'icon' => 'fas fa-fw fa-trophy',
+            'active' => ['admin/competitions*'],
+        ],
+        [
+            'text' => 'Menus',
+            'route'  => 'menus.index',
+            'icon' => 'fas fa-fw fa-bars',
+        ],
+        [
+            'text' => 'SEO',
+            'route'  => 'seo.index',
+            'icon' => 'fas fa-fw fa-search',
+        ],
+        ['header' => 'ACCOUNT'],
         [
             'text' => 'profile',
             'route'  => 'profile',
