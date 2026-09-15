@@ -1,0 +1,99 @@
+/*
+ * OakBridge Events site overrides.
+ * Loaded after style.css / responsive.css so these rules win.
+ */
+
+/* ------------------------------------------------------------------
+   Speaker cards (homepage + /speakers)
+   Every card is the same size and every red name banner has the
+   same shape, whatever the length of the name or designation.
+------------------------------------------------------------------ */
+.speakers-section-three .row > .speaker-block-three {
+    display: flex;
+}
+
+.speaker-block-three .inner-box {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.speaker-block-three .info-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    /* leaves room for the slanted end inside the card */
+    width: calc(100% - 48px);
+    /* fits a 2-line name and a 3-line designation */
+    height: 128px;
+    padding: 12px 6px 12px 30px;
+}
+
+.speaker-block-three .info-box:before {
+    right: -30px;
+    /* gentler angle so the taller banner keeps the original slant width */
+    -webkit-transform: skew(-16deg);
+    -moz-transform: skew(-16deg);
+    -ms-transform: skew(-16deg);
+    -o-transform: skew(-16deg);
+    transform: skew(-16deg);
+}
+
+.speaker-block-three .info-box .name,
+.speaker-block-three .info-box .designation {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+
+.speaker-block-three .info-box .name {
+    -webkit-line-clamp: 2;
+    margin-bottom: 2px;
+}
+
+.speaker-block-three .info-box .designation {
+    -webkit-line-clamp: 3;
+}
+
+/* ------------------------------------------------------------------
+   Header: keep the menu centred on the page (desktop), with the logo
+   on the left and the Register button (when shown) on the right.
+------------------------------------------------------------------ */
+@media only screen and (min-width: 1024px) {
+    .header-style-two .main-box > .auto-container {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+    }
+
+    .header-style-two .main-box > .auto-container:before,
+    .header-style-two .main-box > .auto-container:after {
+        content: none;
+        display: none;
+    }
+
+    .header-style-two .main-box .logo-box {
+        grid-column: 1;
+        justify-self: start;
+        float: none;
+    }
+
+    .header-style-two .main-box .nav-outer {
+        grid-column: 2;
+        justify-self: center;
+        float: none;
+    }
+
+    .header-style-two .main-box .outer-box {
+        grid-column: 3;
+        justify-self: end;
+        float: none;
+        margin-left: 20px;
+    }
+
+    .header-style-two .main-menu .navigation > li:first-child {
+        margin-left: 0;
+    }
+}

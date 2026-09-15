@@ -17,6 +17,8 @@
 
     <link href="{{ asset('public/assets/css/responsive.css') }}" rel="stylesheet">
 
+    <link href="{{ asset('public/assets/css/custom.css') }}?v=1" rel="stylesheet">
+
     <!--Color Switcher Mockup-->
 
     <link href="{{ asset('public/assets/css/color-switcher-design.css') }}" rel="stylesheet">
