@@ -7,6 +7,13 @@
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://www.oakbridge.events/$1 [NC,L,R=301]
 
+    # Block direct web access to app source, git history and server-only folders
+    # (the site root is the project root, so these would otherwise be reachable)
+    RewriteRule ^(\.git|app|bootstrap|config|database|lang|node_modules|resources|routes|storage|tests)(/|$) - [F,L]
+    # vendor/ is blocked except the CSS/JS folders the admin panel loads, and no PHP runs from it
+    RewriteRule ^vendor/(?!(adminlte|bootstrap|fontawesome-free|icheck-bootstrap|jquery|overlayScrollbars|popper)/) - [F,L]
+    RewriteRule ^vendor/.*\.php$ - [F,L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -27,3 +34,9 @@ Options -Indexes
     Order allow,deny
     Deny from all
 </Files>
+
+# Block backups, database dumps and log files anywhere on the site
+<FilesMatch "\.(sql|zip|gz|tar|rar|7z|bak|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
