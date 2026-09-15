@@ -17,8 +17,8 @@
                     <img class="rounded mb-3" src="{{ asset('public/assets/images/vd.jpg') }}" alt="">
                 </div>
                 <div class="card p-3">
-                    <h2 class="mb-3">Book Your Ticket for Vidhi Utsav 2025</h2>
-                    @include('frontend.components.booking-form.blade.php')
+                    <h2 class="mb-3">Book Your Ticket</h2>
+                    @include('frontend.components.booking-form')
                 </div>
             </div>
         </div>
