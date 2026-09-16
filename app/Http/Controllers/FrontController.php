@@ -364,18 +364,8 @@ class FrontController extends Controller
     $data['date'] = $chosenEvent->date->format('Y-m-d H:i:s');
 
 
-    // Fetch the last booking_id from the Booking table
-    $lastBooking = DB::table('bookings')->latest('id')->first();
-
-    if ($lastBooking) {
-        // Extract the numeric part of the last booking_id and increment it
-        $lastNumber = (int)substr($lastBooking->booking_id, 2); // Remove 'VD' prefix
-        $newBookingId = 'VD' . str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT); // Use 4 digits instead of 5
-    } else {
-        // If no bookings exist, start with VD9001
-        $newBookingId = 'VD9167';
-    }
-
+    // next VD number (carries on after the registrations are cleared)
+    $newBookingId = \App\Support\BookingNumber::next();
 
     $data['booking_id'] = $newBookingId;
 
