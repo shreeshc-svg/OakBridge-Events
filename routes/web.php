@@ -220,10 +220,12 @@ Route::get('/videos', [FrontController::class, 'videos'])->name('videos');
 Route::get('/thanks', [FrontController::class, 'thanks'])->name('thanks');
 
 // online payment (Razorpay)
-Route::get('/pay/{orderNo}', [PaymentController::class, 'pay'])->name('order.pay');
-Route::post('/pay/{orderNo}/verify', [PaymentController::class, 'verify'])->name('order.verify');
-Route::get('/pay/{orderNo}/cancelled', [PaymentController::class, 'cancelled'])->name('order.cancelled');
-Route::get('/pay/{orderNo}/done', [PaymentController::class, 'done'])->name('order.done');
+Route::middleware('throttle:20,1')->group(function () {
+    Route::get('/pay/{orderNo}', [PaymentController::class, 'pay'])->name('order.pay');
+    Route::post('/pay/{orderNo}/verify', [PaymentController::class, 'verify'])->name('order.verify');
+    Route::get('/pay/{orderNo}/cancelled', [PaymentController::class, 'cancelled'])->name('order.cancelled');
+    Route::get('/pay/{orderNo}/done', [PaymentController::class, 'done'])->name('order.done');
+});
 Route::post('/webhooks/razorpay', [PaymentController::class, 'webhook'])->name('razorpay.webhook')
     ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 Route::get('/thank-you', [FrontController::class, 'contactThanks'])->name('contact.thanks');
@@ -240,7 +242,7 @@ Route::get('/gallery', [FrontController::class, 'gallery'])->name('gallery');
 // Route::post('/grievence', [FrontController::class, 'grievenceForm'])->name('grievence.form');
 // Route::post('/job-notification', [FrontController::class, 'jobNotification'])->name('job.notification');
 
-Route::post('book-ticket',[FrontController::class,'bookTicket'])->name('book.ticket');
+Route::post('book-ticket', [FrontController::class, 'bookTicket'])->middleware('throttle:10,1')->name('book.ticket');
 Route::get('legathon',[FrontController::class,'legathan'])->name('legathan');
 
 

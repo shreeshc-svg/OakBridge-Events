@@ -47,7 +47,7 @@
                     <span>&ndash; {{ $money($quote['discount']) }}</span>
                 </div>
             @endif
-            @if ($quote['tax'] > 0)
+            @if ($quote['tax'] > 0 && !$quote['tax_included'])
                 <div class="pay-line">
                     <span>{{ $quote['tax_label'] }} ({{ rtrim(rtrim(number_format($quote['tax_percent'], 2), '0'), '.') }}%)</span>
                     <span>{{ $money($quote['tax']) }}</span>
@@ -57,6 +57,10 @@
                 <span>Amount payable</span>
                 <span class="pay-total">{{ $money($quote['total']) }}</span>
             </div>
+
+            @if ($quote['tax'] > 0 && $quote['tax_included'])
+                <p class="small text-muted mb-0">Includes {{ $quote['tax_label'] }} of {{ $money($quote['tax']) }}.</p>
+            @endif
 
             <ul class="list-unstyled small text-muted mt-3 mb-4">
                 @foreach ($order->attendeeList() as $number => $person)
@@ -71,8 +75,10 @@
                 </p>
             @else
                 <div class="alert alert-warning mb-0">
-                    Online payment is not available right now. We have emailed you the bank details for order
-                    <strong>{{ $order->order_no }}</strong> – your passes are held until the payment reaches us.
+                    We could not open the payment window for order <strong>{{ $order->order_no }}</strong> just now.
+                    Your passes are held. Please email
+                    <a href="mailto:{{ $setting->email ?? 'info@oakbridge.in' }}">{{ $setting->email ?? 'info@oakbridge.in' }}</a>
+                    quoting that number and we will send you payment details.
                 </div>
             @endif
 

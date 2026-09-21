@@ -151,6 +151,16 @@ class OrderController extends Controller
         ]);
 
         $orders = Order::whereIn('id', $data['ids'])->get();
+        $paid = $orders->where('status', 'paid');
+
+        // paid orders are payment records: they need the single delete, with its warning
+        if ($paid->isNotEmpty() && ! $request->boolean('include_paid')) {
+            return back()->withErrors([
+                'ids' => $paid->count() . ' of those orders are PAID (' . $paid->pluck('order_no')->implode(', ')
+                    . '). Untick them, or delete a paid order one at a time from its own page.',
+            ]);
+        }
+
         $passes = 0;
 
         DB::transaction(function () use ($orders, &$passes) {
