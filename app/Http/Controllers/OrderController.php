@@ -58,14 +58,25 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        $order->status = $data['status'];
         $order->payment_reference = ($data['payment_reference'] ?? null) ?: null;
         $order->payment_method = ($data['payment_method'] ?? null) ?: null;
         $order->notes = ($data['notes'] ?? null) ?: null;
-        $order->paid_at = $data['status'] === 'paid' ? ($order->paid_at ?: now()) : null;
         $order->save();
 
-        return redirect()->route('orders.show', $order)->with('success', 'Order ' . $order->order_no . ' updated.');
+        if ($data['status'] === 'paid') {
+            // issues the passes and sends the confirmation, once
+            $issued = \App\Support\OrderFulfiller::markPaid($order);
+            $message = $issued
+                ? 'Order ' . $order->order_no . ' marked paid – ' . $order->quantity . ' pass(es) issued and the buyer emailed.'
+                : 'Order ' . $order->order_no . ' updated.';
+        } else {
+            $order->status = $data['status'];
+            $order->paid_at = null;
+            $order->save();
+            $message = 'Order ' . $order->order_no . ' updated.';
+        }
+
+        return redirect()->route('orders.show', $order)->with('success', $message);
     }
 
     /** Spreadsheet of the orders currently filtered. */

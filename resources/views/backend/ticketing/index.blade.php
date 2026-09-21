@@ -318,6 +318,7 @@
                     Tax &amp; payment
                     <small class="text-muted ml-2">
                         {{ $setting->tax_percent ? rtrim(rtrim(number_format((float) $setting->tax_percent, 2), '0'), '.') . '% ' . ($setting->tax_label ?: 'tax') . ($setting->prices_include_tax ? ' included' : ' added on top') : 'no tax' }}
+                        &middot; {{ \App\Support\Razorpay::enabled() ? 'Razorpay on' : 'bank transfer' }}
                     </small>
                 </h3>
                 <div class="card-tools">
@@ -355,8 +356,33 @@
                                 value="{{ old('max_passes_per_order', $setting->max_passes_per_order ?: 10) }}">
                         </div>
                     </div>
+                    @php
+                        $razorpayKeys = (bool) \App\Support\Razorpay::keyId();
+                    @endphp
+                    <div class="border rounded p-3 mb-3" style="background:#f8f9fa">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="online_payment" name="online_payment"
+                                value="1" @checked(old('online_payment', $setting->online_payment)) @disabled(!$razorpayKeys)>
+                            <label class="custom-control-label" for="online_payment">
+                                <strong>Take payment online with Razorpay</strong>
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">
+                            @if (!$razorpayKeys)
+                                Add RAZORPAY_KEY and RAZORPAY_SECRET to the server's .env file first, then this can be switched on.
+                            @elseif (\App\Support\Razorpay::isTestMode())
+                                <span class="badge badge-warning">Test keys</span>
+                                Payments will not charge real money until live keys are in .env.
+                            @else
+                                <span class="badge badge-success">Live keys</span>
+                                Buyers go straight to checkout and their passes are issued the moment payment succeeds.
+                            @endif
+                            When this is off, buyers get the bank details below and you mark orders paid in Orders.
+                        </small>
+                    </div>
+
                     <div class="form-group">
-                        <label for="payment_instructions">How to pay (shown in the email and on the thank-you page)</label>
+                        <label for="payment_instructions">How to pay (shown when online payment is off)</label>
                         <textarea class="form-control" id="payment_instructions" name="payment_instructions" rows="3"
                             placeholder="Bank name, account number, IFSC, UPI id…">{{ old('payment_instructions', $setting->payment_instructions) }}</textarea>
                     </div>

@@ -409,9 +409,15 @@ class FrontController extends Controller
         if (count(array_unique($emails)) !== count($emails)) {
             return back()->withInput()->withErrors(['email' => 'Each pass needs a different email address.']);
         }
+        // already registered = holds a pass, or sits in an order that is paid or still awaiting payment
         $taken = Booking::where('service_id', $chosenEvent->id)
-            ->whereIn(\Illuminate\Support\Facades\DB::raw('LOWER(email)'), $emails)
-            ->pluck('email')->map(fn ($e) => strtolower($e))->all();
+            ->pluck('email')->filter()->map(fn ($e) => strtolower($e))->all();
+        $heldInOrders = \App\Models\Order::where('service_id', $chosenEvent->id)
+            ->whereIn('status', ['pending', 'paid'])
+            ->pluck('attendees')
+            ->flatMap(fn ($list) => collect((array) $list)->pluck('email'))
+            ->filter()->map(fn ($e) => strtolower($e))->all();
+        $taken = array_unique(array_merge($taken, $heldInOrders));
         foreach ($emails as $number => $email) {
             if (in_array($email, $taken, true)) {
                 $field = $number === 1 ? 'email' : "attendees.{$number}.email";
@@ -426,80 +432,81 @@ class FrontController extends Controller
             ? \App\Support\Pricing::quote($passType, $quantity, $chosenEvent)
             : null;
 
-        $order = null;
-        $bookings = [];
+        // Free event: register straight away, exactly as before.
+        if (! $quote) {
+            $booking = Booking::create([
+                'booking_id' => \App\Support\BookingNumber::next(),
+                'attendee_no' => 1,
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'company' => $data['company'],
+                'designation' => $data['designation'],
+                'date' => $data['date'],
+                'service_id' => $chosenEvent->id,
+                'event' => $chosenEvent->title,
+            ]);
 
-        \Illuminate\Support\Facades\DB::transaction(function () use (&$order, &$bookings, $data, $chosenEvent, $passType, $quantity, $attendees, $quote) {
-            if ($quote) {
-                $order = \App\Models\Order::create([
-                    'order_no' => 'TMP',
-                    'service_id' => $chosenEvent->id,
-                    'pass_type_id' => $passType->id,
-                    'event' => $chosenEvent->title,
-                    'pass_name' => $passType->name,
-                    'buyer_name' => $data['name'],
-                    'buyer_email' => $data['email'],
-                    'buyer_phone' => $data['phone'],
-                    'buyer_company' => $data['company'],
-                    'buyer_designation' => $data['designation'],
-                    'quantity' => $quantity,
-                    'unit_price' => $quote['unit'],
-                    'discount_total' => $quote['discount'],
-                    'discount_label' => $quote['discount_label'],
-                    'tax_percent' => $quote['tax_percent'],
-                    'tax_total' => $quote['tax'],
-                    'total' => $quote['total'],
-                    'status' => 'pending',
-                ]);
-                $order->update(['order_no' => 'OB' . now()->format('ymd') . '-' . str_pad((string) $order->id, 4, '0', STR_PAD_LEFT)]);
-            }
+            $this->notifyFreeBooking($data, $chosenEvent, $booking);
+            $request->session()->flash('eventName', $chosenEvent->title);
 
-            for ($number = 1; $number <= $quantity; $number++) {
-                $person = $number === 1
-                    ? ['name' => $data['name'], 'email' => $data['email']]
-                    : $attendees[$number];
-
-                $bookings[] = Booking::create([
-                    'order_id' => $order?->id,
-                    'booking_id' => \App\Support\BookingNumber::next(),
-                    'attendee_no' => $number,
-                    'name' => $person['name'],
-                    'email' => $person['email'],
-                    'phone' => $data['phone'],
-                    'company' => $data['company'],
-                    'designation' => $number === 1 ? $data['designation'] : null,
-                    'amount' => $quote ? $quote['per_pass'] : null,
-                    'date' => $data['date'],
-                    'service_id' => $chosenEvent->id,
-                    'event' => $chosenEvent->title,
-                ]);
-            }
-        });
-
-        $this->notifyBooking($data, $chosenEvent, $order, $bookings, $quote);
-        $this->sendBookingWhatsApp($data);
-
-        $request->session()->flash('eventName', $chosenEvent->title);
-        if ($order) {
-            $request->session()->flash('orderNo', $order->order_no);
-            $request->session()->flash('orderTotal', \App\Support\Pricing::money((float) $order->total));
-            $request->session()->flash('orderPasses', $order->quantity);
+            return redirect()->route('thanks');
         }
+
+        // Paid event: hold the attendees on the order; they become passes once it is paid.
+        $attendeeList = [1 => ['name' => $data['name'], 'email' => $data['email']]];
+        foreach ($attendees as $number => $attendee) {
+            $attendeeList[$number] = $attendee;
+        }
+
+        $order = \App\Models\Order::create([
+            'order_no' => 'TMP',
+            'service_id' => $chosenEvent->id,
+            'pass_type_id' => $passType->id,
+            'event' => $chosenEvent->title,
+            'pass_name' => $passType->name,
+            'buyer_name' => $data['name'],
+            'buyer_email' => $data['email'],
+            'buyer_phone' => $data['phone'],
+            'buyer_company' => $data['company'],
+            'buyer_designation' => $data['designation'],
+            'quantity' => $quantity,
+            'attendees' => $attendeeList,
+            'unit_price' => $quote['unit'],
+            'discount_total' => $quote['discount'],
+            'discount_label' => $quote['discount_label'],
+            'tax_percent' => $quote['tax_percent'],
+            'tax_total' => $quote['tax'],
+            'total' => $quote['total'],
+            'status' => 'pending',
+        ]);
+        $order->update(['order_no' => 'OB' . now()->format('ymd') . '-' . str_pad((string) $order->id, 4, '0', STR_PAD_LEFT)]);
+
+        // Online payment on: straight to checkout. Otherwise the bank details email.
+        if (\App\Support\Razorpay::enabled()) {
+            return redirect()->route('order.pay', $order->order_no);
+        }
+
+        \App\Support\OrderFulfiller::notify($order, true);
+        $request->session()->flash('eventName', $chosenEvent->title);
+        $request->session()->flash('orderNo', $order->order_no);
+        $request->session()->flash('orderTotal', \App\Support\Pricing::money((float) $order->total));
+        $request->session()->flash('orderPasses', $order->quantity);
 
         return redirect()->route('thanks');
     }
 
-    /** Confirmation email to the buyer (and the admin copy). */
-    private function notifyBooking(array $data, Service $event, $order, array $bookings, ?array $quote): void
+    /** Free registration: the old confirmation email. */
+    private function notifyFreeBooking(array $data, Service $event, $booking): void
     {
         $payload = $data + [
             'event' => $event->title,
             'event_date' => $event->date,
-            'booking_id' => $bookings[0]->booking_id ?? null,
-            'order' => $order,
-            'quote' => $quote,
-            'attendees' => collect($bookings)->map(fn ($b) => ['name' => $b->name, 'email' => $b->email, 'booking_id' => $b->booking_id])->all(),
-            'payment_instructions' => Setting::find(1)->payment_instructions,
+            'booking_id' => $booking->booking_id,
+            'order' => null,
+            'quote' => null,
+            'attendees' => [['name' => $booking->name, 'email' => $booking->email, 'booking_id' => $booking->booking_id]],
+            'payment_instructions' => null,
             'ip' => request()->ip(),
         ];
 
@@ -508,6 +515,8 @@ class FrontController extends Controller
         } catch (\Throwable $e) {
             report($e);
         }
+
+        $this->sendBookingWhatsApp($data);
     }
 
     /** WhatsApp confirmation through Interakt; never blocks the registration. */

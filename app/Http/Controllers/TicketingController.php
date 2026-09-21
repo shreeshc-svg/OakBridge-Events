@@ -89,6 +89,7 @@ class TicketingController extends Controller
             'max_passes_per_order' => 'required|integer|min:1|max:' . Pricing::MAX_PASSES,
             'payment_instructions' => 'nullable|string|max:3000',
             'invoice_note' => 'nullable|string|max:1000',
+            'online_payment' => 'nullable|boolean',
         ], [], [
             'tax_percent' => 'tax percentage',
             'max_passes_per_order' => 'maximum passes per order',
@@ -101,6 +102,7 @@ class TicketingController extends Controller
         $setting->max_passes_per_order = $data['max_passes_per_order'];
         $setting->payment_instructions = ($data['payment_instructions'] ?? null) ?: null;
         $setting->invoice_note = ($data['invoice_note'] ?? null) ?: null;
+        $setting->online_payment = $request->boolean('online_payment');
         $setting->save();
 
         return $this->backTo($request->input('event_id'), 'Ticketing settings saved.');

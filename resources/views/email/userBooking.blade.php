@@ -4,6 +4,8 @@
     $attendees = $data['attendees'] ?? [];
     $eventDate = $data['event_date'] ?? null;
     $setting = \App\Models\Setting::find(1);
+    $payUrl = $data['pay_url'] ?? null;
+    $isPaid = $order && $order->isPaid();
     $money = fn ($amount) => \App\Support\Pricing::money((float) $amount);
 @endphp
 <!DOCTYPE html>
@@ -37,7 +39,11 @@
         </p>
 
         @if ($order && $quote)
-            <p><strong>To confirm your {{ $order->quantity > 1 ? 'passes' : 'pass' }}, please complete the payment below.</strong></p>
+            @if ($isPaid)
+                <p><strong>Payment received &ndash; your {{ $order->quantity > 1 ? 'passes are' : 'pass is' }} confirmed.</strong></p>
+            @else
+                <p><strong>To confirm your {{ $order->quantity > 1 ? 'passes' : 'pass' }}, please complete the payment below.</strong></p>
+            @endif
 
             <table class="summary">
                 <tr>
@@ -70,9 +76,22 @@
                 <p class="muted">Includes {{ $quote['tax_label'] }} of {{ $money($quote['tax']) }}.</p>
             @endif
 
-            <p class="muted">Order reference: <strong>{{ $order->order_no }}</strong> &ndash; please quote it with your payment.</p>
+            <p class="muted">
+                Order reference: <strong>{{ $order->order_no }}</strong>{!! $isPaid ? '' : ' &ndash; please quote it with your payment' !!}.
+            </p>
 
-            @if (!empty($data['payment_instructions']))
+            @if ($payUrl && !$isPaid)
+                <p style="text-align:center;margin:24px 0">
+                    <a href="{{ $payUrl }}"
+                        style="display:inline-block;background:#b8860b;color:#fff;padding:12px 28px;border-radius:5px;
+                               text-decoration:none;font-weight:bold;font-size:16px">
+                        Pay {{ $money($quote['total']) }} now
+                    </a>
+                </p>
+                <p class="muted" style="text-align:center">Cards, UPI, net banking and wallets. Your passes are held until then.</p>
+            @endif
+
+            @if (!$isPaid && !empty($data['payment_instructions']))
                 <div class="box">
                     <strong>How to pay</strong>
                     <div>{!! nl2br(e($data['payment_instructions'])) !!}</div>
@@ -80,7 +99,7 @@
             @endif
 
             @if (count($attendees) > 1)
-                <p><strong>Passes in this order:</strong></p>
+                <p><strong>{{ $isPaid ? 'Your passes:' : 'Passes in this order:' }}</strong></p>
                 <ul>
                     @foreach ($attendees as $attendee)
                         <li>{{ $attendee['name'] }} ({{ $attendee['email'] }}) &ndash; {{ $attendee['booking_id'] }}</li>
