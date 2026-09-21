@@ -33,20 +33,38 @@ class BookingCreatedAdminNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-                    ->subject('New Booking'.' '.$this->data['booking_id'])
-                    ->greeting('Hello Admin,')
-                    ->line('A new booking has been made with the following details:')
-                    ->line('**Booking Details:**')
-                    ->line('Booking ID: '. $this->data['booking_id'])
-                    ->line('Name: '. $this->data['name'])
-                    ->line('Email: '. $this->data['email'])
-                    ->line('Phone: '. $this->data['phone'])
-                    ->line('Company: '. $this->data['company'] ?? 'NA')
-                    ->line('Designation: '. $this->data['designation'] ??  'NA')
-                    ->line('Event Date: '. $this->data['date'])
-                    ->line('IP: '. $this->data['ip'])
-                    ->line('Thank you!');
+        $data = $this->data;
+        $order = $data['order'] ?? null;
+        $quote = $data['quote'] ?? null;
+
+        $mail = (new MailMessage)
+            ->subject(($order ? 'New order ' . $order->order_no : 'New registration ' . ($data['booking_id'] ?? '')) . ' – ' . ($data['event'] ?? ''))
+            ->greeting('Hello Admin,')
+            ->line($order
+                ? 'A new order has been placed (payment still to be confirmed):'
+                : 'A new registration has come in:')
+            ->line('Event: ' . ($data['event'] ?? 'NA'))
+            ->line('Name: ' . $data['name'])
+            ->line('Email: ' . $data['email'])
+            ->line('Phone: ' . $data['phone'])
+            ->line('Company: ' . ($data['company'] ?: 'NA'))
+            ->line('Designation: ' . ($data['designation'] ?: 'NA'));
+
+        if ($order && $quote) {
+            $mail->line('Pass: ' . $order->pass_name . ' × ' . $order->quantity)
+                ->line('Amount: ' . \App\Support\Pricing::money((float) $order->total)
+                    . ($quote['discount'] > 0 ? ' (after ' . $quote['discount_label'] . ')' : ''))
+                ->line('Status: ' . $order->statusLabel())
+                ->action('Open the order', url('/admin/orders/' . $order->id));
+        }
+
+        foreach ($data['attendees'] ?? [] as $index => $attendee) {
+            if ($index > 0) {
+                $mail->line('Attendee ' . ($index + 1) . ': ' . $attendee['name'] . ' (' . $attendee['email'] . ')');
+            }
+        }
+
+        return $mail->line('IP: ' . ($data['ip'] ?? 'NA'));
     }
 
     /**

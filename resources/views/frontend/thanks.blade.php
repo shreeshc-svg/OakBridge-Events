@@ -23,7 +23,25 @@
                         to reach out to us at <a href="mailto:info@vidhiutsav.in">info@vidhiutsav.in</a> / <a
                             href="tel:7055503337">+91 705550 3337</a>.
                     </p> --}}
-                    <h2>Thank you for expressing your interest. We have added you to our mailing list for future events!</h2>
+                    @if (session('orderNo'))
+                        <h2>Thank you, {{ session('eventName') }} passes reserved!</h2>
+                        <p class="lead mb-1">
+                            {{ session('orderPasses') }} {{ session('orderPasses') > 1 ? 'passes' : 'pass' }} &ndash;
+                            <strong>{{ session('orderTotal') }}</strong> to pay
+                        </p>
+                        <p class="text-muted">Order reference: <strong>{{ session('orderNo') }}</strong></p>
+                        <div class="alert alert-info text-start">
+                            <strong>Your passes are held until payment is received.</strong>
+                            We have emailed you the payment details and the order summary.
+                            @if (!empty($setting?->payment_instructions))
+                                <hr>
+                                {!! nl2br(e($setting->payment_instructions)) !!}
+                            @endif
+                        </div>
+                        <a href="{{ url('/') }}" class="btn btn-primary">Back to the website</a>
+                    @else
+                        <h2>Thank you for expressing your interest. We have added you to our mailing list for future events!</h2>
+                    @endif
                    {{-- <a target="_blank" href="https://oakbridgepublishing.mojo.page/ilats-2025" class="btn btn-success">Complete Registration</a> --}}
                 </div>
             </div>

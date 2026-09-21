@@ -19,6 +19,8 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\VidhiSammanController;
 use App\Http\Controllers\HeroBannerController;
 use App\Http\Controllers\MarketingStripController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\TicketingController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\PageContentController;
 use App\Http\Controllers\SponsorController;
@@ -90,6 +92,21 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::post('menus/{item}', [MenuController::class, 'update'])->name('menus.update');
     Route::delete('menus/{item}', [MenuController::class, 'destroy'])->name('menus.destroy');
     Route::post('menus/{item}/toggle', [MenuController::class, 'toggle'])->name('menus.toggle');
+
+    // ticket prices, bulk discounts and orders
+    Route::get('ticketing', [TicketingController::class, 'index'])->name('ticketing.index');
+    Route::post('ticketing/passes', [TicketingController::class, 'storePass'])->name('ticketing.pass.store');
+    Route::post('ticketing/passes/{pass}', [TicketingController::class, 'updatePass'])->name('ticketing.pass.update');
+    Route::delete('ticketing/passes/{pass}', [TicketingController::class, 'destroyPass'])->name('ticketing.pass.destroy');
+    Route::post('ticketing/tiers', [TicketingController::class, 'storeTier'])->name('ticketing.tier.store');
+    Route::post('ticketing/tiers/{tier}', [TicketingController::class, 'updateTier'])->name('ticketing.tier.update');
+    Route::delete('ticketing/tiers/{tier}', [TicketingController::class, 'destroyTier'])->name('ticketing.tier.destroy');
+    Route::post('ticketing/settings', [TicketingController::class, 'updateSettings'])->name('ticketing.settings');
+
+    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
+    Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     // profile
     Route::get('profile', [ProfileController::class, 'profile'])->name('profile');
     //password update

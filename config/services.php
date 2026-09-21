@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'interakt' => [
+        // WhatsApp confirmations; set INTERAKT_TOKEN in .env (never in the code)
+        'token' => env('INTERAKT_TOKEN'),
+        'template' => env('INTERAKT_TEMPLATE', 'new_reg_tba_events'),
+    ],
+
 ];

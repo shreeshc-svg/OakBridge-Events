@@ -340,6 +340,16 @@ return [
             'icon' => 'fas fa-fw fa-user-check',
         ],
         [
+            'text' => 'Orders',
+            'url' => 'admin/orders',
+            'icon' => 'fas fa-fw fa-receipt',
+        ],
+        [
+            'text' => 'Ticketing',
+            'url' => 'admin/ticketing',
+            'icon' => 'fas fa-fw fa-tags',
+        ],
+        [
             'text' => 'Booking',
             'route'  => 'booking.index',
             'icon' => 'fas fa-ticket-alt',
