@@ -138,22 +138,52 @@
                 }
 
                 // same maths as App\Support\Pricing - the server always recalculates before saving
+                function bundleTotal(pass, quantity) {
+                    var bundles = pass.bundles || {};
+                    var quantities = Object.keys(bundles).map(Number).sort(function(a, b) { return a - b; });
+                    if (!quantities.length) {
+                        return null;
+                    }
+                    if (bundles[quantity] !== undefined) {
+                        return bundles[quantity];
+                    }
+                    var largest = quantities[quantities.length - 1];
+                    if (quantity > largest) {
+                        return Math.round((bundles[largest] + (quantity - largest) * pass.extra) * 100) / 100;
+                    }
+                    return null;
+                }
+
                 function quote(pricing, pass, quantity) {
                     var unit = pass.price;
                     var subtotal = Math.round(unit * quantity * 100) / 100;
-                    var tier = null;
-                    (pricing.tiers || []).forEach(function(row) {
-                        if (quantity >= row.min && (!tier || row.min > tier.min)) {
-                            tier = row;
+                    var net, discount, label = null, isBundle = false;
+
+                    var bundle = bundleTotal(pass, quantity);
+                    if (bundle !== null) {
+                        isBundle = true;
+                        net = Math.round(bundle * 100) / 100;
+                        discount = Math.round(Math.max(subtotal - net, 0) * 100) / 100;
+                        if (discount > 0) {
+                            label = 'Bundle price for ' + quantity + ' passes';
                         }
-                    });
-                    var perPassOff = 0;
-                    if (tier) {
-                        perPassOff = tier.type === 'percent' ? unit * (tier.value / 100) : tier.value;
-                        perPassOff = Math.min(Math.max(Math.round(perPassOff * 100) / 100, 0), unit);
+                    } else {
+                        var tier = null;
+                        (pricing.tiers || []).forEach(function(row) {
+                            if (quantity >= row.min && (!tier || row.min > tier.min)) {
+                                tier = row;
+                            }
+                        });
+                        var perPassOff = 0;
+                        if (tier) {
+                            perPassOff = tier.type === 'percent' ? unit * (tier.value / 100) : tier.value;
+                            perPassOff = Math.min(Math.max(Math.round(perPassOff * 100) / 100, 0), unit);
+                            label = tier.label;
+                        }
+                        discount = Math.round(perPassOff * quantity * 100) / 100;
+                        net = Math.round((subtotal - discount) * 100) / 100;
                     }
-                    var discount = Math.round(perPassOff * quantity * 100) / 100;
-                    var net = Math.round((subtotal - discount) * 100) / 100;
+
                     var tax = 0,
                         total = net;
                     if (pricing.taxPercent > 0) {
@@ -164,22 +194,25 @@
                             total = Math.round((net + tax) * 100) / 100;
                         }
                     }
-                    return { unit: unit, subtotal: subtotal, discount: discount, tier: tier, tax: tax, total: total };
+                    return {
+                        unit: unit, subtotal: subtotal, discount: discount, label: label,
+                        isBundle: isBundle, net: net, tax: tax, total: total,
+                        perPass: quantity ? Math.round(total / quantity * 100) / 100 : 0
+                    };
                 }
 
-                function nextTierHint(pricing, quantity) {
-                    var next = null;
-                    (pricing.tiers || []).forEach(function(row) {
-                        if (row.min > quantity && (!next || row.min < next.min)) {
-                            next = row;
+                // "2 more passes and each costs less" - only while the next step is cheaper per pass
+                function nextStepHint(pricing, pass, quantity) {
+                    var current = quote(pricing, pass, quantity);
+                    for (var next = quantity + 1; next <= Math.min(quantity + 4, pricing.max); next++) {
+                        var ahead = quote(pricing, pass, next);
+                        if (ahead.perPass < current.perPass - 1) {
+                            var more = next - quantity;
+                            return 'Add ' + more + ' more pass' + (more > 1 ? 'es' : '') + ' and each pass costs ' +
+                                money(Math.round(ahead.perPass)) + ' instead of ' + money(Math.round(current.perPass)) + '.';
                         }
-                    });
-                    if (!next) {
-                        return '';
                     }
-                    var more = next.min - quantity;
-                    var saving = next.label.split('– ')[1] || next.label;
-                    return 'Add ' + more + ' more pass' + (more > 1 ? 'es' : '') + ' to get ' + saving + '.';
+                    return '';
                 }
 
                 function setup(form) {
@@ -260,7 +293,7 @@
                         var lines = '<div class="d-flex justify-content-between"><span>' + pass.name + ' × ' + quantity +
                             '</span><span>' + money(result.subtotal) + '</span></div>';
                         if (result.discount > 0) {
-                            lines += '<div class="d-flex justify-content-between text-success"><span>' + result.tier.label +
+                            lines += '<div class="d-flex justify-content-between text-success"><span>' + (result.label || 'Discount') +
                                 '</span><span>– ' + money(result.discount) + '</span></div>';
                         }
                         if (result.tax > 0 && !data.taxIncluded) {
@@ -272,7 +305,10 @@
                         if (result.tax > 0 && data.taxIncluded) {
                             lines += '<div class="small text-muted">Includes ' + data.taxLabel + ' of ' + money(result.tax) + '.</div>';
                         }
-                        var hint = nextTierHint(data, quantity);
+                        if (quantity > 1) {
+                            lines += '<div class="small text-muted">' + money(Math.round(result.perPass)) + ' per pass</div>';
+                        }
+                        var hint = nextStepHint(data, pass, quantity);
                         if (hint) {
                             lines += '<div class="small text-muted mt-1">' + hint + '</div>';
                         }

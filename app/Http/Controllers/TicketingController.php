@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PassBundle;
 use App\Models\PassType;
 use App\Models\PricingTier;
 use App\Models\Service;
@@ -26,10 +27,9 @@ class TicketingController extends Controller
         return view('backend.ticketing.index', [
             'events' => $events,
             'event' => $event,
-            'passTypes' => $event ? PassType::where('service_id', $event->id)->orderBy('sort_order')->orderBy('id')->get() : collect(),
+            'passTypes' => $event ? PassType::with('bundles')->where('service_id', $event->id)->orderBy('sort_order')->orderBy('id')->get() : collect(),
             'tiers' => PricingTier::whereNull('service_id')->orderBy('min_quantity')->get(),
             'setting' => Setting::findOrFail(1),
-            'examples' => $this->examples($event),
         ]);
     }
 
@@ -106,6 +106,44 @@ class TicketingController extends Controller
         return $this->backTo($request->input('event_id'), 'Ticketing settings saved.');
     }
 
+    /** Save the whole bundle grid for one pass in a single go. */
+    public function updateBundles(Request $request, PassType $pass)
+    {
+        $max = Pricing::maxPasses();
+        $data = $request->validate([
+            'bundles' => 'array',
+            'bundles.*.early_total' => 'nullable|numeric|min:0|max:99999999',
+            'bundles.*.total' => 'nullable|numeric|min:0|max:99999999',
+            'early_extra_price' => 'nullable|numeric|min:0|max:9999999',
+            'extra_price' => 'nullable|numeric|min:0|max:9999999',
+        ], [], [
+            'early_extra_price' => 'early bird price per extra pass',
+            'extra_price' => 'list price per extra pass',
+        ]);
+
+        $pass->update([
+            'early_extra_price' => ($data['early_extra_price'] ?? null) !== null && $data['early_extra_price'] !== '' ? $data['early_extra_price'] : null,
+            'extra_price' => ($data['extra_price'] ?? null) !== null && $data['extra_price'] !== '' ? $data['extra_price'] : null,
+        ]);
+
+        foreach (range(1, $max) as $quantity) {
+            $row = $data['bundles'][$quantity] ?? [];
+            $early = ($row['early_total'] ?? '') === '' ? null : (float) $row['early_total'];
+            $list = ($row['total'] ?? '') === '' ? null : (float) $row['total'];
+
+            if ($early === null && $list === null) {
+                PassBundle::where('pass_type_id', $pass->id)->where('quantity', $quantity)->delete();
+                continue;
+            }
+            PassBundle::updateOrCreate(
+                ['pass_type_id' => $pass->id, 'quantity' => $quantity],
+                ['early_total' => $early, 'total' => $list],
+            );
+        }
+
+        return $this->backTo($pass->service_id, 'Bundle prices saved for "' . $pass->name . '".');
+    }
+
     private function passRules(Request $request, ?PassType $pass = null): array
     {
         $data = $request->validate([
@@ -154,21 +192,6 @@ class TicketingController extends Controller
         }
 
         return $data;
-    }
-
-    /** What a buyer would pay for 1..10 passes of each active pass type. */
-    private function examples(?Service $event): array
-    {
-        $rows = [];
-        foreach (Pricing::passTypes($event) as $pass) {
-            $line = [];
-            for ($quantity = 1; $quantity <= min(10, Pricing::maxPasses()); $quantity++) {
-                $line[$quantity] = Pricing::quote($pass, $quantity, $event);
-            }
-            $rows[$pass->name] = $line;
-        }
-
-        return $rows;
     }
 
     private function backTo($eventId, string $message)

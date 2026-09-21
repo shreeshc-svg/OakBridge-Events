@@ -11,6 +11,8 @@ class PassType extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'early_price' => 'decimal:2',
+        'extra_price' => 'decimal:2',
+        'early_extra_price' => 'decimal:2',
         'early_until' => 'date',
         'is_active' => 'boolean',
     ];
@@ -18,6 +20,22 @@ class PassType extends Model
     public function service()
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function bundles()
+    {
+        return $this->hasMany(PassBundle::class)->orderBy('quantity');
+    }
+
+    /** What each pass beyond the bundle table costs. */
+    public function extraPriceOn(?\Carbon\Carbon $date = null): float
+    {
+        $early = $this->isEarlyOn($date);
+        $value = $early
+            ? ($this->early_extra_price ?? $this->extra_price)
+            : $this->extra_price;
+
+        return $value !== null ? (float) $value : $this->priceOn($date);
     }
 
     /** Early-bird price while the offer is on, otherwise the normal price. */
