@@ -37,4 +37,11 @@ return [
         'template' => env('INTERAKT_TEMPLATE', 'new_reg_tba_events'),
     ],
 
+    'razorpay' => [
+        // online payment; set these in .env, never in the code
+        'key' => env('RAZORPAY_KEY'),
+        'secret' => env('RAZORPAY_SECRET'),
+        'webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET'),
+    ],
+
 ];

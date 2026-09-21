@@ -32,8 +32,23 @@
             </div>
 
             <div class="card card-primary card-outline">
-                <div class="card-header"><h3 class="card-title">Passes ({{ $order->bookings->count() }})</h3></div>
+                <div class="card-header">
+                    <h3 class="card-title">
+                        {{ $order->isPaid() ? 'Passes issued' : 'Passes to be issued' }} ({{ $order->quantity }})
+                    </h3>
+                </div>
                 <div class="card-body p-0">
+                    @if (!$order->bookings->count())
+                        <table class="table table-sm mb-0">
+                            <thead><tr><th>#</th><th>Name</th><th>Email</th></tr></thead>
+                            <tbody>
+                                @foreach ($order->attendeeList() as $number => $person)
+                                    <tr><td>{{ $number }}</td><td>{{ $person['name'] }}</td><td>{{ $person['email'] }}</td></tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        <p class="text-muted small p-2 mb-0">Booking numbers are issued when the order is paid.</p>
+                    @else
                     <table class="table table-sm mb-0">
                         <thead><tr><th>#</th><th>Booking ID</th><th>Name</th><th>Email</th></tr></thead>
                         <tbody>
@@ -47,6 +62,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    @endif
                 </div>
             </div>
         </div>
@@ -112,7 +128,15 @@
                             <textarea class="form-control" id="notes" name="notes" rows="3">{{ old('notes', $order->notes) }}</textarea>
                         </div>
                         @if ($order->paid_at)
-                            <p class="text-muted small mt-2 mb-0">Marked paid on {{ $order->paid_at->format('j M Y, H:i') }}.</p>
+                            <p class="text-muted small mt-2 mb-0">Paid on {{ $order->paid_at->format('j M Y, H:i') }}.</p>
+                        @endif
+                        @if ($order->gateway_order_id)
+                            <p class="text-muted small mt-1 mb-0">Razorpay order {{ $order->gateway_order_id }}</p>
+                        @endif
+                        @if (!$order->isPaid())
+                            <p class="text-muted small mt-2 mb-0">
+                                Setting this to Paid issues {{ $order->quantity }} pass(es) and emails the buyer.
+                            </p>
                         @endif
                     </div>
                     <div class="card-footer">

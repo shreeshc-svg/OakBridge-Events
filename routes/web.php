@@ -20,6 +20,7 @@ use App\Http\Controllers\VidhiSammanController;
 use App\Http\Controllers\HeroBannerController;
 use App\Http\Controllers\MarketingStripController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TicketingController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\PageContentController;
@@ -214,6 +215,14 @@ Route::get('/videos', [FrontController::class, 'videos'])->name('videos');
 
 
 Route::get('/thanks', [FrontController::class, 'thanks'])->name('thanks');
+
+// online payment (Razorpay)
+Route::get('/pay/{orderNo}', [PaymentController::class, 'pay'])->name('order.pay');
+Route::post('/pay/{orderNo}/verify', [PaymentController::class, 'verify'])->name('order.verify');
+Route::get('/pay/{orderNo}/cancelled', [PaymentController::class, 'cancelled'])->name('order.cancelled');
+Route::get('/pay/{orderNo}/done', [PaymentController::class, 'done'])->name('order.done');
+Route::post('/webhooks/razorpay', [PaymentController::class, 'webhook'])->name('razorpay.webhook')
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 Route::get('/thank-you', [FrontController::class, 'contactThanks'])->name('contact.thanks');
 // Route::get('/benefits',[FrontController::class,'benefits'])->name('benefits');
 // Route::get('/subscription',[FrontController::class,'subscription'])->name('subscription');
