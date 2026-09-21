@@ -115,13 +115,23 @@ class PaymentController extends Controller
         $payment = $body['payload']['payment']['entity'] ?? [];
         $gatewayOrderId = $payment['order_id'] ?? null;
 
-        if (! $gatewayOrderId || ! in_array($event, ['payment.captured', 'order.paid'], true)) {
+        if (! $gatewayOrderId || ! in_array($event, ['payment.captured', 'order.paid', 'payment.failed'], true)) {
             return response()->json(['ok' => true, 'ignored' => $event]);
         }
 
         $order = Order::where('gateway_order_id', $gatewayOrderId)->first();
         if (! $order) {
             return response()->json(['ok' => true, 'unknown_order' => true]);
+        }
+
+        // a failed attempt: tell the buyer once, and leave the order payable
+        if ($event === 'payment.failed') {
+            if (! $order->isPaid() && ! $order->reminded_at) {
+                $order->update(['reminded_at' => now()]);
+                OrderFulfiller::notifyPaymentFailed($order, $payment['error_description'] ?? null);
+            }
+
+            return response()->json(['ok' => true, 'failed_notice' => true]);
         }
 
         if ((int) ($payment['amount'] ?? 0) !== Razorpay::paise((float) $order->total)) {

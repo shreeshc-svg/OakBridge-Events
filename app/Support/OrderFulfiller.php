@@ -40,7 +40,9 @@ class OrderFulfiller
             self::createBookings($order);
         });
 
-        self::notify($order->fresh('bookings'));
+        $order = $order->fresh('bookings');
+        self::notify($order);          // buyer receipt + admin copy
+        self::notifyAttendees($order); // one email per pass holder
 
         return true;
     }
@@ -74,8 +76,41 @@ class OrderFulfiller
         }
     }
 
+    /** Every pass holder gets their own pass number (the buyer gets the receipt instead). */
+    public static function notifyAttendees(Order $order): void
+    {
+        foreach ($order->bookings()->orderBy('attendee_no')->get() as $booking) {
+            if (! $booking->email || strtolower($booking->email) === strtolower((string) $order->buyer_email)) {
+                continue;   // the buyer already has the full receipt
+            }
+
+            try {
+                \Notification::route('mail', $booking->email)->notify(new \App\Notifications\AttendeePassNotification([
+                    'name' => $booking->name,
+                    'email' => $booking->email,
+                    'booking_id' => $booking->booking_id,
+                    'attendee_no' => $booking->attendee_no,
+                    'quantity' => $order->quantity,
+                    'pass_name' => $order->pass_name,
+                    'event' => $order->event,
+                    'event_date' => $order->service?->date,
+                    'buyer_name' => $order->buyer_name,
+                    'buyer_company' => $order->buyer_company,
+                ]));
+            } catch (\Throwable $e) {
+                report($e);   // one bad address never stops the rest
+            }
+        }
+    }
+
+    /** A payment attempt failed: tell the buyer how to try again. */
+    public static function notifyPaymentFailed(Order $order, ?string $reason = null): void
+    {
+        self::notify($order, true, ['payment_failed' => true, 'failure_reason' => $reason]);
+    }
+
     /** Confirmation to the buyer (and the admin copy), plus the WhatsApp message. */
-    public static function notify(Order $order, bool $awaitingPayment = false): void
+    public static function notify(Order $order, bool $awaitingPayment = false, array $extra = []): void
     {
         $bookings = $order->bookings()->orderBy('attendee_no')->get();
 
@@ -97,7 +132,7 @@ class OrderFulfiller
             ])->all(),
             'payment_instructions' => Setting::find(1)?->payment_instructions,
             'ip' => request()?->ip(),
-        ];
+        ] + $extra;
 
         try {
             event(new \App\Events\BookingCreated($payload));
