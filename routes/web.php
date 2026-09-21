@@ -98,6 +98,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::post('ticketing/passes', [TicketingController::class, 'storePass'])->name('ticketing.pass.store');
     Route::post('ticketing/passes/{pass}', [TicketingController::class, 'updatePass'])->name('ticketing.pass.update');
     Route::delete('ticketing/passes/{pass}', [TicketingController::class, 'destroyPass'])->name('ticketing.pass.destroy');
+    Route::post('ticketing/passes/{pass}/bundles', [TicketingController::class, 'updateBundles'])->name('ticketing.pass.bundles');
     Route::post('ticketing/tiers', [TicketingController::class, 'storeTier'])->name('ticketing.tier.store');
     Route::post('ticketing/tiers/{tier}', [TicketingController::class, 'updateTier'])->name('ticketing.tier.update');
     Route::delete('ticketing/tiers/{tier}', [TicketingController::class, 'destroyTier'])->name('ticketing.tier.destroy');

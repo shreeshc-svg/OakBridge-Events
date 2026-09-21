@@ -78,9 +78,18 @@ class Pricing
         $unit = round($passType->priceOn(), 2);
         $subtotal = round($unit * $quantity, 2);
 
-        $tier = self::tierFor($quantity, $event ?: $passType->service);
-        $discount = $tier ? round($tier->discountPerPass($unit) * $quantity, 2) : 0.0;
-        $net = round($subtotal - $discount, 2);
+        // a bundle price for this many passes wins; otherwise fall back to the discount slabs
+        $bundle = self::bundleTotal($passType, $quantity);
+        if ($bundle !== null) {
+            $net = round($bundle, 2);
+            $discount = round(max($subtotal - $net, 0), 2);
+            $label = $discount > 0 ? 'Bundle price for ' . $quantity . ' passes' : null;
+        } else {
+            $tier = self::tierFor($quantity, $event ?: $passType->service);
+            $discount = $tier ? round($tier->discountPerPass($unit) * $quantity, 2) : 0.0;
+            $net = round($subtotal - $discount, 2);
+            $label = $tier?->label();
+        }
 
         $setting = self::setting();
         $taxPercent = (float) ($setting->tax_percent ?? 0);
@@ -104,7 +113,8 @@ class Pricing
             'quantity' => $quantity,
             'subtotal' => $subtotal,
             'discount' => $discount,
-            'discount_label' => $tier?->label(),
+            'discount_label' => $label,
+            'is_bundle' => $bundle !== null,
             'net' => $net,
             'tax_percent' => $taxPercent,
             'tax' => $tax,
@@ -114,6 +124,48 @@ class Pricing
             'per_pass' => $quantity ? round($total / $quantity, 2) : 0.0,
             'currency' => 'INR',
         ];
+    }
+
+    /** Bundle rows for a pass type, cheapest quantity first. */
+    public static function bundles(PassType $passType): \Illuminate\Support\Collection
+    {
+        $key = 'site.pricing.bundles.' . $passType->id;
+        if (! app()->bound($key)) {
+            try {
+                $rows = \App\Models\PassBundle::where('pass_type_id', $passType->id)->orderBy('quantity')->get();
+            } catch (\Throwable $e) {
+                $rows = collect();
+            }
+            app()->instance($key, ['rows' => $rows]);
+        }
+
+        return app($key)['rows'];
+    }
+
+    /**
+     * The bundle total for this many passes, or null when bundles don't cover it.
+     * Above the largest row, each further pass adds the extra-pass price.
+     */
+    public static function bundleTotal(PassType $passType, int $quantity): ?float
+    {
+        $early = $passType->isEarlyOn();
+        $priced = self::bundles($passType)->filter(fn ($row) => $row->totalFor($early) !== null);
+        if ($priced->isEmpty()) {
+            return null;
+        }
+
+        $exact = $priced->firstWhere('quantity', $quantity);
+        if ($exact) {
+            return $exact->totalFor($early);
+        }
+
+        $largest = $priced->sortByDesc('quantity')->first();
+        if ($quantity > $largest->quantity) {
+            return round($largest->totalFor($early) + ($quantity - $largest->quantity) * $passType->extraPriceOn(), 2);
+        }
+
+        // below the smallest row (or a gap in the table): per-pass price
+        return null;
     }
 
     public static function maxPasses(): int
@@ -137,6 +189,12 @@ class Pricing
                 'name' => $pass->name,
                 'price' => $pass->priceOn(),
                 'early' => $pass->isEarlyOn(),
+                'listPrice' => (float) $pass->price,
+                'extra' => $pass->extraPriceOn(),
+                'bundles' => self::bundles($pass)
+                    ->mapWithKeys(fn ($row) => [$row->quantity => $row->totalFor($pass->isEarlyOn())])
+                    ->filter(fn ($total) => $total !== null)
+                    ->all(),
             ])->values()->all(),
             'tiers' => self::tiers($event)->map(fn ($tier) => [
                 'min' => (int) $tier->min_quantity,
