@@ -50,10 +50,19 @@
             </form>
         </div>
         <div class="card-body p-0">
+            <form id="bulkOrders" action="{{ route('orders.bulk-delete') }}" method="post"
+                onsubmit="return confirmBulkDelete(this, 'order');">
+                @csrf
+                <input type="hidden" name="status" value="{{ $status }}">
+                <input type="hidden" name="q" value="{{ $search }}">
+            </form>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
                     <thead>
                         <tr>
+                            <th style="width:34px" class="text-center">
+                                <input type="checkbox" id="checkAllOrders" aria-label="Select all">
+                            </th>
                             <th>Order</th>
                             <th>Buyer</th>
                             <th>Event / pass</th>
@@ -67,6 +76,10 @@
                     <tbody>
                         @forelse ($orders as $order)
                             <tr>
+                                <td class="text-center">
+                                    <input form="bulkOrders" type="checkbox" name="ids[]" value="{{ $order->id }}"
+                                        class="bulk-pick" aria-label="Select {{ $order->order_no }}">
+                                </td>
                                 <td class="text-nowrap"><a href="{{ route('orders.show', $order) }}">{{ $order->order_no }}</a></td>
                                 <td>
                                     {{ $order->buyer_name }}
@@ -88,10 +101,18 @@
                                     ])>{{ $order->statusLabel() }}</span>
                                 </td>
                                 <td class="text-nowrap small">{{ $order->created_at?->format('j M Y, H:i') }}</td>
-                                <td><a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-primary">Open</a></td>
+                                <td class="text-nowrap">
+                                    <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-primary">Open</a>
+                                    <form action="{{ route('orders.destroy', $order) }}" method="post" class="d-inline"
+                                        onsubmit="return confirm('Delete order {{ $order->order_no }}{{ $order->status === 'paid' ? ' – this order is PAID (' . \App\Support\Pricing::money((float) $order->total) . '). Its passes and payment record will be gone for good.' : ' and its held passes?' }}');">
+                                        @csrf
+                                        @method('delete')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete order">&times;</button>
+                                    </form>
+                                </td>
                             </tr>
                         @empty
-                            <tr><td colspan="8" class="text-muted text-center py-4">
+                            <tr><td colspan="9" class="text-muted text-center py-4">
                                 No orders yet. Orders appear here as soon as someone registers for a paid event.
                             </td></tr>
                         @endforelse
@@ -99,8 +120,18 @@
                 </table>
             </div>
         </div>
-        @if ($orders->hasPages())
-            <div class="card-footer">{{ $orders->links() }}</div>
-        @endif
+        <div class="card-footer d-flex align-items-center flex-wrap">
+            <button type="submit" form="bulkOrders" class="btn btn-sm btn-outline-danger mr-3" id="bulkOrdersBtn" disabled>
+                Delete selected
+            </button>
+            <span class="text-muted small mr-auto" id="bulkOrdersCount">Nothing selected</span>
+            @if ($orders->hasPages())
+                {{ $orders->links() }}
+            @endif
+        </div>
     </div>
+@stop
+
+@section('js')
+    @include('backend.partials.bulk-delete-js')
 @stop

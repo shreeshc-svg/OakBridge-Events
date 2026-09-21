@@ -44,6 +44,15 @@
                 <div class="card p-2">
 
                     <div id="" class="card-body p-0">
+                        <form id="bulkBookings" action="{{ route('booking.bulk-delete') }}" method="post"
+                            onsubmit="return confirmBulkDelete(this, 'registration');">
+                            @csrf
+                        </form>
+                        <div class="mb-2 d-flex align-items-center">
+                            <button type="submit" form="bulkBookings" class="btn btn-sm btn-outline-danger mr-3"
+                                id="bulkBookingsBtn" disabled>Delete selected</button>
+                            <span class="text-muted small" id="bulkBookingsCount">Nothing selected</span>
+                        </div>
                         <table id="mytable" class="table table-striped projects">
                             <thead>
                                 <tr>
@@ -52,6 +61,9 @@
                                     </th>
                                     <th style="width: 14%">
                                         Booking id
+                                    </th>
+                                    <th style="width: 34px" class="text-center">
+                                        <input type="checkbox" id="checkAllBookings" aria-label="Select all">
                                     </th>
                                     <th style="width: 20%">
                                         Name
@@ -86,6 +98,10 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $booking->booking_id }}</td>
+                                        <td class="text-center">
+                                            <input form="bulkBookings" type="checkbox" name="ids[]" value="{{ $booking->id }}"
+                                                class="bulk-pick" aria-label="Select {{ $booking->booking_id }}">
+                                        </td>
                                         <td>
                                             <a>
                                                 {{ $booking->name }}
@@ -125,7 +141,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button
-                                                        onclick="return confirm('Category cannot be delted - Post attached');"
+                                                        onclick="return confirm('Delete the registration for {{ addslashes($booking->name) }} ({{ $booking->booking_id }})? This cannot be undone.');"
                                                         class="btn btn-danger btn-sm ml-2">
                                                         <i class="fas fa-trash"></i>
                                                         Delete
@@ -148,6 +164,7 @@
 @stop
 
 @section('js')
+    @include('backend.partials.bulk-delete-js')
 
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>

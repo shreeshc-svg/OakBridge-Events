@@ -18,4 +18,19 @@ class BookingController extends Controller
         $booking->delete();
         return redirect()->back()->withSuccess('Booking has been deleted successfully!');
     }
+
+    /** Delete several registrations at once. */
+    public function bulkDestroy(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer',
+        ], [
+            'ids.required' => 'Tick the registrations you want to delete first.',
+        ]);
+
+        $deleted = Booking::whereIn('id', $data['ids'])->delete();
+
+        return back()->with('success', $deleted . ' registration(s) deleted.');
+    }
 }
