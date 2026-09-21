@@ -36,9 +36,15 @@ class BookingCreatedUserNotificationUpdated extends Notification
         //             ->line('The introduction to the notification.')
         //             ->action('Notification Action', url('/'))
         //             ->line('Thank you for using our application!');
+        $data = $this->data;
+        $order = $data['order'] ?? null;
+        $event = $data['event'] ?? 'our event';
+
         return (new MailMessage)
-        ->subject('[Complete payment to book seat] India Law, AI & Tech Summit 2025')
-        ->view('email.userBooking', ['data' => $this->data]);
+            ->subject($order
+                ? 'Complete your payment – ' . $event
+                : 'Registration received – ' . $event)
+            ->view('email.userBooking', ['data' => $data]);
     }
 
     /**

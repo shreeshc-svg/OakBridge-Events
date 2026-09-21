@@ -1,114 +1,118 @@
+@php
+    $order = $data['order'] ?? null;
+    $quote = $data['quote'] ?? null;
+    $attendees = $data['attendees'] ?? [];
+    $eventDate = $data['event_date'] ?? null;
+    $setting = \App\Models\Setting::find(1);
+    $money = fn ($amount) => \App\Support\Pricing::money((float) $amount);
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete payment to book seat - {{ $data['event'] }}</title>
+    <title>{{ $order ? 'Complete your payment' : 'Registration received' }} – {{ $data['event'] }}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .header {
-            text-align: center;
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 0.9em;
-            color: #555;
-        }
-
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .button {
-            display: inline-block;
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-
-        .button:hover {
-            background-color: #0056b3;
-        }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .footer { margin-top: 20px; text-align: center; font-size: 0.9em; color: #555; }
+        a { color: #007bff; text-decoration: none; }
+        table.summary { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        table.summary th, table.summary td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: left; font-size: 14px; }
+        table.summary td.amount, table.summary th.amount { text-align: right; white-space: nowrap; }
+        table.summary tr.total td { border-top: 2px solid #333; border-bottom: none; font-weight: bold; font-size: 16px; }
+        .box { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 5px; padding: 12px 16px; margin: 16px 0; }
+        .muted { color: #666; font-size: 13px; }
     </style>
 </head>
 
 <body>
     <div class="container">
-       {{-- <div class="header">
-            <h1>Thank you!</h1>
-            {{--<p>Thank you for registering for: <strong>{{ $data['event'] }} </strong></p>--}}
-        </div> --}}
-
         <p>Dear {{ $data['name'] }},</p>
 
-
-        <p>Thank you for expressing your interest in the <strong>{{ $data['event'] }}</strong>, scheduled to be held on 29 November 2025 (Saturday) in New Delhi.</p>
-        <p><strong>To confirm your registration, please book your seat by completing the payment below.</strong></p>
         <p>
-             <a class="button" target="_blank" href="https://bit.ly/4oeT4xL" color:"white">Pay Now</a>
-
+            Thank you for registering for <strong>{{ $data['event'] }}</strong>@if ($eventDate), scheduled for
+                {{ $eventDate->format('l, j F Y') }}@endif.
         </p>
 
+        @if ($order && $quote)
+            <p><strong>To confirm your {{ $order->quantity > 1 ? 'passes' : 'pass' }}, please complete the payment below.</strong></p>
+
+            <table class="summary">
+                <tr>
+                    <th>{{ $order->pass_name }} &times; {{ $order->quantity }}</th>
+                    <th class="amount">{{ $money($quote['subtotal']) }}</th>
+                </tr>
+                <tr>
+                    <td class="muted">{{ $money($quote['unit']) }} per pass{{ $quote['is_early'] ? ' (early bird)' : '' }}</td>
+                    <td class="amount muted">&nbsp;</td>
+                </tr>
+                @if ($quote['discount'] > 0)
+                    <tr>
+                        <td>{{ $quote['discount_label'] }}</td>
+                        <td class="amount">&ndash; {{ $money($quote['discount']) }}</td>
+                    </tr>
+                @endif
+                @if ($quote['tax'] > 0 && ! $quote['tax_included'])
+                    <tr>
+                        <td>{{ $quote['tax_label'] }} ({{ rtrim(rtrim(number_format($quote['tax_percent'], 2), '0'), '.') }}%)</td>
+                        <td class="amount">{{ $money($quote['tax']) }}</td>
+                    </tr>
+                @endif
+                <tr class="total">
+                    <td>Amount payable</td>
+                    <td class="amount">{{ $money($quote['total']) }}</td>
+                </tr>
+            </table>
+
+            @if ($quote['tax'] > 0 && $quote['tax_included'])
+                <p class="muted">Includes {{ $quote['tax_label'] }} of {{ $money($quote['tax']) }}.</p>
+            @endif
+
+            <p class="muted">Order reference: <strong>{{ $order->order_no }}</strong> &ndash; please quote it with your payment.</p>
+
+            @if (!empty($data['payment_instructions']))
+                <div class="box">
+                    <strong>How to pay</strong>
+                    <div>{!! nl2br(e($data['payment_instructions'])) !!}</div>
+                </div>
+            @endif
+
+            @if (count($attendees) > 1)
+                <p><strong>Passes in this order:</strong></p>
+                <ul>
+                    @foreach ($attendees as $attendee)
+                        <li>{{ $attendee['name'] }} ({{ $attendee['email'] }}) &ndash; {{ $attendee['booking_id'] }}</li>
+                    @endforeach
+                </ul>
+            @endif
+
+            @if (!empty($setting?->invoice_note))
+                <p class="muted">{{ $setting->invoice_note }}</p>
+            @endif
+        @else
+            <p>Your registration has been received. We will be in touch with the joining details closer to the date.</p>
+            @if (!empty($data['booking_id']))
+                <p class="muted">Registration reference: <strong>{{ $data['booking_id'] }}</strong></p>
+            @endif
+        @endif
+
         <p>
-            <strong>Limited seats! The Early Bird offer is open till 15 November 2025 only!</strong>
+            For any queries, please reach out to us at
+            <a href="mailto:{{ $setting?->email ?: 'info@oakbridge.in' }}">{{ $setting?->email ?: 'info@oakbridge.in' }}</a>
+            @if ($setting?->phone)
+                or WhatsApp: <a href="https://wa.me/{{ preg_replace('/\D/', '', $setting->phone) }}">{{ $setting->phone }}</a>
+            @endif
         </p>
 
-        {{-- <h3>Booking Details:</h3> --}}
-        {{-- <ul>
-            <li><strong>Booking ID:</strong> {{ $data['booking_id'] }}</li>
-            <li><strong>Name:</strong> {{ $data['name'] }}</li>
-            <li><strong>Email:</strong> <a href="mailto:{{ $data['email'] }}">{{ $data['email'] }}</a></li>
-            <li><strong>Phone:</strong> {{ $data['phone'] }}</li>
-            <li><strong>Company:</strong> {{ $data['company'] ?? 'NA' }}</li>
-            <li><strong>Designation:</strong> {{ $data['designation'] ?? 'NA' }}</li>
-            <li><strong>Event Date:</strong> {{ $data['date'] }}</li>
-             <li><strong>Venue:</strong> Constitution Club of India, Rafi Marg, New Delhi <br>
-                (Nearest Metro Station: Central Secretariat / Patel Chowk)</li>
-        </ul> --}}
-
-
-
-        {{-- <p>
-            <a class="button" href="https://maps.app.goo.gl/21boPJbsMyd4X1eH6" target="_blank">View Venue Location</a>
-        </p> 
-
-        <p>We look forward to being a part of your special occasion.</p> --}}
-        <p>For any queries, please reach out to us at email: info@oakbridge.in or WhatsApp: <a href="https://www.wa.me/+918800337299">+91 88003 37299</a></p>
-
-        <p>Warm regards,</p>
-        <p><strong>Team OakBridge</strong><br>
-            {{-- (An initiative of OakBridge Publishing)</p> --}}
+        <p>Warm regards,<br>
+            <strong>Team OakBridge</strong>
+        </p>
 
         <div class="footer">
-            <p>Email: <a href="mailto:info@oakbridge.in">info@oakbridge.in</a></p>
-            <p>Website: <a href="https://www.oakbridge.events" target="_blank">https://www.oakbridge.events</a></p>
+            <p>Email: <a href="mailto:{{ $setting?->email ?: 'info@oakbridge.in' }}">{{ $setting?->email ?: 'info@oakbridge.in' }}</a></p>
+            <p>Website: <a href="{{ url('/') }}">{{ url('/') }}</a></p>
         </div>
     </div>
 </body>

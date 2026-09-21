@@ -340,97 +340,201 @@ class FrontController extends Controller
         if (! $registration['registrationOpen']) {
             return back()->withErrors(['registration_closed' => $registration['registrationClosedMessage']]);
         }
-       
+
         $data = $request->validate([
-        'name' => 'required|string|max:100',
-        'email' => 'required|string|email|max:100|unique:bookings,email', // made email unique
-        'phone' => 'required|digits:10|unique:bookings,phone', // made phone no. unique
-        'company'  => 'required|string|max:100',
-        'designation'  => 'required|string|max:100',
-        'event'      => 'required|string|max:255',
-        'date'      => 'nullable'
-    ]);
+            'name' => 'required|string|max:100',
+            'email' => 'required|string|email|max:100',
+            'phone' => 'required|digits:10',
+            'company' => 'required|string|max:100',
+            'designation' => 'required|string|max:100',
+            'event' => 'required|string|max:255',
+        ]);
 
-    // Use the event the visitor actually picked (and its real date) - the
-    // hidden date field in the form is not reliable.
-    $chosenEvent = Service::wherePublished('1')
-        ->where('title', $data['event'])
-        ->where('date', '>', now())
-        ->orderBy('date')
-        ->first();
-    if (! $chosenEvent) {
-        return back()->withInput()->withErrors(['event' => 'Please choose an event from the list.']);
-    }
-    $data['date'] = $chosenEvent->date->format('Y-m-d H:i:s');
+        // Use the event the visitor actually picked (and its real date) - the
+        // hidden date field in the form is not reliable.
+        $chosenEvent = Service::wherePublished('1')
+            ->where('title', $data['event'])
+            ->where('date', '>', now())
+            ->orderBy('date')
+            ->first();
+        if (! $chosenEvent) {
+            return back()->withInput()->withErrors(['event' => 'Please choose an event from the list.']);
+        }
+        $data['date'] = $chosenEvent->date->format('Y-m-d H:i:s');
 
+        $paid = \App\Support\Pricing::isPaid($chosenEvent);
+        $passType = null;
+        $quantity = 1;
+        $attendees = [];
 
-    // next VD number (carries on after the registrations are cleared)
-    $newBookingId = \App\Support\BookingNumber::next();
+        if ($paid) {
+            $extra = $request->validate([
+                'pass_type_id' => [
+                    'required',
+                    \Illuminate\Validation\Rule::exists('pass_types', 'id')
+                        ->where('service_id', $chosenEvent->id)->where('is_active', 1),
+                ],
+                'quantity' => 'required|integer|min:1|max:' . \App\Support\Pricing::maxPasses(),
+                'attendees' => 'array',
+                'attendees.*.name' => 'nullable|string|max:100',
+                'attendees.*.email' => 'nullable|string|email|max:100',
+            ], [
+                'pass_type_id.required' => 'Please choose a pass.',
+                'pass_type_id.exists' => 'Please choose a pass from the list.',
+                'quantity.max' => 'Please contact us for more than :max passes.',
+            ]);
 
-    $data['booking_id'] = $newBookingId;
+            $passType = \App\Models\PassType::find($extra['pass_type_id']);
+            $quantity = (int) $extra['quantity'];
 
+            // pass 1 is the buyer; passes 2+ need their own attendee
+            for ($number = 2; $number <= $quantity; $number++) {
+                $attendee = $extra['attendees'][$number] ?? [];
+                $name = trim((string) ($attendee['name'] ?? ''));
+                $email = trim((string) ($attendee['email'] ?? ''));
+                if ($name === '' || $email === '') {
+                    return back()->withInput()->withErrors([
+                        "attendees.{$number}.name" => 'Enter the name and email for pass ' . $number . '.',
+                    ]);
+                }
+                $attendees[$number] = ['name' => $name, 'email' => $email];
+            }
+        }
 
-    $booking =  Booking::create([
-        'booking_id' => $data['booking_id'],
-        'name' => $data['name'],
-        'email' => $data['email'],
-        'phone' => $data['phone'],
-        'company' => $data['company'],
-        'designation' => $data['designation'],
-        'date' => $data['date'],
-        'service_id' => $chosenEvent->id,
-        'event' => $chosenEvent->title,
-    ]);
+        // one email can hold only one pass for the same event
+        $emails = [1 => strtolower($data['email'])];
+        foreach ($attendees as $number => $attendee) {
+            $emails[$number] = strtolower($attendee['email']);
+        }
+        if (count(array_unique($emails)) !== count($emails)) {
+            return back()->withInput()->withErrors(['email' => 'Each pass needs a different email address.']);
+        }
+        $taken = Booking::where('service_id', $chosenEvent->id)
+            ->whereIn(\Illuminate\Support\Facades\DB::raw('LOWER(email)'), $emails)
+            ->pluck('email')->map(fn ($e) => strtolower($e))->all();
+        foreach ($emails as $number => $email) {
+            if (in_array($email, $taken, true)) {
+                $field = $number === 1 ? 'email' : "attendees.{$number}.email";
 
+                return back()->withInput()->withErrors([
+                    $field => $email . ' is already registered for this event.',
+                ]);
+            }
+        }
 
-    $data['ip']=  \Request::ip();
+        $quote = $passType
+            ? \App\Support\Pricing::quote($passType, $quantity, $chosenEvent)
+            : null;
 
+        $order = null;
+        $bookings = [];
 
+        \Illuminate\Support\Facades\DB::transaction(function () use (&$order, &$bookings, $data, $chosenEvent, $passType, $quantity, $attendees, $quote) {
+            if ($quote) {
+                $order = \App\Models\Order::create([
+                    'order_no' => 'TMP',
+                    'service_id' => $chosenEvent->id,
+                    'pass_type_id' => $passType->id,
+                    'event' => $chosenEvent->title,
+                    'pass_name' => $passType->name,
+                    'buyer_name' => $data['name'],
+                    'buyer_email' => $data['email'],
+                    'buyer_phone' => $data['phone'],
+                    'buyer_company' => $data['company'],
+                    'buyer_designation' => $data['designation'],
+                    'quantity' => $quantity,
+                    'unit_price' => $quote['unit'],
+                    'discount_total' => $quote['discount'],
+                    'discount_label' => $quote['discount_label'],
+                    'tax_percent' => $quote['tax_percent'],
+                    'tax_total' => $quote['tax'],
+                    'total' => $quote['total'],
+                    'status' => 'pending',
+                ]);
+                $order->update(['order_no' => 'OB' . now()->format('ymd') . '-' . str_pad((string) $order->id, 4, '0', STR_PAD_LEFT)]);
+            }
 
-    // // send whatsapp message via curl
-    $response = Http::withHeaders([
-        'Authorization' => 'Basic ak9udkt1QnhLTnFac01scllFN2NVenhOUTZYcXhZS1J4VE5VcnBQU29jdzo=',
-        'Content-Type' => 'application/json',
-    ])->post('https://api.interakt.ai/v1/public/message/', [
-        'countryCode' => '+91',
-            'phoneNumber' => $data['phone'],
-        //'fullPhoneNumber' => '918447525204', // Optional
-        // 'campaignId' => 'YOUR_CAMPAIGN_ID', // Optional
-        'callbackData' => 'some text here',
-        'type' => 'Template',
-        'template' => [
-            //'name' => 'new_registration_vu_2025',
-            'name' => 'new_reg_tba_events',
-            'languageCode' => 'en',
-            // "headerValues"=> [
-            //         "https://www.lafashioncloset.com/wp-content/uploads/2021/12/la-fashion-logo.png"
-            // ],
-            'bodyValues' => [
-                $data['name'],
-               // $data['event'],
-               // $data['date'],
-            ],
+            for ($number = 1; $number <= $quantity; $number++) {
+                $person = $number === 1
+                    ? ['name' => $data['name'], 'email' => $data['email']]
+                    : $attendees[$number];
 
-        ],
-    ]);
+                $bookings[] = Booking::create([
+                    'order_id' => $order?->id,
+                    'booking_id' => \App\Support\BookingNumber::next(),
+                    'attendee_no' => $number,
+                    'name' => $person['name'],
+                    'email' => $person['email'],
+                    'phone' => $data['phone'],
+                    'company' => $data['company'],
+                    'designation' => $number === 1 ? $data['designation'] : null,
+                    'amount' => $quote ? $quote['per_pass'] : null,
+                    'date' => $data['date'],
+                    'service_id' => $chosenEvent->id,
+                    'event' => $chosenEvent->title,
+                ]);
+            }
+        });
 
+        $this->notifyBooking($data, $chosenEvent, $order, $bookings, $quote);
+        $this->sendBookingWhatsApp($data);
 
-    //  event(new BookingCreated($data));
+        $request->session()->flash('eventName', $chosenEvent->title);
+        if ($order) {
+            $request->session()->flash('orderNo', $order->order_no);
+            $request->session()->flash('orderTotal', \App\Support\Pricing::money((float) $order->total));
+            $request->session()->flash('orderPasses', $order->quantity);
+        }
 
-    // Handle the response
-    if ($response->successful()) {
-        $eventName = $request->input('event');
-        $request->session()->flash('eventName', $eventName);
-        // return redirect()->away('https://oakbridgepublishing.mojo.page/ilats-2025');
         return redirect()->route('thanks');
-    } else {
-        // return $response->body(); // Or get the raw response
-        return back();
     }
 
+    /** Confirmation email to the buyer (and the admin copy). */
+    private function notifyBooking(array $data, Service $event, $order, array $bookings, ?array $quote): void
+    {
+        $payload = $data + [
+            'event' => $event->title,
+            'event_date' => $event->date,
+            'booking_id' => $bookings[0]->booking_id ?? null,
+            'order' => $order,
+            'quote' => $quote,
+            'attendees' => collect($bookings)->map(fn ($b) => ['name' => $b->name, 'email' => $b->email, 'booking_id' => $b->booking_id])->all(),
+            'payment_instructions' => Setting::find(1)->payment_instructions,
+            'ip' => request()->ip(),
+        ];
+
+        try {
+            event(new \App\Events\BookingCreated($payload));
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
+    /** WhatsApp confirmation through Interakt; never blocks the registration. */
+    private function sendBookingWhatsApp(array $data): void
+    {
+        $token = config('services.interakt.token');
+        if (! $token) {
+            return;
+        }
 
-
-
+        try {
+            Http::withHeaders([
+                'Authorization' => 'Basic ' . $token,
+                'Content-Type' => 'application/json',
+            ])->timeout(10)->post('https://api.interakt.ai/v1/public/message/', [
+                'countryCode' => '+91',
+                'phoneNumber' => $data['phone'],
+                'callbackData' => 'registration',
+                'type' => 'Template',
+                'template' => [
+                    'name' => config('services.interakt.template', 'new_reg_tba_events'),
+                    'languageCode' => 'en',
+                    'bodyValues' => [$data['name']],
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
 }
