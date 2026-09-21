@@ -21,12 +21,16 @@ class OrderFulfiller
      */
     public static function markPaid(Order $order, array $payment = []): bool
     {
-        $alreadyPaid = $order->status === 'paid' && $order->bookings()->exists();
-        if ($alreadyPaid) {
+        if ($order->status === 'paid') {
             return false;
         }
 
-        DB::transaction(function () use ($order, $payment) {
+        $issued = DB::transaction(function () use ($order, $payment) {
+            // lock the row: the browser return and the webhook arrive together
+            $locked = Order::whereKey($order->id)->lockForUpdate()->first();
+            if (! $locked || $locked->status === 'paid') {
+                return false;
+            }
             $order->refresh();
             $order->status = 'paid';
             $order->paid_at = $order->paid_at ?: now();
@@ -38,7 +42,13 @@ class OrderFulfiller
             $order->save();
 
             self::createBookings($order);
+
+            return true;
         });
+
+        if (! $issued) {
+            return false;
+        }
 
         $order = $order->fresh('bookings');
         self::notify($order);          // buyer receipt + admin copy

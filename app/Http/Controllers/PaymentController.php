@@ -21,8 +21,13 @@ class PaymentController extends Controller
         if ($order->isPaid()) {
             return redirect()->route('order.done', $order->order_no);
         }
-        if (in_array($order->status, ['cancelled', 'failed'], true)) {
-            $order->update(['status' => 'pending']);   // let them try again
+        if ($order->status === 'cancelled') {
+            // an admin cancelled this one; a page view must never revive it
+            return view('frontend.pay-done', [
+                'order' => $order,
+                'quote' => $order->quoteSummary(),
+                'bookings' => collect(),
+            ]);
         }
 
         $gatewayOrderId = Razorpay::enabled() ? Razorpay::orderIdFor($order) : null;
@@ -59,7 +64,8 @@ class PaymentController extends Controller
 
         // ask Razorpay what really happened before trusting the browser
         $payment = Razorpay::fetchPayment($data['razorpay_payment_id']);
-        $captured = $payment && in_array($payment['status'] ?? '', ['captured', 'authorized'], true)
+        // only a captured payment is money in the bank; 'authorized' is just a hold
+        $captured = $payment && ($payment['status'] ?? '') === 'captured'
             && (int) ($payment['amount'] ?? 0) === Razorpay::paise((float) $order->total);
 
         if (! $captured) {

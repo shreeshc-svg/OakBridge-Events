@@ -460,7 +460,7 @@ class FrontController extends Controller
         }
 
         $order = \App\Models\Order::create([
-            'order_no' => 'TMP',
+            'order_no' => \App\Models\Order::newOrderNumber(),
             'service_id' => $chosenEvent->id,
             'pass_type_id' => $passType->id,
             'event' => $chosenEvent->title,
@@ -480,7 +480,6 @@ class FrontController extends Controller
             'total' => $quote['total'],
             'status' => 'pending',
         ]);
-        $order->update(['order_no' => 'OB' . now()->format('ymd') . '-' . str_pad((string) $order->id, 4, '0', STR_PAD_LEFT)]);
 
         // Online payment on: straight to checkout. Otherwise the bank details email.
         if (\App\Support\Razorpay::enabled()) {

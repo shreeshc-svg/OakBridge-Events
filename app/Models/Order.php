@@ -26,6 +26,19 @@ class Order extends Model
         'cancelled' => 'Cancelled',
     ];
 
+    /**
+     * A fresh order number: OB + date + random. Not sequential, so the public
+     * pay page cannot be walked by guessing the next number.
+     */
+    public static function newOrderNumber(): string
+    {
+        do {
+            $candidate = 'OB' . now()->format('ymd') . '-' . strtoupper(\Illuminate\Support\Str::random(6));
+        } while (static::where('order_no', $candidate)->exists());
+
+        return $candidate;
+    }
+
     public function bookings()
     {
         return $this->hasMany(Booking::class);
@@ -55,6 +68,10 @@ class Order extends Model
     public function quoteSummary(): array
     {
         $setting = Setting::find(1);
+        $included = (bool) ($setting?->prices_include_tax ?? true);
+        $net = $included
+            ? (float) $this->total
+            : round((float) $this->total - (float) $this->tax_total, 2);
 
         return [
             'unit' => (float) $this->unit_price,
@@ -63,10 +80,10 @@ class Order extends Model
             'subtotal' => round((float) $this->unit_price * $this->quantity, 2),
             'discount' => (float) $this->discount_total,
             'discount_label' => $this->discount_label,
-            'net' => round((float) $this->total - (float) $this->tax_total, 2),
+            'net' => $net,
             'tax_percent' => (float) $this->tax_percent,
             'tax' => (float) $this->tax_total,
-            'tax_included' => false,
+            'tax_included' => $included,
             'tax_label' => (string) ($setting?->tax_label ?: 'Tax'),
             'total' => (float) $this->total,
             'per_pass' => $this->quantity ? round((float) $this->total / $this->quantity, 2) : 0.0,
