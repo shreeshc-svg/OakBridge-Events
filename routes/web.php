@@ -109,6 +109,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::post('orders-bulk-delete', [OrderController::class, 'bulkDestroy'])->name('orders.bulk-delete');
+    Route::post('booking-bulk-delete', [\App\Http\Controllers\BookingController::class, 'bulkDestroy'])->name('booking.bulk-delete');
     // profile
     Route::get('profile', [ProfileController::class, 'profile'])->name('profile');
     //password update

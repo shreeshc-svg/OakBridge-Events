@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Support\Pricing;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 /**
@@ -122,6 +123,46 @@ class OrderController extends Controller
         $name = 'orders-' . ($status ?: 'all') . '-' . now()->format('Y-m-d') . '.csv';
 
         return response()->streamDownload($callback, $name, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    /** Delete one order and the passes it issued. */
+    public function destroy(Order $order)
+    {
+        $reference = $order->order_no;
+        $passes = $order->bookings()->count();
+
+        DB::transaction(function () use ($order) {
+            $order->bookings()->delete();   // the passes go with the order
+            $order->delete();
+        });
+
+        return redirect()->route('orders.index')
+            ->with('success', 'Order ' . $reference . ' deleted' . ($passes ? ' along with ' . $passes . ' pass(es).' : '.'));
+    }
+
+    /** Delete several orders at once (for clearing out test bookings). */
+    public function bulkDestroy(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer',
+        ], [
+            'ids.required' => 'Tick the orders you want to delete first.',
+        ]);
+
+        $orders = Order::whereIn('id', $data['ids'])->get();
+        $passes = 0;
+
+        DB::transaction(function () use ($orders, &$passes) {
+            foreach ($orders as $order) {
+                $passes += $order->bookings()->count();
+                $order->bookings()->delete();
+                $order->delete();
+            }
+        });
+
+        return redirect()->route('orders.index', $request->only('status', 'q'))
+            ->with('success', $orders->count() . ' order(s) and ' . $passes . ' pass(es) deleted.');
     }
 
     private function csvSafe($value): string
