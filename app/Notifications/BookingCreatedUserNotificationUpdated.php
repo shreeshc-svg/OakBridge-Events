@@ -32,18 +32,21 @@ class BookingCreatedUserNotificationUpdated extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        // return (new MailMessage)
-        //             ->line('The introduction to the notification.')
-        //             ->action('Notification Action', url('/'))
-        //             ->line('Thank you for using our application!');
         $data = $this->data;
         $order = $data['order'] ?? null;
         $event = $data['event'] ?? 'our event';
+        $passes = $order && $order->quantity > 1 ? 'passes' : 'pass';
+
+        $subject = match (true) {
+            $order && $order->isPaid() => 'Your ' . $passes . ' for ' . $event . ' – payment received',
+            ! empty($data['payment_failed']) => 'Payment could not be completed – ' . $event,
+            (bool) $order => 'Complete your payment – ' . $event,
+            default => 'Registration received – ' . $event,
+        };
 
         return (new MailMessage)
-            ->subject($order
-                ? 'Complete your payment – ' . $event
-                : 'Registration received – ' . $event)
+            ->subject($subject)
+            ->replyTo(\App\Models\Setting::find(1)?->email ?: 'info@oakbridge.in')
             ->view('email.userBooking', ['data' => $data]);
     }
 

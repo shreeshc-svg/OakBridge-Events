@@ -38,11 +38,19 @@ class BookingCreatedAdminNotification extends Notification
         $quote = $data['quote'] ?? null;
 
         $mail = (new MailMessage)
-            ->subject(($order ? 'New order ' . $order->order_no : 'New registration ' . ($data['booking_id'] ?? '')) . ' – ' . ($data['event'] ?? ''))
+            ->subject(match (true) {
+                $order && $order->isPaid() => 'PAID: order ' . $order->order_no . ' – ' . ($data['event'] ?? ''),
+                ! empty($data['payment_failed']) => 'Payment failed: order ' . $order->order_no . ' – ' . ($data['event'] ?? ''),
+                (bool) $order => 'New order (unpaid) ' . $order->order_no . ' – ' . ($data['event'] ?? ''),
+                default => 'New registration ' . ($data['booking_id'] ?? '') . ' – ' . ($data['event'] ?? ''),
+            })
             ->greeting('Hello Admin,')
-            ->line($order
-                ? 'A new order has been placed (payment still to be confirmed):'
-                : 'A new registration has come in:')
+            ->line(match (true) {
+                $order && $order->isPaid() => 'Payment received – the passes have been issued and everyone emailed:',
+                ! empty($data['payment_failed']) => 'A payment attempt failed. The passes are still held:',
+                (bool) $order => 'A new order has been placed (payment still to be confirmed):',
+                default => 'A new registration has come in:',
+            })
             ->line('Event: ' . ($data['event'] ?? 'NA'))
             ->line('Name: ' . $data['name'])
             ->line('Email: ' . $data['email'])
