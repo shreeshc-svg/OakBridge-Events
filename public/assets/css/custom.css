@@ -335,3 +335,75 @@ a.ob-logo:hover,
         height: 120px;
     }
 }
+
+/* ------------------------------------------------------------------
+   Header on phones: the Register button sits in the bar next to the
+   hamburger instead of being buried inside the slide-out menu.
+------------------------------------------------------------------ */
+@media only screen and (max-width: 767px) {
+    .main-header .nav-outer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        float: right;
+    }
+
+    /* the theme parks this off-screen on small widths - bring it back into the bar */
+    .main-header .nav-outer .outer-box {
+        display: block;
+        position: static;
+        float: none;
+        margin: 0;
+        left: auto;
+        top: auto;
+    }
+
+    .main-header .nav-outer .outer-box .btn-box {
+        margin: 0;
+        float: none;
+    }
+
+    .main-header .nav-outer .outer-box .theme-btn.btn-style-one {
+        padding: 8px 16px;
+        font-size: 13px;
+        line-height: 20px;
+        border-radius: 8px;
+        white-space: nowrap;
+        /* a long label from Admin > Registration must not shove the bar onto
+           two rows or ride over the logo - trim it instead */
+        max-width: 46vw;
+        overflow: hidden;
+    }
+
+    .main-header .nav-outer .outer-box .theme-btn.btn-style-one .btn-title {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* button first, hamburger stays in its usual far-right corner */
+    .main-header .nav-outer .outer-box {
+        order: 1;
+    }
+
+    .main-header .nav-outer .mobile-nav-toggler {
+        order: 2;
+        float: none;
+        margin: 0;
+        line-height: 1;
+    }
+}
+
+/* narrow phones: keep the label on one line beside the hamburger */
+@media only screen and (max-width: 374px) {
+    .main-header .nav-outer {
+        gap: 8px;
+    }
+
+    .main-header .nav-outer .outer-box .theme-btn.btn-style-one {
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+}
