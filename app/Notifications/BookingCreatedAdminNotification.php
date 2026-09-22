@@ -55,8 +55,8 @@ class BookingCreatedAdminNotification extends Notification
             ->line('Name: ' . $data['name'])
             ->line('Email: ' . $data['email'])
             ->line('Phone: ' . $data['phone'])
-            ->line('Company: ' . ($data['company'] ?: 'NA'))
-            ->line('Designation: ' . ($data['designation'] ?: 'NA'));
+            ->line('Company: ' . (($data['company'] ?? null) ?: 'NA'))
+            ->line('Designation: ' . (($data['designation'] ?? null) ?: 'NA'));
 
         if ($order && $quote) {
             $mail->line('Pass: ' . $order->pass_name . ' × ' . $order->quantity)
