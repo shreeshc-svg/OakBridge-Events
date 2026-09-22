@@ -42,7 +42,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label>Organization</label>
+                    <label>Organization <small class="text-muted">(optional)</small></label>
                     <input type="text" placeholder="Company name" name="company" class="form-control"
                         value="{{ old('company') }}">
                     @error('company')
@@ -52,7 +52,7 @@
             </div>
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label>Designation</label>
+                    <label>Designation <small class="text-muted">(optional)</small></label>
                     <input type="text" placeholder="Designation" name="designation" class="form-control"
                         value="{{ old('designation') }}">
                     @error('designation')
