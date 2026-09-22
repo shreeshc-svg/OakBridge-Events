@@ -37,6 +37,77 @@ class SiteSections
         ];
     }
 
+    /** Homepage sections, top to bottom, as the site shipped. */
+    public static function homeDefaultOrder(): array
+    {
+        return array_keys(self::all()['Homepage']);
+    }
+
+    /**
+     * Homepage sections in the order the admin arranged them.
+     *
+     * Anything stored but no longer a real section is dropped, and any section
+     * added to the code later is slotted in at its default position, so a saved
+     * order never hides a new section or breaks on an old one.
+     */
+    public static function homeOrder(): array
+    {
+        $default = self::homeDefaultOrder();
+        $saved = json_decode((string) (self::setting()?->home_section_order ?? ''), true);
+
+        if (! is_array($saved)) {
+            return $default;
+        }
+
+        $order = [];
+        foreach ($saved as $key) {
+            if (is_string($key) && in_array($key, $default, true) && ! in_array($key, $order, true)) {
+                $order[] = $key;
+            }
+        }
+
+        // sections the saved order never knew about go back where they belong
+        foreach ($default as $position => $key) {
+            if (! in_array($key, $order, true)) {
+                array_splice($order, min($position, count($order)), 0, [$key]);
+            }
+        }
+
+        return $order;
+    }
+
+    /** Save a new order. Passing an empty list restores the original one. */
+    public static function setHomeOrder(array $keys): array
+    {
+        $default = self::homeDefaultOrder();
+        $clean = [];
+
+        foreach ($keys as $key) {
+            if (is_string($key) && in_array($key, $default, true) && ! in_array($key, $clean, true)) {
+                $clean[] = $key;
+            }
+        }
+
+        $setting = Setting::findOrFail(1);
+        $setting->home_section_order = ($clean && $clean !== $default) ? json_encode($clean) : null;
+        $setting->save();
+
+        app()->forgetInstance('site.sections.setting');
+
+        return self::homeOrder();
+    }
+
+    public static function homeOrderIsDefault(): bool
+    {
+        return self::homeOrder() === self::homeDefaultOrder();
+    }
+
+    /** 'home.intro' -> 'intro', the partial under frontend/sections/home/. */
+    public static function homeView(string $key): string
+    {
+        return str_replace('home.', '', $key);
+    }
+
     public static function find(string $key): ?array
     {
         foreach (self::all() as $sections) {

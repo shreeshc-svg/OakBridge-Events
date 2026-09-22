@@ -69,6 +69,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
     // website content
     Route::get('page-content', [PageContentController::class, 'index'])->name('page-content.index');
+    // must sit above page-content/{key} so "order" is not read as a section key
+    Route::post('home-section-order', [PageContentController::class, 'order'])->name('page-content.order');
     Route::get('page-content/{key}', [PageContentController::class, 'edit'])->name('page-content.edit');
     Route::post('page-content/{key}', [PageContentController::class, 'update'])->name('page-content.update');
     Route::post('page-content/{key}/reset', [PageContentController::class, 'reset'])->name('page-content.reset');

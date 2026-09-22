@@ -124,4 +124,30 @@ class PageContentController extends Controller
 
         return back()->with('success', $message);
     }
+
+    /** Save the top-to-bottom order of the homepage sections. */
+    public function order(Request $request)
+    {
+        $request->validate([
+            'keys' => 'array',
+            'keys.*' => 'string|max:60',
+        ]);
+
+        // an empty list is the "put it back how it was" button
+        $order = SiteSections::setHomeOrder($request->input('keys', []));
+
+        $message = $request->input('keys')
+            ? 'Homepage order saved.'
+            : 'Homepage order put back to the original.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'order' => $order,
+                'is_default' => SiteSections::homeOrderIsDefault(),
+                'message' => $message,
+            ]);
+        }
+
+        return back()->with('success', $message);
+    }
 }
