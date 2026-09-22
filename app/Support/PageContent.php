@@ -23,7 +23,7 @@ class PageContent
             'home.intro' => [
                 'page' => 'Homepage',
                 'label' => 'Intro and highlight cards',
-                'hint' => 'Directly below the marketing strip.',
+                'hint' => 'The opening block of copy and the cards under it.',
                 'fields' => [
                     'eyebrow' => ['type' => 'text', 'label' => 'Small title', 'default' => 'Forging the Future of Law, AI & Tech'],
                     'body' => ['type' => 'richtext', 'label' => 'Intro text', 'default' => '<p>The India Law, AI &amp; Tech Summit envisions India’s premier annual forum for legal innovation. A dynamic experience designed for maximum engagement and unparalled access, celebrating Law, AI &amp; Tech pioneers, leaders, and innovators driving Law, AI &amp; Tech revolution.</p>'],

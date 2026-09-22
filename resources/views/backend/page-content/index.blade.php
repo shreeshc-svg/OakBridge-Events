@@ -11,10 +11,12 @@
 
     <p class="text-muted">
         Edit the text on the public pages, and use the <strong>Shown / Hidden</strong> switches to take a section off the
-        site without losing its content (switches save straight away). Sections you have not edited show the site's
-        original text. Other content has its own page:
+        site without losing its content (switches save straight away). On the homepage you can also <strong>drag a
+        section</strong>, or use the arrows, to change the order it appears in. Sections you have not edited show the
+        site's original text. Other content has its own page:
         <a href="{{ route('hero.edit') }}">Hero Banner</a>,
         <a href="{{ route('strip.edit') }}">Marketing Strip</a>,
+        <a href="{{ route('promo.edit') }}">Marketing Popup</a>,
         <a href="{{ route('sponsors.index') }}">Sponsors &amp; Exhibitors</a>,
         <a href="{{ route('competitions.index') }}">Legathon</a>,
         <a href="{{ route('seo.index') }}">SEO</a>.
@@ -24,20 +26,35 @@
     @php
         // page order: pages with switches first (Homepage, About), then the rest
         $pageNames = array_values(array_unique(array_merge(array_keys($toggles), array_keys($pages))));
+        $orderIsDefault = \App\Support\SiteSections::homeOrderIsDefault();
     @endphp
     <div class="row">
         @foreach ($pageNames as $page)
             @php
                 $sections = $pages[$page] ?? [];
                 $pageToggles = $toggles[$page] ?? [];
-                $keys = array_values(array_unique(array_merge(array_keys($pageToggles), array_keys($sections))));
+                $sortable = $page === 'Homepage';
+                $keys = $sortable
+                    ? \App\Support\SiteSections::homeOrder()
+                    : array_values(array_unique(array_merge(array_keys($pageToggles), array_keys($sections))));
             @endphp
             <div class="col-lg-6">
                 <div class="card card-primary card-outline">
-                    <div class="card-header">
-                        <h3 class="card-title">{{ $page }}</h3>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">{{ $page }}</h3>
+                        @if ($sortable)
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="resetOrder"
+                                {{ $orderIsDefault ? 'hidden' : '' }}>
+                                Put back in the original order
+                            </button>
+                        @endif
                     </div>
-                    <ul class="list-group list-group-flush">
+                    @if ($sortable)
+                        <div class="px-3 pt-2">
+                            <small class="text-muted">Top to bottom is how the homepage reads. Saves as you move things.</small>
+                        </div>
+                    @endif
+                    <ul class="list-group list-group-flush" @if ($sortable) id="homeSectionOrder" @endif>
                         @foreach ($keys as $key)
                             @php
                                 $def = $sections[$key] ?? null;
@@ -47,19 +64,33 @@
                                 $editUrl = $def ? route('page-content.edit', $key) : (isset($toggle['route']) ? route($toggle['route']) : null);
                             @endphp
                             <li class="list-group-item d-flex justify-content-between align-items-center {{ $visible ? '' : 'is-hidden' }}"
-                                data-visibility-row>
-                                <div class="pr-3 vs-dim">
-                                    <div class="font-weight-bold">
-                                        {{ $toggle['label'] ?? $def['label'] }}
-                                        @if ($def && \App\Support\PageContent::isCustomised($key))
-                                            <span class="badge badge-info ml-1">Edited</span>
-                                        @endif
+                                data-visibility-row
+                                @if ($sortable) data-order-row data-key="{{ $key }}" draggable="true" @endif>
+                                <div class="d-flex align-items-center pr-3 vs-dim" style="min-width: 0">
+                                    @if ($sortable)
+                                        <span class="ob-grip mr-2" aria-hidden="true" title="Drag to move">&#x22EE;&#x22EE;</span>
+                                    @endif
+                                    <div style="min-width: 0">
+                                        <div class="font-weight-bold">
+                                            {{ $toggle['label'] ?? $def['label'] }}
+                                            @if ($def && \App\Support\PageContent::isCustomised($key))
+                                                <span class="badge badge-info ml-1">Edited</span>
+                                            @endif
+                                        </div>
+                                        @foreach ($hints as $hint)
+                                            <small class="text-muted d-block">{{ $hint }}</small>
+                                        @endforeach
                                     </div>
-                                    @foreach ($hints as $hint)
-                                        <small class="text-muted d-block">{{ $hint }}</small>
-                                    @endforeach
                                 </div>
                                 <div class="d-flex align-items-center flex-shrink-0">
+                                    @if ($sortable)
+                                        <div class="btn-group btn-group-sm mr-2 ob-move">
+                                            <button type="button" class="btn btn-outline-secondary" data-move="up"
+                                                aria-label="Move {{ $toggle['label'] ?? $def['label'] }} up">&uarr;</button>
+                                            <button type="button" class="btn btn-outline-secondary" data-move="down"
+                                                aria-label="Move {{ $toggle['label'] ?? $def['label'] }} down">&darr;</button>
+                                        </div>
+                                    @endif
                                     @if ($toggle)
                                         <div class="mr-3">
                                             @include('backend.partials.visibility-switch', [
@@ -85,4 +116,5 @@
 
 @section('js')
     @include('backend.partials.visibility-switch-js')
+    @include('backend.partials.section-order-js', ['orderUrl' => route('page-content.order')])
 @stop
