@@ -19,6 +19,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\VidhiSammanController;
 use App\Http\Controllers\HeroBannerController;
 use App\Http\Controllers\MarketingStripController;
+use App\Http\Controllers\PromoBannerController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TicketingController;
@@ -59,6 +60,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     // scrolling marketing strip under the hero banner
     Route::get('marketing-strip', [MarketingStripController::class, 'edit'])->name('strip.edit');
     Route::post('marketing-strip', [MarketingStripController::class, 'update'])->name('strip.update');
+    // marketing popup over the home page
+    Route::get('marketing-popup', [PromoBannerController::class, 'edit'])->name('promo.edit');
+    Route::post('marketing-popup', [PromoBannerController::class, 'update'])->name('promo.update');
     // open / close event registration
     Route::get('registration', [RegistrationController::class, 'edit'])->name('registration.edit');
     Route::post('registration', [RegistrationController::class, 'update'])->name('registration.update');

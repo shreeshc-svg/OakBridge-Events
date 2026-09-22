@@ -516,6 +516,11 @@ return [
             'icon' => 'fas fa-fw fa-bullhorn',
         ],
         [
+            'text' => 'Marketing Popup',
+            'route'  => 'promo.edit',
+            'icon' => 'fas fa-fw fa-rectangle-ad',
+        ],
+        [
             'text' => 'Page Content',
             'route'  => 'page-content.index',
             'icon' => 'fas fa-fw fa-file-alt',

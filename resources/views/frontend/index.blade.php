@@ -398,6 +398,9 @@
 
     <!--End News Section -->
 
+    {{-- Marketing popup (Admin > Marketing Popup) --}}
+    @include('frontend.components.promo-popup')
+
 @endsection
 
 
