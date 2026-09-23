@@ -44,6 +44,7 @@ class PageContentController extends Controller
                 'richtext' => 'nullable|string|max:200000',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
                 'file' => 'nullable|file|mimes:pdf|max:20480',
+                'toggle' => 'nullable|boolean',
             };
         }
         if (isset($def['items'])) {
@@ -63,12 +64,25 @@ class PageContentController extends Controller
                 if ($request->hasFile($name)) {
                     Uploads::delete($data[$name] ?? null);
                     $data[$name] = Uploads::store($request->file($name), $folder);
+                } elseif ($request->boolean('clear_' . $name)) {
+                    // explicitly nothing: the page shows the "coming soon" note instead
+                    Uploads::delete($data[$name] ?? null);
+                    $data[$name] = '';
                 } elseif ($request->boolean('reset_' . $name)) {
                     Uploads::delete($data[$name] ?? null);
                     unset($data[$name]);
                 }
                 continue;
             }
+            if ($field['type'] === 'toggle') {
+                // the form always posts a switch (there is a hidden 0 behind it), so a
+                // request that leaves one out is a partial save - don't flip it silently
+                if ($request->has($name)) {
+                    $data[$name] = $request->boolean($name) ? '1' : '0';
+                }
+                continue;
+            }
+
             $value = $request->input($name);
             $data[$name] = is_string($value) ? trim($value) : '';
         }

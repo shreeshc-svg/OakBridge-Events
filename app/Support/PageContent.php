@@ -13,7 +13,7 @@ use App\Models\PageSection;
  */
 class PageContent
 {
-    /** field types: text, textarea, richtext, image, file */
+    /** field types: text, textarea, richtext, image, file, toggle */
     public static function definitions(): array
     {
         $icon = ['type' => 'text', 'label' => 'Icon', 'help' => 'Icon class, e.g. fa fa-medal'];
@@ -156,10 +156,15 @@ class PageContent
                 'fields' => [
                     'eyebrow' => ['type' => 'text', 'label' => 'Small title', 'default' => 'Event Agenda'],
                     'heading' => ['type' => 'text', 'label' => 'Heading', 'default' => 'Schedule'],
-                    'register_label' => ['type' => 'text', 'label' => 'Register button text', 'help' => 'Shown only while registration is open.', 'default' => 'Register Now'],
-                    'agenda_label' => ['type' => 'text', 'label' => 'Agenda button text', 'help' => 'Leave empty to hide the agenda button.', 'default' => 'Download Agenda'],
-                    'agenda_file' => ['type' => 'file', 'label' => 'Default agenda PDF', 'help' => 'Used when an event has no agenda PDF of its own.', 'default' => 'public/uploads/Agenda_29_Nov.pdf'],
                     'empty_message' => ['type' => 'text', 'label' => 'Message when an event has no sessions yet', 'default' => 'The full schedule will be announced soon.'],
+
+                    'register_show' => ['type' => 'toggle', 'label' => 'Show the Register button', 'help' => 'It is hidden anyway while registration is closed.', 'default' => '1'],
+                    'register_label' => ['type' => 'text', 'label' => 'Register button text', 'default' => 'Register Now'],
+
+                    'agenda_show' => ['type' => 'toggle', 'label' => 'Show the Agenda button', 'default' => '1'],
+                    'agenda_label' => ['type' => 'text', 'label' => 'Agenda button text', 'default' => 'Download Agenda'],
+                    'agenda_pending_message' => ['type' => 'text', 'label' => 'Message while no agenda PDF is uploaded', 'help' => 'Shown in place of the button until an agenda is ready. Leave empty to show nothing at all.', 'default' => 'The agenda will be uploaded soon.'],
+                    'agenda_file' => ['type' => 'file', 'label' => 'Default agenda PDF', 'help' => 'Used when an event has no agenda PDF of its own.', 'default' => 'public/uploads/Agenda_29_Nov.pdf'],
                 ],
             ],
 
@@ -259,7 +264,7 @@ class PageContent
                 // drop the Blade comment line the default views start with
                 $value = trim(preg_replace('/^\s*<!--.*?-->\s*/s', '', $value));
             }
-            $values[$name] = $value;
+            $values[$name] = ($field['type'] ?? '') === 'toggle' ? (bool) $value : $value;
         }
 
         if (isset($def['items'])) {
