@@ -49,6 +49,12 @@ class Order extends Model
         return $this->belongsTo(Service::class);
     }
 
+    /** Payment reminders sent to the buyer, newest first. */
+    public function reminders()
+    {
+        return $this->hasMany(OrderReminder::class)->orderByDesc('sent_at');
+    }
+
     /** Attendees kept on the order until it is paid: [1 => ['name'=>, 'email'=>], ...] */
     public function attendeeList(): array
     {

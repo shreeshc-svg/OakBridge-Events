@@ -117,6 +117,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::post('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
     Route::post('orders-bulk-delete', [OrderController::class, 'bulkDestroy'])->name('orders.bulk-delete');
+    // chase an unpaid order
+    Route::post('orders/{order}/remind', [OrderController::class, 'remind'])->name('orders.remind');
+    Route::post('orders-bulk-remind', [OrderController::class, 'bulkRemind'])->name('orders.bulk-remind');
     Route::post('booking-bulk-delete', [\App\Http\Controllers\BookingController::class, 'bulkDestroy'])->name('booking.bulk-delete');
     // profile
     Route::get('profile', [ProfileController::class, 'profile'])->name('profile');
