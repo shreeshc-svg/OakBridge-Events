@@ -13,12 +13,13 @@
     (function() {
         var boxes = Array.prototype.slice.call(document.querySelectorAll('input.bulk-pick'));
         var all = document.querySelector('[id^=checkAll]');
-        var button = document.querySelector('[id$=Btn][form]');
+        // a list can offer more than one action on the same ticked rows
+        var buttons = Array.prototype.slice.call(document.querySelectorAll('[id$=Btn][form]'));
         var count = document.querySelector('[id$=Count]');
 
         function refresh() {
             var picked = boxes.filter(function(b) { return b.checked; }).length;
-            if (button) { button.disabled = picked === 0; }
+            buttons.forEach(function(button) { button.disabled = picked === 0; });
             if (count) {
                 count.textContent = picked ? picked + ' selected' : 'Nothing selected';
             }

@@ -152,6 +152,8 @@
                     </div>
                 </form>
             </div>
+
+            @include('backend.orders.reminders', ['order' => $order])
         </div>
     </div>
 @stop

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Support\PaymentReminders;
 use App\Support\Pricing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ class OrderController extends Controller
         $status = $request->query('status');
         $search = trim((string) $request->query('q'));
 
-        $orders = Order::with('bookings')
+        $orders = Order::with('bookings', 'reminders')
             ->when(in_array($status, array_keys(Order::STATUSES), true), fn ($q) => $q->where('status', $status))
             ->when($search !== '', fn ($q) => $q->where(function ($sub) use ($search) {
                 $sub->where('order_no', 'like', "%{$search}%")
@@ -45,9 +46,68 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load('bookings');
+        $order->load('bookings', 'reminders');
 
         return view('backend.orders.show', compact('order'));
+    }
+
+    /** Email this buyer the pay link again. */
+    public function remind(Request $request, Order $order)
+    {
+        if ($reason = PaymentReminders::blockedReason($order)) {
+            return back()->withErrors(['reminder' => $reason]);
+        }
+
+        $reminder = PaymentReminders::send($order, 'manual', null, $request->user()?->name);
+
+        if ($reminder->failed) {
+            return back()->withErrors([
+                'reminder' => 'The reminder could not be sent to ' . $order->buyer_email
+                    . '. It is listed below with the reason.',
+            ]);
+        }
+
+        return back()->with('success', 'Reminder sent to ' . $order->buyer_email . '.');
+    }
+
+    /** Chase several unpaid orders at once from the list. */
+    public function bulkRemind(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer',
+        ], [
+            'ids.required' => 'Tick the orders you want to remind first.',
+        ]);
+
+        $orders = Order::with('reminders')->whereIn('id', $data['ids'])->get();
+        $sent = 0;
+        $skipped = [];
+        $failed = [];
+
+        foreach ($orders as $order) {
+            if (PaymentReminders::blockedReason($order) !== null) {
+                $skipped[] = $order->order_no;
+                continue;
+            }
+
+            $reminder = PaymentReminders::send($order, 'manual', null, $request->user()?->name);
+            $reminder->failed ? $failed[] = $order->order_no : $sent++;
+        }
+
+        $message = $sent . ' reminder(s) sent.';
+
+        if ($skipped) {
+            $message .= ' Skipped ' . count($skipped) . ' (already paid, or reminded in the last 24 hours): '
+                . implode(', ', array_slice($skipped, 0, 5)) . (count($skipped) > 5 ? '…' : '') . '.';
+        }
+
+        if ($failed) {
+            $message .= ' ' . count($failed) . ' could not be sent: ' . implode(', ', $failed) . '.';
+        }
+
+        return redirect()->route('orders.index', $request->only('status', 'q'))
+            ->with('success', $message);
     }
 
     public function update(Request $request, Order $order)
@@ -84,13 +144,14 @@ class OrderController extends Controller
     public function export(Request $request)
     {
         $status = $request->query('status');
-        $orders = Order::with('bookings')
+        $orders = Order::with('bookings', 'reminders')
             ->when(in_array($status, array_keys(Order::STATUSES), true), fn ($q) => $q->where('status', $status))
             ->orderBy('id')
             ->get();
 
         $columns = ['Order', 'Date', 'Status', 'Event', 'Pass', 'Passes', 'Buyer', 'Email', 'Phone', 'Company',
-            'Designation', 'Unit price', 'Discount', 'Tax', 'Total', 'Payment reference', 'Attendees'];
+            'Designation', 'Unit price', 'Discount', 'Tax', 'Total', 'Payment reference',
+            'Reminders sent', 'Last reminded', 'Attendees'];
 
         $callback = function () use ($orders, $columns) {
             $out = fopen('php://output', 'w');
@@ -114,6 +175,8 @@ class OrderController extends Controller
                     $order->tax_total,
                     $order->total,
                     $order->payment_reference,
+                    PaymentReminders::sentCount($order),
+                    PaymentReminders::lastSentAt($order)?->format('Y-m-d H:i'),
                     $order->bookings->map(fn ($b) => $b->name . ' <' . ($b->email ?: '-') . '>')->implode('; '),
                 ]));
             }
@@ -132,7 +195,8 @@ class OrderController extends Controller
         $passes = $order->bookings()->count();
 
         DB::transaction(function () use ($order) {
-            $order->bookings()->delete();   // the passes go with the order
+            $order->bookings()->delete();    // the passes go with the order
+            $order->reminders()->delete();   // and so does its reminder history
             $order->delete();
         });
 
@@ -167,6 +231,7 @@ class OrderController extends Controller
             foreach ($orders as $order) {
                 $passes += $order->bookings()->count();
                 $order->bookings()->delete();
+                $order->reminders()->delete();
                 $order->delete();
             }
         });

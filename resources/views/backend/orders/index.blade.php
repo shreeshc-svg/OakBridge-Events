@@ -51,7 +51,7 @@
         </div>
         <div class="card-body p-0">
             <form id="bulkOrders" action="{{ route('orders.bulk-delete') }}" method="post"
-                onsubmit="return confirmBulkDelete(this, 'order');">
+                onsubmit="return obBulkConfirm(this);">
                 @csrf
                 <input type="hidden" name="status" value="{{ $status }}">
                 <input type="hidden" name="q" value="{{ $search }}">
@@ -100,7 +100,22 @@
                                         'badge-secondary' => $order->status === 'cancelled',
                                     ])>{{ $order->statusLabel() }}</span>
                                 </td>
-                                <td class="text-nowrap small">{{ $order->created_at?->format('j M Y, H:i') }}</td>
+                                <td class="text-nowrap small">
+                                    {{ $order->created_at?->format('j M Y, H:i') }}
+                                    @if ($order->status === 'pending')
+                                        @php $remindedAt = \App\Support\PaymentReminders::lastSentAt($order); @endphp
+                                        <div class="text-muted">
+                                            @if ($remindedAt)
+                                                <i class="fas fa-fw fa-paper-plane"></i>
+                                                reminded {{ $remindedAt->diffForHumans() }}
+                                                ({{ \App\Support\PaymentReminders::sentCount($order) }})
+                                            @else
+                                                <i class="fas fa-fw fa-paper-plane text-muted" style="opacity:.35"></i>
+                                                not reminded yet
+                                            @endif
+                                        </div>
+                                    @endif
+                                </td>
                                 <td class="text-nowrap">
                                     <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-primary">Open</a>
                                     <form action="{{ route('orders.destroy', $order) }}" method="post" class="d-inline"
@@ -121,6 +136,11 @@
             </div>
         </div>
         <div class="card-footer d-flex align-items-center flex-wrap">
+            <button type="submit" form="bulkOrders" formaction="{{ route('orders.bulk-remind') }}"
+                class="btn btn-sm btn-outline-primary mr-2" id="bulkRemindBtn" disabled
+                onclick="window.obBulkAction = 'remind';">
+                Remind selected
+            </button>
             <button type="submit" form="bulkOrders" class="btn btn-sm btn-outline-danger mr-3" id="bulkOrdersBtn" disabled>
                 Delete selected
             </button>
@@ -134,4 +154,25 @@
 
 @section('js')
     @include('backend.partials.bulk-delete-js')
+    <script>
+        // the ticked rows feed two buttons; each gets its own question
+        window.obBulkAction = 'delete';
+
+        function obBulkConfirm(form) {
+            var kind = window.obBulkAction;
+            window.obBulkAction = 'delete';
+
+            if (kind !== 'remind') {
+                return confirmBulkDelete(form, 'order');
+            }
+
+            var picked = document.querySelectorAll('input.bulk-pick:checked').length;
+            if (!picked) {
+                alert('Tick the orders you want to remind first.');
+                return false;
+            }
+            return confirm('Email a payment reminder to the unpaid orders among the ' + picked + ' selected?\n\n'
+                + 'Paid ones, and anyone already reminded in the last 24 hours, are skipped.');
+        }
+    </script>
 @stop
