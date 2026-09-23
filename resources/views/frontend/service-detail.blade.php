@@ -170,19 +170,34 @@
 
         </div>
         
-        <div class="btn-box w-100 text-center">
-            @if ($registrationOpen && $schedulePage['register_label'])
-                <a href="#" data-toggle="modal" data-target="#exampleModal" class="theme-btn btn-style-one"><span
-                        class="btn-title">{{ $schedulePage['register_label'] }}</span></a>
-            @endif
-            @php $agendaFile = $service->agenda_file ?: $schedulePage['agenda_file']; @endphp
-            @if ($schedulePage['agenda_label'] && $agendaFile)
-                <a href="{{ \App\Support\Uploads::url($agendaFile) }}" download
-                    class="theme-btn btn-style-three ml-3">
-                    <span class="btn-title">{{ $schedulePage['agenda_label'] }}</span>
-                </a>
-            @endif
-        </div>
+        {{-- Both buttons and the "agenda coming" note are set in Admin > Page Content > Schedule page. --}}
+        @php
+            $agendaFile = $service->agenda_file ?: $schedulePage['agenda_file'];
+            $showRegister = $registrationOpen && $schedulePage['register_show'] && $schedulePage['register_label'];
+            $showAgenda = $schedulePage['agenda_show'] && $schedulePage['agenda_label'] && $agendaFile;
+            // switched on, but there is no file to download yet
+            $agendaPending = $schedulePage['agenda_show'] && ! $agendaFile && $schedulePage['agenda_pending_message'];
+        @endphp
+
+        @if ($showRegister || $showAgenda || $agendaPending)
+            <div class="btn-box w-100 text-center ob-schedule-cta">
+                @if ($showRegister)
+                    <a href="#" data-cta="register" data-toggle="modal" data-target="#exampleModal"
+                        class="theme-btn btn-style-one"><span
+                            class="btn-title">{{ $schedulePage['register_label'] }}</span></a>
+                @endif
+                @if ($showAgenda)
+                    <a href="{{ \App\Support\Uploads::url($agendaFile) }}" download data-cta="agenda"
+                        class="theme-btn btn-style-three {{ $showRegister ? 'ml-3' : '' }}">
+                        <span class="btn-title">{{ $schedulePage['agenda_label'] }}</span>
+                    </a>
+                @elseif ($agendaPending)
+                    <p class="text-muted mb-0 {{ $showRegister ? 'mt-3' : '' }}" data-cta="agenda-pending">
+                        {{ $schedulePage['agenda_pending_message'] }}
+                    </p>
+                @endif
+            </div>
+        @endif
 
     </section>
 

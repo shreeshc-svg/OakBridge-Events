@@ -36,9 +36,22 @@
                 @foreach ($def['fields'] as $name => $field)
                     @php $value = old($name, $values[$name] ?? ''); @endphp
                     <div class="form-group">
-                        <label for="f_{{ $name }}">{{ $field['label'] }}</label>
+                        @unless ($field['type'] === 'toggle')
+                            <label for="f_{{ $name }}">{{ $field['label'] }}</label>
+                        @endunless
 
                         @switch($field['type'])
+                            @case('toggle')
+                                <div class="custom-control custom-switch">
+                                    <input type="hidden" name="{{ $name }}" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="f_{{ $name }}"
+                                        name="{{ $name }}" value="1" {{ old($name, $values[$name] ?? false) ? 'checked' : '' }}>
+                                    <label class="custom-control-label" for="f_{{ $name }}">
+                                        <strong>{{ $field['label'] }}</strong>
+                                    </label>
+                                </div>
+                            @break
+
                             @case('text')
                                 <input type="text" class="form-control @error($name) is-invalid @enderror" id="f_{{ $name }}"
                                     name="{{ $name }}" value="{{ $value }}" maxlength="255">
@@ -80,11 +93,13 @@
                                 @endif
                                 <input type="file" class="form-control-file" id="f_{{ $name }}" name="{{ $name }}" accept=".pdf">
                                 <small class="form-text text-muted">PDF, up to 20 MB.</small>
-                                @if (str_starts_with((string) ($values[$name] ?? ''), 'public/uploads/files/'))
+                                @if (!empty($values[$name]))
                                     <div class="custom-control custom-checkbox mt-2">
-                                        <input type="checkbox" class="custom-control-input" id="reset_{{ $name }}"
-                                            name="reset_{{ $name }}" value="1">
-                                        <label class="custom-control-label" for="reset_{{ $name }}">Go back to the original file</label>
+                                        <input type="checkbox" class="custom-control-input" id="clear_{{ $name }}"
+                                            name="clear_{{ $name }}" value="1">
+                                        <label class="custom-control-label" for="clear_{{ $name }}">
+                                            Remove this file &ndash; there is nothing to download yet
+                                        </label>
                                     </div>
                                 @endif
                             @break
