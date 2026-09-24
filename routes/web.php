@@ -21,6 +21,7 @@ use App\Http\Controllers\HeroBannerController;
 use App\Http\Controllers\MarketingStripController;
 use App\Http\Controllers\PromoBannerController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TicketingController;
 use App\Http\Controllers\RegistrationController;
@@ -120,6 +121,15 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     // chase an unpaid order
     Route::post('orders/{order}/remind', [OrderController::class, 'remind'])->name('orders.remind');
     Route::post('orders-bulk-remind', [OrderController::class, 'bulkRemind'])->name('orders.bulk-remind');
+    // GST tax invoices
+    Route::get('invoice-settings', [InvoiceController::class, 'settings'])->name('invoices.settings');
+    Route::post('invoice-settings', [InvoiceController::class, 'saveSettings'])->name('invoices.settings.save');
+    Route::get('invoice-settings/preview', [InvoiceController::class, 'preview'])->name('invoices.preview');
+    Route::post('orders/{order}/invoice', [InvoiceController::class, 'issue'])->name('orders.invoice.issue');
+    Route::get('orders/{order}/invoice', [InvoiceController::class, 'download'])->name('orders.invoice.download');
+    Route::post('orders/{order}/invoice/send', [InvoiceController::class, 'send'])->name('orders.invoice.send');
+    Route::post('orders/{order}/billing', [InvoiceController::class, 'billing'])->name('orders.billing');
+    Route::post('orders-bulk-invoice', [InvoiceController::class, 'bulkSend'])->name('orders.bulk-invoice');
     Route::post('booking-bulk-delete', [\App\Http\Controllers\BookingController::class, 'bulkDestroy'])->name('booking.bulk-delete');
     // profile
     Route::get('profile', [ProfileController::class, 'profile'])->name('profile');

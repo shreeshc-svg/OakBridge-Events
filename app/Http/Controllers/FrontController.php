@@ -341,14 +341,16 @@ class FrontController extends Controller
             return back()->withErrors(['registration_closed' => $registration['registrationClosedMessage']]);
         }
 
-        $data = $request->validate([
+        $request->merge(['buyer_gstin' => strtoupper(trim((string) $request->input('buyer_gstin'))) ?: null]);
+
+        $data = $request->validate(array_merge([
             'name' => 'required|string|max:100',
             'email' => 'required|string|email|max:100',
             'phone' => 'required|digits:10',
             'company' => 'nullable|string|max:100',
             'designation' => 'nullable|string|max:100',
             'event' => 'required|string|max:255',
-        ]);
+        ], InvoiceController::billingRules()), InvoiceController::billingMessages());
 
         // Use the event the visitor actually picked (and its real date) - the
         // hidden date field in the form is not reliable.
@@ -470,6 +472,10 @@ class FrontController extends Controller
             'buyer_phone' => $data['phone'],
             'buyer_company' => ($data['company'] ?? null) ?: null,
             'buyer_designation' => ($data['designation'] ?? null) ?: null,
+            'buyer_gstin' => $data['buyer_gstin'] ?? null,
+            'billing_address' => trim((string) ($data['billing_address'] ?? '')) ?: null,
+            'billing_state' => ($data['billing_state'] ?? null) ?: \App\Support\GstStates::stateFromGstin($data['buyer_gstin'] ?? null),
+            'billing_pin' => ($data['billing_pin'] ?? null) ?: null,
             'quantity' => $quantity,
             'attendees' => $attendeeList,
             'unit_price' => $quote['unit'],

@@ -19,7 +19,7 @@ class OrderController extends Controller
         $status = $request->query('status');
         $search = trim((string) $request->query('q'));
 
-        $orders = Order::with('bookings', 'reminders')
+        $orders = Order::with('bookings', 'reminders', 'invoice')
             ->when(in_array($status, array_keys(Order::STATUSES), true), fn ($q) => $q->where('status', $status))
             ->when($search !== '', fn ($q) => $q->where(function ($sub) use ($search) {
                 $sub->where('order_no', 'like', "%{$search}%")
@@ -46,7 +46,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load('bookings', 'reminders');
+        $order->load('bookings', 'reminders', 'invoice');
 
         return view('backend.orders.show', compact('order'));
     }
@@ -191,6 +191,12 @@ class OrderController extends Controller
     /** Delete one order and the passes it issued. */
     public function destroy(Order $order)
     {
+        // a tax invoice is a legal record in an unbroken series: it cannot just vanish
+        if ($invoice = $order->invoice) {
+            return back()->withErrors(['invoice' => 'Order ' . $order->order_no . ' has tax invoice ' . $invoice->number
+                . ', so it cannot be deleted. To reverse it, issue a credit note in your accounts.']);
+        }
+
         $reference = $order->order_no;
         $passes = $order->bookings()->count();
 
@@ -215,6 +221,15 @@ class OrderController extends Controller
         ]);
 
         $orders = Order::whereIn('id', $data['ids'])->get();
+        $invoiced = Order::whereIn('id', $orders->pluck('id'))->has('invoice')->pluck('order_no');
+
+        if ($invoiced->isNotEmpty()) {
+            return back()->withErrors([
+                'ids' => $invoiced->count() . ' of those orders have a tax invoice (' . $invoiced->implode(', ')
+                    . ') and cannot be deleted. Untick them.',
+            ]);
+        }
+
         $paid = $orders->where('status', 'paid');
 
         // paid orders are payment records: they need the single delete, with its warning

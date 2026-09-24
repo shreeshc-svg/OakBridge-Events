@@ -43,6 +43,7 @@ class ScheduleController extends Controller
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'nullable|date_format:H:i|after:start_time',
             'venue' => 'nullable|string|max:255',
+            'place_of_supply' => ['nullable', \Illuminate\Validation\Rule::in(\App\Support\GstStates::names())],
             'seat_target' => 'nullable|integer|min:1|max:1000000',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:1000',
@@ -82,6 +83,7 @@ class ScheduleController extends Controller
         $service->date = Carbon::createFromFormat('Y-m-d H:i', $request->input('event_date') . ' ' . $request->input('start_time'));
         $service->end_time = $request->input('end_time') ?: null;
         $service->venue = trim((string) $request->input('venue')) ?: null;
+        $service->place_of_supply = $request->input('place_of_supply') ?: null;
         $service->seat_target = $request->input('seat_target') ?: null;
         $service->meta_title = $request->input('meta_title');
         $service->meta_description = $request->input('meta_description');

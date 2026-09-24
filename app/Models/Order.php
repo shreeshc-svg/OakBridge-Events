@@ -49,6 +49,11 @@ class Order extends Model
         return $this->belongsTo(Service::class);
     }
 
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
+    }
+
     /** Payment reminders sent to the buyer, newest first. */
     public function reminders()
     {

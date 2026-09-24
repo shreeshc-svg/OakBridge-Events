@@ -7,12 +7,14 @@
         <h1>Order {{ $order->order_no }}</h1>
         <div>
             <a href="{{ route('orders.index') }}" class="btn btn-outline-secondary btn-sm">&larr; All orders</a>
+            @unless ($order->invoice)
             <form action="{{ route('orders.destroy', $order) }}" method="post" class="d-inline"
                 onsubmit="return confirm('Delete order {{ $order->order_no }}?{{ $order->isPaid() ? ' This order is PAID (' . \App\Support\Pricing::money((float) $order->total) . ') – the payment record and its issued passes will be gone for good.' : ' Its held passes go with it.' }}');">
                 @csrf
                 @method('delete')
                 <button type="submit" class="btn btn-outline-danger btn-sm">Delete order</button>
             </form>
+            @endunless
         </div>
     </div>
 @stop
@@ -153,6 +155,7 @@
                 </form>
             </div>
 
+            @include('backend.orders.invoice', ['order' => $order])
             @include('backend.orders.reminders', ['order' => $order])
         </div>
     </div>

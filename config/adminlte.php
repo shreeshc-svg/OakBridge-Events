@@ -350,6 +350,11 @@ return [
             'icon' => 'fas fa-fw fa-tags',
         ],
         [
+            'text' => 'Invoice Details',
+            'route' => 'invoices.settings',
+            'icon' => 'fas fa-fw fa-file-invoice',
+        ],
+        [
             'text' => 'Booking',
             'route'  => 'booking.index',
             'icon' => 'fas fa-ticket-alt',
