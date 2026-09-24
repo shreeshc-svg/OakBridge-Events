@@ -83,10 +83,10 @@
         </tr>
     </table>
 
-    {{-- buyer + event (an event has no "ship to") --}}
+    {{-- buyer (an event has no "ship to"; what was bought is described on the line below) --}}
     <table class="frame" style="border-top: 0;">
         <tr>
-            <td class="pad" style="width: 50%; border-right: 1px solid #c7ccd6;">
+            <td class="pad">
                 <div class="label">Buyer (Bill to)</div>
                 <div class="who">{{ $buyer['company'] ?: $buyer['name'] }}</div>
                 <div class="muted" style="line-height: 1.45;">
@@ -97,20 +97,6 @@
                     @if ($buyer['email'])E-Mail: {{ $buyer['email'] }}<br>@endif
                     @if ($buyer['gstin'])GSTIN/UIN: <span class="b" style="color: #1f2937;">{{ $buyer['gstin'] }}</span><br>@endif
                     @if ($buyer['state'])State Name: {{ $buyer['state'] }}@if ($buyer['state_code']), Code: {{ $buyer['state_code'] }}@endif @endif
-                </div>
-            </td>
-            <td class="pad" style="width: 50%;">
-                <div class="label">Event</div>
-                <div class="who">{{ $event['title'] }}</div>
-                <div class="muted" style="line-height: 1.45;">
-                    @if ($eventDate){{ $eventDate->format('l, j F Y') }}<br>@endif
-                    @if ($event['venue']){{ $event['venue'] }}<br>@endif
-                    @if (count($s['attendees']))
-                        <span style="display: block; margin-top: 4px;">Pass holders:</span>
-                        @foreach ($s['attendees'] as $a)
-                            {{ $a['name'] }}@if ($a['pass']) ({{ $a['pass'] }})@endif<br>
-                        @endforeach
-                    @endif
                 </div>
             </td>
         </tr>
@@ -128,21 +114,32 @@
             <tr>
                 <th style="width: 5%;">Sl</th>
                 <th>Description of Services</th>
-                <th style="width: 11%;">SAC</th>
-                <th style="width: 10%;" class="num">Qty</th>
-                <th style="width: 12%;" class="num">Rate</th>
-                <th style="width: 8%;" class="num">GST</th>
-                <th style="width: 14%;" class="num">Amount</th>
+                <th style="width: 10%;">SAC</th>
+                <th style="width: 11%;" class="num">Qty</th>
+                <th style="width: 13%;" class="num">Rate</th>
+                <th style="width: 15%;" class="num">Amount</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>1</td>
-                <td class="navy">{{ $s['line']['description'] }}</td>
+                <td>
+                    <div class="navy b">{{ $s['line']['description'] }}</div>
+                    <div class="muted small" style="line-height: 1.5; margin-top: 3px;">
+                        @if ($eventDate){{ $eventDate->format('l, j F Y') }}@endif
+                        @if ($eventDate && $event['venue']) &middot; @endif
+                        @if ($event['venue']){{ $event['venue'] }}@endif
+                        @if (count($s['attendees']))
+                            <br>Pass holders:
+                            @foreach ($s['attendees'] as $a)
+                                {{ $a['name'] }}@if ($a['pass']) ({{ $a['pass'] }})@endif{{ $loop->last ? '' : ',' }}
+                            @endforeach
+                        @endif
+                    </div>
+                </td>
                 <td>{{ $s['line']['sac'] ?: '' }}</td>
                 <td class="num">{{ $s['line']['qty'] }} {{ $s['line']['qty'] > 1 ? 'Passes' : 'Pass' }}</td>
                 <td class="num">{{ $A($s['line']['rate']) }}</td>
-                <td class="num">{{ $rate($gstRate) }}%</td>
                 <td class="num">{{ $A($s['line']['amount']) }}</td>
             </tr>
         </tbody>
