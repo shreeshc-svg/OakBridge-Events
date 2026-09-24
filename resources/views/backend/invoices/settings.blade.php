@@ -165,6 +165,16 @@
                             <small class="form-text text-muted">Off: invoices are still numbered on payment, and you send them from the order.</small>
                         </div>
 
+                        <div class="form-group">
+                            <label for="seller_pan">Company's PAN</label>
+                            <input type="text" class="form-control text-uppercase @error('seller_pan') is-invalid @enderror"
+                                id="seller_pan" name="seller_pan" maxlength="10"
+                                value="{{ old('seller_pan', $setting->seller_pan) }}"
+                                placeholder="{{ $setting->seller_gstin ? substr($setting->seller_gstin, 2, 10) : 'AACCO5406D' }}">
+                            @error('seller_pan')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <small class="form-text text-muted">Printed above the declaration. It is characters 3 to 12 of your GSTIN.</small>
+                        </div>
+
                         <div class="form-group mb-0">
                             <label for="invoice_declaration">Declaration</label>
                             <textarea class="form-control" id="invoice_declaration" name="invoice_declaration" rows="3" maxlength="500"

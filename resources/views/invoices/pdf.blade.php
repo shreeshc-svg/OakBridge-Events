@@ -167,10 +167,11 @@
     <table class="foot">
         <tr>
             <td style="width: 54%;">
+                @if (! empty($seller['pan']))
+                    <div style="margin-bottom: 6px;"><span class="muted">Company's PAN:</span> <span class="b navy">{{ $seller['pan'] }}</span></div>
+                @endif
                 <div class="b navy" style="margin-bottom: 3px;">Declaration</div>
                 <div class="muted">{{ $seller['declaration'] }}</div>
-                <div class="muted" style="margin-top: 16px;">for {{ $seller['name'] }}</div>
-                <div class="muted" style="margin-top: 20px;">Authorised Signatory</div>
             </td>
             <td style="width: 46%;">
                 @if ($seller['bank_name'] || $seller['bank_account'])
@@ -181,6 +182,10 @@
                         @if ($seller['bank_branch_ifsc'])Branch &amp; IFS Code: {{ $seller['bank_branch_ifsc'] }}@endif
                     </div>
                 @endif
+                <div class="right" style="margin-top: 14px;">
+                    <div class="b navy">for {{ $seller['name'] }}</div>
+                    <div class="muted" style="margin-top: 26px;">Authorised Signatory</div>
+                </div>
             </td>
         </tr>
     </table>

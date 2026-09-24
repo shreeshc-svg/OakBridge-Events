@@ -179,6 +179,7 @@ class InvoiceIssuer
                 'name' => $setting->seller_name,
                 'address' => $setting->seller_address,
                 'gstin' => $setting->seller_gstin,
+                'pan' => $setting->seller_pan,
                 'state' => $sellerState,
                 'state_code' => GstStates::codeFor($sellerState),
                 'phone' => $setting->seller_phone,
