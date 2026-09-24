@@ -54,6 +54,28 @@
                                 <small class="form-text text-muted">Leave empty to show the address from Settings.</small>
                             </div>
                             <div class="form-group col-md-4">
+                                <label for="place_of_supply">State it is held in <span class="text-muted">(GST)</span></label>
+                                @php
+                                    $obSellerState = $setting->seller_state ?? null;
+                                    $obPos = old('place_of_supply', $service->place_of_supply);
+                                @endphp
+                                <select class="form-control" id="place_of_supply" name="place_of_supply"
+                                    data-seller-state="{{ $obSellerState }}">
+                                    <option value="">Not set – charge IGST</option>
+                                    @foreach (\App\Support\GstStates::names() as $obState)
+                                        <option value="{{ $obState }}" @selected($obPos === $obState)>{{ $obState }}</option>
+                                    @endforeach
+                                </select>
+                                <small class="form-text text-muted" id="posHint">
+                                    The invoice's place of supply.
+                                    @if ($obSellerState)
+                                        {{ $obPos && $obPos === $obSellerState ? 'Same state as your GSTIN: CGST + SGST.' : 'Not ' . $obSellerState . ': IGST.' }}
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
                                 <label for="seat_target">Registration target</label>
                                 <input type="number" class="form-control" id="seat_target" name="seat_target" min="1"
                                     value="{{ old('seat_target', $service->seat_target) }}" placeholder="e.g. 500">

@@ -99,6 +99,13 @@
                                         'badge-danger' => $order->status === 'failed',
                                         'badge-secondary' => $order->status === 'cancelled',
                                     ])>{{ $order->statusLabel() }}</span>
+                                    @if ($order->invoice)
+                                        <div class="small text-muted mt-1 text-nowrap" title="Tax invoice">
+                                            <i class="fas fa-fw fa-file-invoice"></i>{{ $order->invoice->number }}
+                                        </div>
+                                    @elseif ($order->status === 'paid')
+                                        <div class="small text-danger mt-1 text-nowrap">no invoice yet</div>
+                                    @endif
                                 </td>
                                 <td class="text-nowrap small">
                                     {{ $order->created_at?->format('j M Y, H:i') }}
@@ -118,12 +125,17 @@
                                 </td>
                                 <td class="text-nowrap">
                                     <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-primary">Open</a>
+                                    @if ($order->invoice)
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled
+                                        title="Has tax invoice {{ $order->invoice->number }} – cannot be deleted">&times;</button>
+                                    @else
                                     <form action="{{ route('orders.destroy', $order) }}" method="post" class="d-inline"
                                         onsubmit="return confirm('Delete order {{ $order->order_no }}{{ $order->status === 'paid' ? ' – this order is PAID (' . \App\Support\Pricing::money((float) $order->total) . '). Its passes and payment record will be gone for good.' : ' and its held passes?' }}');">
                                         @csrf
                                         @method('delete')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete order">&times;</button>
                                     </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -136,6 +148,11 @@
             </div>
         </div>
         <div class="card-footer d-flex align-items-center flex-wrap">
+            <button type="submit" form="bulkOrders" formaction="{{ route('orders.bulk-invoice') }}"
+                class="btn btn-sm btn-outline-success mr-2" id="bulkInvoiceBtn" disabled
+                onclick="window.obBulkAction = 'invoice';">
+                Send invoices
+            </button>
             <button type="submit" form="bulkOrders" formaction="{{ route('orders.bulk-remind') }}"
                 class="btn btn-sm btn-outline-primary mr-2" id="bulkRemindBtn" disabled
                 onclick="window.obBulkAction = 'remind';">
@@ -161,6 +178,16 @@
         function obBulkConfirm(form) {
             var kind = window.obBulkAction;
             window.obBulkAction = 'delete';
+
+            if (kind === 'invoice') {
+                var ticked = document.querySelectorAll('input.bulk-pick:checked').length;
+                if (!ticked) {
+                    alert('Tick the orders you want to invoice first.');
+                    return false;
+                }
+                return confirm('Issue and email invoices for the paid orders among the ' + ticked + ' selected?\n\n'
+                    + 'Unpaid ones are skipped. Orders that already have an invoice get the same one again.');
+            }
 
             if (kind !== 'remind') {
                 return confirmBulkDelete(form, 'order');

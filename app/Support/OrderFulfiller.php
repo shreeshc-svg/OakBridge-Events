@@ -53,6 +53,7 @@ class OrderFulfiller
         $order = $order->fresh('bookings');
         self::notify($order);          // buyer receipt + admin copy
         self::notifyAttendees($order); // one email per pass holder
+        \App\Support\InvoiceIssuer::autoIssue($order);   // GST invoice, emailed if switched on
 
         return true;
     }
