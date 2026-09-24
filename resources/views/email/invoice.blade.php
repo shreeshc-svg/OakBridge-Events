@@ -29,7 +29,12 @@
         <div class="box">
             <span class="row"><strong>Invoice</strong> {{ $s['number'] }}</span>
             <span class="row"><strong>Order</strong> {{ $s['order_no'] }}</span>
-            <span class="row"><strong>Amount</strong> INR {{ \App\Support\InvoicePdf::amount($s['total']) }}</span>
+            <span class="row"><strong>Taxable value</strong> INR {{ \App\Support\InvoicePdf::amount($s['taxable']) }}</span>
+            @if (($s['gst_total'] ?? 0) > 0)
+                <span class="row"><strong>GST @ {{ rtrim(rtrim(number_format((float) $s['gst_rate'], 2), '0'), '.') }}%</strong>
+                    INR {{ \App\Support\InvoicePdf::amount($s['gst_total']) }}</span>
+            @endif
+            <span class="row"><strong>Total paid</strong> INR {{ \App\Support\InvoicePdf::amount($s['total']) }}</span>
             @if ($s['buyer']['gstin'])
                 <span class="row"><strong>Your GSTIN</strong> {{ $s['buyer']['gstin'] }}</span>
             @endif
