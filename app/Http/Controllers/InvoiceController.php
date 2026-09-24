@@ -42,6 +42,7 @@ class InvoiceController extends Controller
         $request->merge([
             'invoice_prefix' => strtoupper(trim((string) $request->input('invoice_prefix'))),
             'seller_gstin' => strtoupper(trim((string) $request->input('seller_gstin'))) ?: null,
+            'seller_pan' => strtoupper(str_replace(' ', '', (string) $request->input('seller_pan'))) ?: null,
         ]);
 
         $data = $request->validate([
@@ -51,6 +52,7 @@ class InvoiceController extends Controller
             'seller_name' => 'nullable|string|max:191',
             'seller_address' => 'nullable|string|max:500',
             'seller_gstin' => ['nullable', 'regex:' . GstStates::GSTIN_PATTERN],
+            'seller_pan' => ['nullable', 'regex:/^[A-Z]{5}[0-9]{4}[A-Z]$/'],
             'seller_state' => ['nullable', Rule::in(GstStates::names())],
             'seller_phone' => 'nullable|string|max:60',
             'seller_email' => 'nullable|email|max:191',
@@ -63,7 +65,15 @@ class InvoiceController extends Controller
             'invoice_prefix.regex' => 'Use 1 to 3 letters or digits, e.g. OBE.',
             'seller_gstin.regex' => 'That is not a valid GSTIN – it should be 15 characters, like 06AACCO5406D1ZW.',
             'invoice_sac.regex' => 'A SAC code is 4 to 8 digits.',
+            'seller_pan.regex' => 'That is not a valid PAN – it should be 10 characters, like AACCO5406D.',
         ]);
+
+        // characters 3 to 12 of a GSTIN are the PAN it was issued against
+        if ($data['seller_gstin'] && $data['seller_pan'] && substr($data['seller_gstin'], 2, 10) !== $data['seller_pan']) {
+            return back()->withInput()->withErrors([
+                'seller_pan' => 'This PAN does not match your GSTIN, which carries ' . substr($data['seller_gstin'], 2, 10) . '.',
+            ]);
+        }
 
         // the GSTIN's first two digits name its state; a mismatch is always a typo
         if ($data['seller_gstin'] && $data['seller_state']
@@ -80,8 +90,8 @@ class InvoiceController extends Controller
 
         $setting->invoice_auto_send = $request->boolean('invoice_auto_send');
 
-        foreach (['seller_name', 'seller_address', 'seller_gstin', 'seller_state', 'seller_phone', 'seller_email',
-                     'invoice_sac', 'bank_name', 'bank_account', 'bank_branch_ifsc', 'invoice_declaration'] as $field) {
+        foreach (['seller_name', 'seller_address', 'seller_gstin', 'seller_pan', 'seller_state', 'seller_phone',
+                     'seller_email', 'invoice_sac', 'bank_name', 'bank_account', 'bank_branch_ifsc', 'invoice_declaration'] as $field) {
             $value = $data[$field] ?? null;
             $setting->{$field} = is_string($value) ? (trim($value) ?: null) : $value;
         }
