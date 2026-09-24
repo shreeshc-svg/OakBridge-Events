@@ -602,7 +602,9 @@
             $errors->has('company') ||
             $errors->has('registration_closed') ||
             $errors->has('event') ||
-            $errors->has('date')))
+            $errors->has('date') ||
+            $errors->hasAny(['pass_type_id', 'quantity', 'billing_address', 'billing_state', 'billing_pin', 'buyer_gstin']) ||
+            collect($errors->keys())->contains(fn ($key) => str_starts_with($key, 'attendees.'))))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Use Bootstrap's modal API to open the modal

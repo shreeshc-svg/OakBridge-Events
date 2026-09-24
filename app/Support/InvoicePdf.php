@@ -22,7 +22,7 @@ class InvoicePdf
     {
         if (! class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
             throw new \RuntimeException(
-                'The PDF engine is not installed on this server yet. Run: composer require barryvdh/laravel-dompdf'
+                'The PDF engine is not installed on this server yet. Run: composer require barryvdh/laravel-dompdf:^3.1'
             );
         }
 

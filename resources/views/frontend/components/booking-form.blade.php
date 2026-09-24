@@ -109,67 +109,54 @@
 
                 <div class="ob-summary mb-3 p-3 rounded" style="background:#f8f9fa;border:1px solid #e9ecef"></div>
 
-                {{-- optional: a GST invoice in the company's name --}}
-                @php
-                    $obGstOpen = old('buyer_gstin') || old('billing_address') || old('billing_state') || old('billing_pin')
-                        || $errors->hasAny(['buyer_gstin', 'billing_address', 'billing_state', 'billing_pin']);
-                @endphp
-                <details class="ob-gst mb-3" {{ $obGstOpen ? 'open' : '' }}>
-                    <summary style="cursor:pointer" class="text-muted">
-                        Need a GST invoice for your company? <u>Add your GSTIN</u>
-                    </summary>
-                    <div class="pt-3">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label>GSTIN <small>(optional)</small></label>
-                                    <input type="text" name="buyer_gstin" class="form-control text-uppercase" maxlength="15"
-                                        placeholder="27AAAAA0000A1Z5" value="{{ old('buyer_gstin') }}">
-                                    @error('buyer_gstin')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label>State <small>(optional)</small></label>
-                                    <select name="billing_state" class="form-select w-100 border py-2 rounded">
-                                        <option value="">Select state</option>
-                                        @foreach (\App\Support\GstStates::names() as $obState)
-                                            <option value="{{ $obState }}" @selected(old('billing_state') === $obState)>{{ $obState }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('billing_state')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-9">
-                                <div class="mb-3">
-                                    <label>Billing address <small>(optional)</small></label>
-                                    <input type="text" name="billing_address" class="form-control" maxlength="500"
-                                        placeholder="Office, building, street, city" value="{{ old('billing_address') }}">
-                                    @error('billing_address')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label>PIN <small>(optional)</small></label>
-                                    <input type="text" name="billing_pin" class="form-control" maxlength="6" inputmode="numeric"
-                                        value="{{ old('billing_pin') }}">
-                                    @error('billing_pin')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <small class="text-muted d-block">The invoice is emailed once your payment goes through.</small>
+                {{-- billing details: every paid order gets a GST invoice --}}
+                <div class="ob-billing mb-3 p-3 rounded" style="border:1px solid #e9ecef">
+                    <div class="mb-2"><strong>Billing details</strong> <small class="text-muted">for your GST invoice</small></div>
+                    <div class="mb-3">
+                        <label>Billing address<span class="text-danger">*</span></label>
+                        <input type="text" name="billing_address" class="form-control ob-bill-req" maxlength="500"
+                            placeholder="Office / flat, building, street, city" value="{{ old('billing_address') }}">
+                        @error('billing_address')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
-                </details>
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="mb-3">
+                                <label>State<span class="text-danger">*</span></label>
+                                <select name="billing_state" class="form-select w-100 border py-2 rounded ob-bill-req">
+                                    <option value="">Select state</option>
+                                    @foreach (\App\Support\GstStates::names() as $obState)
+                                        <option value="{{ $obState }}" @selected(old('billing_state') === $obState)>{{ $obState }}</option>
+                                    @endforeach
+                                </select>
+                                @error('billing_state')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="mb-3">
+                                <label>PIN code<span class="text-danger">*</span></label>
+                                <input type="text" name="billing_pin" class="form-control ob-bill-req" maxlength="6"
+                                    inputmode="numeric" pattern="[0-9]{6}" value="{{ old('billing_pin') }}">
+                                @error('billing_pin')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <label>Company GSTIN <small>(optional – to claim input tax credit)</small></label>
+                        <input type="text" name="buyer_gstin" class="form-control text-uppercase" maxlength="15"
+                            placeholder="27AAAAA0000A1Z5" value="{{ old('buyer_gstin') }}">
+                        @error('buyer_gstin')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    @php $obGstRate = rtrim(rtrim(number_format((float) ($setting->tax_percent ?? 18), 2), '0'), '.'); @endphp
+                    <small class="text-muted d-block mt-2">Your tax invoice, showing {{ $obGstRate }}% GST, is emailed once your payment goes through.</small>
+                </div>
             </div>
         @endif
 
@@ -304,6 +291,7 @@
                         var data = current();
                         var hasPasses = data && data.passes.length > 0;
                         box.classList.toggle('d-none', !hasPasses);
+                        box.querySelectorAll('.ob-bill-req').forEach(function(field) { field.required = hasPasses; });
                         passSelect.disabled = !hasPasses;
                         quantitySelect.disabled = !hasPasses;
                         if (!hasPasses) {

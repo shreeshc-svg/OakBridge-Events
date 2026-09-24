@@ -8,6 +8,9 @@
     $date = \Illuminate\Support\Carbon::parse($s['date']);
     $eventDate = $event['date'] ? \Illuminate\Support\Carbon::parse($event['date']) : null;
     $rate = fn ($r) => rtrim(rtrim(number_format((float) $r, 2), '0'), '.');
+    // older snapshots may predate these two keys
+    $gstRate = $s['gst_rate'] ?? array_sum(array_column($s['taxes'], 'rate'));
+    $gstTotal = $s['gst_total'] ?? array_sum(array_column($s['taxes'], 'amount'));
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -127,8 +130,9 @@
                 <th>Description of Services</th>
                 <th style="width: 11%;">SAC</th>
                 <th style="width: 10%;" class="num">Qty</th>
-                <th style="width: 13%;" class="num">Rate</th>
-                <th style="width: 15%;" class="num">Amount</th>
+                <th style="width: 12%;" class="num">Rate</th>
+                <th style="width: 8%;" class="num">GST</th>
+                <th style="width: 14%;" class="num">Amount</th>
             </tr>
         </thead>
         <tbody>
@@ -138,6 +142,7 @@
                 <td>{{ $s['line']['sac'] ?: '' }}</td>
                 <td class="num">{{ $s['line']['qty'] }} {{ $s['line']['qty'] > 1 ? 'Passes' : 'Pass' }}</td>
                 <td class="num">{{ $A($s['line']['rate']) }}</td>
+                <td class="num">{{ $rate($gstRate) }}%</td>
                 <td class="num">{{ $A($s['line']['amount']) }}</td>
             </tr>
         </tbody>
@@ -151,6 +156,9 @@
         @foreach ($s['taxes'] as $t)
             <tr><td class="muted">{{ $t['label'] }} @ {{ $rate($t['rate']) }}%</td><td class="right">{{ $A($t['amount']) }}</td></tr>
         @endforeach
+        @if ($gstTotal > 0)
+            <tr><td class="b navy">Total GST @ {{ $rate($gstRate) }}%</td><td class="right b navy">{{ $A($gstTotal) }}</td></tr>
+        @endif
         <tr class="total"><td>Total</td><td class="right">INR {{ $A($s['total']) }}</td></tr>
     </table>
 

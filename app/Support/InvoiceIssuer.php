@@ -226,6 +226,8 @@ class InvoiceIssuer
             ] : null,
             'taxable' => $taxable,
             'taxes' => $taxes,
+            'gst_rate' => $rate,
+            'gst_total' => $tax,
             'total' => $total,
             'total_words' => self::amountInWords($total),
 

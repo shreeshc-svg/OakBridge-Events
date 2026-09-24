@@ -370,7 +370,16 @@ class FrontController extends Controller
         $attendees = [];
 
         if ($paid) {
+            // a paid order gets a GST invoice, which needs a billing address
+            if (! $request->input('billing_state') && ($fromGstin = \App\Support\GstStates::stateFromGstin($data['buyer_gstin'] ?? null))) {
+                $request->merge(['billing_state' => $fromGstin]);
+                $data['billing_state'] = $fromGstin;
+            }
+
             $extra = $request->validate([
+                'billing_address' => 'required|string|max:500',
+                'billing_state' => ['required', \Illuminate\Validation\Rule::in(\App\Support\GstStates::names())],
+                'billing_pin' => 'required|digits:6',
                 'pass_type_id' => [
                     'required',
                     \Illuminate\Validation\Rule::exists('pass_types', 'id')
@@ -381,10 +390,24 @@ class FrontController extends Controller
                 'attendees.*.name' => 'nullable|string|max:100',
                 'attendees.*.email' => 'nullable|string|email|max:100',
             ], [
+                'billing_address.required' => 'Please enter your billing address – it goes on your GST invoice.',
+                'billing_state.required' => 'Please choose your state.',
+                'billing_pin.required' => 'Please enter your PIN code.',
+                'billing_pin.digits' => 'The PIN code is 6 digits.',
                 'pass_type_id.required' => 'Please choose a pass.',
                 'pass_type_id.exists' => 'Please choose a pass from the list.',
                 'quantity.max' => 'Please contact us for more than :max passes.',
             ]);
+
+            $gstinState = \App\Support\GstStates::stateFromGstin($data['buyer_gstin'] ?? null);
+            if ($gstinState && $gstinState !== $extra['billing_state']) {
+                return back()->withInput()->withErrors([
+                    'billing_state' => 'Your GSTIN is registered in ' . $gstinState . ' – choose that state, or check the GSTIN.',
+                ]);
+            }
+            $data['billing_address'] = $extra['billing_address'];
+            $data['billing_state'] = $extra['billing_state'];
+            $data['billing_pin'] = $extra['billing_pin'];
 
             $passType = \App\Models\PassType::find($extra['pass_type_id']);
             $quantity = (int) $extra['quantity'];
