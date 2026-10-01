@@ -35,7 +35,7 @@
                     @if ($invoice->sent_count)
                         {{ $invoice->sent_count }}× – last {{ $invoice->last_sent_at?->format('j M Y, H:i') }}
                     @else
-                        <span class="text-danger">not yet</span>
+                        <span class="text-muted">not emailed</span>
                     @endif
                 </dd>
             </dl>
@@ -88,11 +88,15 @@
                 <button type="submit" class="btn btn-outline-secondary btn-sm btn-block">Save billing details</button>
             </form>
 
-            <form action="{{ route('orders.invoice.issue', $order) }}" method="post"
-                onsubmit="return confirm('Issue the invoice and email it to {{ $order->buyer_email }}? Its number is final once issued.');">
+            <form action="{{ route('orders.invoice.issue', $order) }}" method="post" class="d-flex">
                 @csrf
-                <button type="submit" class="btn btn-primary btn-block" {{ $blocked ? 'disabled' : '' }}>
-                    <i class="fas fa-fw fa-file-invoice"></i> Issue invoice and email it
+                <button type="submit" name="email" value="0" class="btn btn-outline-primary flex-fill mr-2" {{ $blocked ? 'disabled' : '' }}
+                    onclick="return confirm('Issue the invoice without emailing the buyer? Its number is final once issued.');">
+                    <i class="fas fa-fw fa-file-invoice"></i> Issue only
+                </button>
+                <button type="submit" name="email" value="1" class="btn btn-primary flex-fill" {{ $blocked ? 'disabled' : '' }}
+                    onclick="return confirm('Issue the invoice and email it to {{ $order->buyer_email }}? Its number is final once issued.');">
+                    <i class="fas fa-fw fa-paper-plane"></i> Issue and email
                 </button>
             </form>
             @if ($blocked)
