@@ -146,12 +146,17 @@ class InvoiceController extends Controller
     // ---------------------------------------------------------------- per order
 
     /** Issue the invoice (if it has none yet) and email it. */
-    public function issue(Order $order)
+    /** Issue the invoice; email it only when the admin chose "Issue and email". */
+    public function issue(Request $request, Order $order)
     {
         try {
             $invoice = InvoiceIssuer::issue($order);
         } catch (\RuntimeException $e) {
             return back()->withErrors(['invoice' => $e->getMessage()]);
+        }
+
+        if (! $request->boolean('email')) {
+            return back()->with('success', 'Invoice ' . $invoice->number . ' issued. It has not been emailed to the buyer.');
         }
 
         return $this->deliver($invoice, 'Invoice ' . $invoice->number . ' issued');
