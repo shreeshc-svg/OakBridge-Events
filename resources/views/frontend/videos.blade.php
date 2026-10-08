@@ -1,5 +1,5 @@
 @extends('frontend.layouts.app')
-@section('title', 'Videos' . ' ' . '-' . ' ' . $setting->site_title)
+@section('title', 'Videos' . ($edition ? ' ' . $edition->year : '') . ' - ' . $setting->site_title)
 @section('keywords', $setting->site_keywords)
 @section('description', $setting->site_description)
 @section('content')
@@ -14,37 +14,28 @@
         style="background-image:linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url({{ asset('public/assets/images/background/bread.webp') }}); background-size: cover; background-position: center;"> --}}
         {{-- <section class="page-title" style="background-image:url({{ asset('public/assets/images/background/5.jpg') }});"> --}}
         <div class="auto-container">
-            <h1>Videos</h1>
+            <h1>Videos{{ $edition ? ' ' . $edition->year : '' }}</h1>
             <ul class="bread-crumb clearfix">
                 <li><a href="{{ route('home') }}">Home</a></li>
+                <li>Gallery</li>
+                @if ($edition)<li>{{ $edition->year }}</li>@endif
                 <li>Videos</li>
             </ul>
         </div>
     </section>
     <!--End Page Title-->
+    @include('frontend.components.year-tabs', ['section' => 'videos'])
     <section class="py-5">
         <div class="container">
             <div class="row">
 
                 @foreach ($videos as $video)
-                    @php
-                        // Original YouTube watch URL
-                        $watchUrl = $video->video;
-
-                        // Parse the video ID from the URL
-                        $parsedUrl = parse_url($watchUrl);
-                        $embedUrl = null;
-                        if (isset($parsedUrl['query'])) {
-                            parse_str($parsedUrl['query'], $queryParams);
-                            if (isset($queryParams['v'])) {
-                                $embedUrl = 'https://www.youtube.com/embed/' . $queryParams['v'];
-                            }
-                        }
-                    @endphp
+                    @php $embedUrl = $video->embedUrl(); @endphp
+                    @continue(! $embedUrl)
 
                     <div class="col-md-4 mb-5">
                         <div class="card p-2">
-                            <iframe width="100%" height="220" src="{{ $embedUrl }}" frameborder="0"
+                            <iframe width="100%" height="220" src="{{ $embedUrl }}" title="{{ $video->title }}" loading="lazy" frameborder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowfullscreen>
                             </iframe>

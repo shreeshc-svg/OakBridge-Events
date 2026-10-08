@@ -407,3 +407,55 @@ a.ob-logo:hover,
         font-size: 12px;
     }
 }
+
+/* ---- year-wise sections: header flyouts and page year tabs ---- */
+@media (min-width: 1024px) {
+    /* second flyout (Gallery > 2025 > Images / Videos) opens beside the year, level with it */
+    .main-menu .navigation > li > ul > li.dropdown { position: relative; }
+    .main-menu .navigation > li > ul > li > ul {
+        top: -20px;
+        margin-top: 0;
+        width: 180px;
+    }
+    .main-menu .navigation > li > ul > li.dropdown > a { padding-right: 40px; }
+}
+
+.ob-year-tabs {
+    background: #fff;
+    border-bottom: 1px solid #ececf3;
+    padding: 18px 0 14px;
+}
+.ob-year-tabs__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+.ob-year-tabs__row + .ob-year-tabs__row { margin-top: 12px; }
+.ob-year-tabs__pill {
+    display: inline-block;
+    min-width: 84px;
+    padding: 8px 20px;
+    border: 1px solid #d9d9e3;
+    border-radius: 999px;
+    color: #222;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    transition: all .2s ease;
+}
+.ob-year-tabs__pill:hover { border-color: #D3181F; color: #D3181F; }
+.ob-year-tabs__pill.is-active { background: #D3181F; border-color: #D3181F; color: #fff; }
+.ob-year-tabs__kind {
+    padding: 4px 4px 6px;
+    margin: 0 12px;
+    color: #555;
+    font-size: 15px;
+    border-bottom: 2px solid transparent;
+}
+.ob-year-tabs__kind:hover { color: #D3181F; }
+.ob-year-tabs__kind.is-active { color: #D3181F; border-bottom-color: #D3181F; font-weight: 600; }
+
+/* mobile menu: indent years under their tab, and Images / Videos under their year */
+.mobile-menu .navigation > li > ul > li > a { padding-left: 36px; font-weight: 500; }
+.mobile-menu .navigation > li > ul > li > ul > li > a { padding-left: 56px; font-weight: 400; color: #555; }

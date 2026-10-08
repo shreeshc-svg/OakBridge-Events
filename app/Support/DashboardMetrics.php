@@ -167,7 +167,7 @@ class DashboardMetrics
             $items[] = ['Sponsor logos', Sponsor::where('is_active', true)->count(), 'fas fa-handshake', route('sponsors.index')];
             $items[] = ['Legathon competitions', Competition::where('is_active', true)->count(), 'fas fa-trophy', route('competitions.index')];
         }
-        $items[] = ['Gallery images', Gallery::count(), 'far fa-images', route('gallery.edit')];
+        $items[] = ['Gallery images', Gallery::count(), 'far fa-images', route('gallery.index')];
         $items[] = ['Videos', Video::count(), 'fas fa-video', route('video.index')];
         $items[] = ['Testimonials', Testimonial::count(), 'fas fa-star', route('testimonial.index')];
         $items[] = ['Blog posts', Post::wherePublished('1')->count(), 'fas fa-book', route('post.index')];

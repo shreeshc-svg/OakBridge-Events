@@ -155,8 +155,19 @@
                                             @if (count($menuItem['children']))
                                                 <ul>
                                                     @foreach ($menuItem['children'] as $subItem)
-                                                        <li><a href="{{ \App\Support\SiteMenu::href($subItem['url']) }}"
-                                                                @if ($subItem['new_tab']) target="_blank" rel="noopener" @endif>{{ $subItem['label'] }}</a></li>
+                                                        {{-- years can open a second flyout (Gallery: 2025 > Images / Videos) --}}
+                                                        <li class="{{ count($subItem['children']) ? 'dropdown' : '' }}">
+                                                            <a href="{{ \App\Support\SiteMenu::href($subItem['url']) }}"
+                                                                @if ($subItem['new_tab']) target="_blank" rel="noopener" @endif>{{ $subItem['label'] }}</a>
+                                                            @if (count($subItem['children']))
+                                                                <ul>
+                                                                    @foreach ($subItem['children'] as $leaf)
+                                                                        <li><a href="{{ \App\Support\SiteMenu::href($leaf['url']) }}"
+                                                                                @if ($leaf['new_tab']) target="_blank" rel="noopener" @endif>{{ $leaf['label'] }}</a></li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            @endif
+                                                        </li>
                                                     @endforeach
                                                 </ul>
                                             @endif

@@ -27,7 +27,13 @@ class TeamUpdateRequest extends FormRequest
             'image' => 'sometimes|nullable|image|mimes:png,jpg,webp,jpeg|max:2048',
             'social' => 'sometimes|nullable',
             'bio' => 'nullable',
-            'year' => 'required',
+            'year' => 'required|in:Speaker,Advisor,Organizer',
+            'edition_id' => 'nullable|required_if:year,Speaker|exists:editions,id',
         ];
+    }
+
+    public function messages(): array
+    {
+        return ['edition_id.required_if' => 'Choose the year this speaker belongs to.'];
     }
 }

@@ -67,7 +67,11 @@ class FrontController extends Controller
 
 
         $services = Service::wherePublished('1')->latest()->paginate(12);
-        $speakers = Team::where('year','Speaker')->take(8)->get();
+        // the newest year that has speakers (Admin > Years)
+        $speakerYear = \App\Support\Editions::latest('speakers');
+        $speakers = Team::where('year', 'Speaker')
+            ->when($speakerYear, fn ($q) => $q->where('edition_id', $speakerYear->id))
+            ->take(8)->get();
         $testimonials = Testimonial::all();
         $teams = Team::all();
 
@@ -120,10 +124,46 @@ class FrontController extends Controller
         return view('frontend.service-detail', compact('service', 'categories', 'recently'));
     }
 
-    public function speakers()
+    public function speakers($year = null)
     {
-        $speakers = Team::where('year','Speaker')->get();
-        return view('frontend.speakers',compact('speakers'));
+        $edition = $this->editionOr404('speakers', $year);
+        $speakers = Team::where('year', 'Speaker')
+            ->when($edition, fn ($q) => $q->where('edition_id', $edition->id))
+            ->get();
+
+        return view('frontend.speakers', compact('speakers', 'edition'));
+    }
+
+    /** Sponsors and exhibitors of one year. */
+    public function sponsors($year = null)
+    {
+        $edition = $this->editionOr404('sponsors', $year);
+
+        return view('frontend.sponsors', compact('edition'));
+    }
+
+    /** A year's schedule is its event page. */
+    public function schedule($year = null)
+    {
+        $edition = \App\Support\Editions::pick('schedule', $year);
+        $service = $edition?->scheduleService;
+
+        if (! $service) {
+            abort_if($year !== null, 404);
+
+            return redirect()->route('events');
+        }
+
+        return redirect()->route('service.detail', $service->slug);
+    }
+
+    /** The year asked for (404 if it has nothing for this section), or the newest one. */
+    private function editionOr404(string $section, $year): ?\App\Models\Edition
+    {
+        $edition = \App\Support\Editions::pick($section, $year);
+        abort_if($year !== null && ! $edition, 404);
+
+        return $edition;
     }
 
     public function speakerDetail(Request $request)
@@ -287,16 +327,20 @@ class FrontController extends Controller
         return view('frontend.term-condition');
     }
 
-    public function gallery()
+    public function gallery($year = null)
     {
-        $images = Gallery::all();
-        return view('frontend.gallery',compact('images'));
+        $edition = $this->editionOr404('images', $year);
+        $images = Gallery::when($edition, fn ($q) => $q->where('edition_id', $edition->id))->orderBy('id')->get();
+
+        return view('frontend.gallery', compact('images', 'edition'));
     }
 
-    public function videos()
+    public function videos($year = null)
     {
-        $videos = Video::all();
-        return view('frontend.videos',compact('videos'));
+        $edition = $this->editionOr404('videos', $year);
+        $videos = Video::when($edition, fn ($q) => $q->where('edition_id', $edition->id))->orderBy('id')->get();
+
+        return view('frontend.videos', compact('videos', 'edition'));
     }
 
     public function vidhiSamman()

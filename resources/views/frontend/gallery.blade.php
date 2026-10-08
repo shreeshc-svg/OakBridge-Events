@@ -1,5 +1,5 @@
 @extends('frontend.layouts.app')
-@section('title', 'OakBridge Events Gallery | Highlights from the India Law, AI & Tech Summit 2025')
+@section('title', 'OakBridge Events Gallery | Highlights from the India Law, AI & Tech Summit' . ($edition ? ' ' . $edition->year : ''))
 @section('keywords', 'legal tech, law ai, tech summit, legal tech summit, new technology, technology summit, legal tech leaders, india law ai, ai in law, ai legal tech photos, summit legal tech images')
 @section('description', 'The India Law AI Tech Summit 2025 envisions Indias premier annual forum for legal innovation. A dynamic experience designed for maximum engagement and unparalled access celebrating Law AI Tech pioneers leaders and innovators driving Law AI Tech revolution.')
 @section('content')
@@ -18,21 +18,24 @@
          style="background-image: url({{ asset('public/assets/images/background/bread2.webp') }}); background-size: cover; background-position: center;">
         {{-- <section class="page-title" style="background-image:url({{ asset('public/assets/images/background/5.jpg') }});"> --}}
         <div class="auto-container">
-            <h1>Image Gallery</h1>
+            <h1>Image Gallery{{ $edition ? ' ' . $edition->year : '' }}</h1>
             <ul class="bread-crumb clearfix">
                 <li><a href="{{ route('home') }}">Home</a></li>
-                <li>Image Gallery</li>
+                <li>Gallery</li>
+                @if ($edition)<li>{{ $edition->year }}</li>@endif
+                <li>Images</li>
             </ul>
         </div>
     </section>
     <!--End Page Title-->
+    @include('frontend.components.year-tabs', ['section' => 'images'])
     <section class="py-5">
         <div class="container">
             <div class="row">
                 @foreach ($images as $key => $image)
                     <div class="col-md-4 mb-4">
-                        <img src="{{ asset('public/uploads/images/our-gallery/' . $image->name) }}" alt="Gallery Image"
-                            class="img-fluid gallery-image" data-index="{{ $key }}"
+                        <img src="{{ asset('public/uploads/images/our-gallery/' . $image->name) }}" alt="Gallery image{{ $edition ? ' ' . $edition->year : '' }}"
+                            loading="lazy" class="img-fluid gallery-image" data-index="{{ $key }}"
                             data-src="{{ asset('public/uploads/images/our-gallery/' . $image->name) }}">
                     </div>
                 @endforeach

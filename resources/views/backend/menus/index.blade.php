@@ -12,9 +12,10 @@
     @php $activeTab = session('tab', old('location', 'header')); @endphp
 
     <p class="text-muted">
-        Links can point to a page on this site (e.g. <code>/speakers</code>, <code>/#exhibitors</code>,
+        Links can point to a page on this site (e.g. <code>/speakers</code>, <code>/sponsors</code>,
         <code>/event/your-event-slug</code>) or a full address (<code>https://...</code>). Use <code>#</code> for a
-        header item that only opens a dropdown. Lower order numbers show first. Use the <strong>On site</strong> switch to
+        header item that only opens a dropdown. Set <strong>Year flyout</strong> on a header tab to list its years
+        automatically (from <a href="{{ route('editions.index') }}">Years</a>) – e.g. Speakers › 2026, 2025. Lower order numbers show first. Use the <strong>On site</strong> switch to
         hide a tab without deleting it – it saves straight away (hiding a dropdown also hides its sub-links). The footer title and text are in
         <a href="{{ route('page-content.edit', 'footer') }}">Page Content › Footer</a>.
     </p>
@@ -40,6 +41,7 @@
                                         <th style="min-width: 160px">Label</th>
                                         <th style="min-width: 260px">Link</th>
                                         @if ($location === 'header')
+                                            <th style="min-width: 190px">Year flyout</th>
                                             <th style="min-width: 150px">Inside dropdown of</th>
                                         @endif
                                         <th style="width: 80px">Order</th>
@@ -52,10 +54,10 @@
                                     @forelse ($items as $item)
                                         @include('backend.menus.row', ['item' => $item, 'location' => $location, 'parents' => $items, 'child' => false, 'parentHidden' => false])
                                         @foreach ($item->children as $childItem)
-                                            @include('backend.menus.row', ['item' => $childItem, 'location' => $location, 'parents' => $items, 'child' => true, 'parentHidden' => ! $item->is_active])
+                                            @include('backend.menus.row', ['item' => $childItem, 'location' => $location, 'parents' => $items, 'child' => true, 'parentHidden' => ! $item->is_active, 'parentListsYears' => (bool) $item->source])
                                         @endforeach
                                     @empty
-                                        <tr><td colspan="7" class="text-muted text-center py-3">No links yet.</td></tr>
+                                        <tr><td colspan="8" class="text-muted text-center py-3">No links yet.</td></tr>
                                     @endforelse
 
                                     {{-- add --}}
@@ -70,9 +72,17 @@
                                         </td>
                                         @if ($location === 'header')
                                             <td>
+                                                <select form="add-{{ $location }}" name="source" class="form-control form-control-sm">
+                                                    <option value="">No – my own links</option>
+                                                    @foreach (\App\Support\Editions::SECTIONS as $key => $sectionLabel)
+                                                        <option value="{{ $key }}">{{ $sectionLabel }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
                                                 <select form="add-{{ $location }}" name="parent_id" class="form-control form-control-sm">
                                                     <option value="">— Top level —</option>
-                                                    @foreach ($items as $parent)
+                                                    @foreach ($items->whereNull('source') as $parent)
                                                         <option value="{{ $parent->id }}">{{ $parent->label }}</option>
                                                     @endforeach
                                                 </select>

@@ -16,9 +16,15 @@ class Team extends Model
         'social',
         'bio',
         'year',
+        'edition_id',
     ];
 
     protected $casts = [
         'social' => 'array',
     ];
+
+    public function edition()
+    {
+        return $this->belongsTo(Edition::class);
+    }
 }

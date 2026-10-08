@@ -74,6 +74,7 @@ class MenuController extends Controller
                 Rule::exists('menu_items', 'id')->whereNull('parent_id')->where('location', $request->input('location')),
             ],
             'sort_order' => 'nullable|integer|min:0|max:9999',
+            'source' => ['nullable', Rule::in(array_keys(\App\Support\Editions::SECTIONS))],
         ], [
             'parent_id.exists' => 'Pick a top-level link from the same menu as the parent.',
         ]);
@@ -83,6 +84,9 @@ class MenuController extends Controller
         // the Show switch on existing links saves on its own (see toggle), so keep the current value here
         $data['is_active'] = ($item && ! $request->has('is_active')) ? (bool) $item->is_active : $request->boolean('is_active');
         $data['parent_id'] = $data['parent_id'] ?? null;
+        // only a top-level header tab can list years; a save that doesn't send the field keeps the current setting
+        $source = ($item && ! $request->has('source')) ? $item->source : ($data['source'] ?? null);
+        $data['source'] = ($data['location'] === 'header' && ! $data['parent_id']) ? $source : null;
 
         if ($item && (int) $data['parent_id'] === (int) $item->id) {
             $data['parent_id'] = null;

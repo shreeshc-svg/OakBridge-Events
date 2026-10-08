@@ -422,9 +422,16 @@ return [
             ],
         ],
         [
+            'text' => 'Years',
+            'route' => 'editions.index',
+            'icon' => 'fas fa-fw fa-layer-group',
+            'active' => ['admin/editions*'],
+        ],
+        [
             'text' => 'Gallery',
-            'route' => 'gallery.update',
-            'icon' => 'far fa-images'
+            'route' => 'gallery.index',
+            'icon' => 'far fa-images',
+            'active' => ['admin/gallery*'],
         ],
         // [
         //     'text' => 'Vidhi Samman',

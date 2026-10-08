@@ -12,5 +12,11 @@ class Gallery extends Model
     protected $fillable = [
         'name',
         'src',
+        'edition_id',
     ];
+
+    public function edition()
+    {
+        return $this->belongsTo(Edition::class);
+    }
 }

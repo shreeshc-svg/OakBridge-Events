@@ -1,9 +1,11 @@
-{{-- Partners & sponsors: Admin > Sponsors & Exhibitors (heading in Admin > Page Content) --}}
+{{-- Partners & sponsors: Admin > Sponsors & Exhibitors (heading in Admin > Page Content).
+     One year: $sponsorEdition when given (the Sponsors page), else the newest year that has sponsors (home page). --}}
 @php
+    $sponsorEdition = $sponsorEdition ?? \App\Support\Editions::latest('sponsors');
     try {
         $sponsorGroups = \App\Models\SponsorGroup::where('is_active', true)
             ->orderBy('sort_order')->orderBy('id')
-            ->with('activeSponsors')
+            ->with(['activeSponsors' => fn ($q) => $q->when($sponsorEdition, fn ($q) => $q->where('edition_id', $sponsorEdition->id))])
             ->get()
             ->filter(fn ($group) => $group->activeSponsors->count());
     } catch (\Throwable $e) {
