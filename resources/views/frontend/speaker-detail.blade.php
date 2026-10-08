@@ -44,34 +44,34 @@
 
                             <ul class="social-icon-two social-icon-colored text-center">
 
-                                @if ($speaker->social['facebook'])
-                                    <li><a target="_blank" href="{{ $speaker->social['facebook'] }}"><span
+                                @if (($speaker->social['facebook'] ?? null))
+                                    <li><a target="_blank" href="{{ ($speaker->social['facebook'] ?? null) }}"><span
                                                 class="fab fa-facebook-f"></span></a>
                                     </li>
                                 @endif
 
-                                @if ($speaker->social['instagram'])
-                                    <li><a target="_blank" href="{{ $speaker->social['instagram'] }}"><span
+                                @if (($speaker->social['instagram'] ?? null))
+                                    <li><a target="_blank" href="{{ ($speaker->social['instagram'] ?? null) }}"><span
                                                 class="fab fa-instagram"></span></a>
                                     </li>
                                 @endif
 
 
-                                @if ($speaker->social['x'])
-                                    <li><a target="_blank" href="{{ $speaker->social['x'] }}"><span
+                                @if (($speaker->social['x'] ?? null))
+                                    <li><a target="_blank" href="{{ ($speaker->social['x'] ?? null) }}"><span
                                                 class="fab fa-twitter"></span></a>
                                     </li>
                                 @endif
 
 
-                                @if ($speaker->social['linkedin'])
-                                    <li><a target="_blank" href="{{ $speaker->social['linkedin'] }}"><span
+                                @if (($speaker->social['linkedin'] ?? null))
+                                    <li><a target="_blank" href="{{ ($speaker->social['linkedin'] ?? null) }}"><span
                                                 class="fab fa-linkedin-in"></span></a>
                                     </li>
                                 @endif
 
-                                @if ($speaker->social['youtube'])
-                                    <li><a target="_blank" href="{{ $speaker->social['youtube'] }}"><span
+                                @if (($speaker->social['youtube'] ?? null))
+                                    <li><a target="_blank" href="{{ ($speaker->social['youtube'] ?? null) }}"><span
                                                 class="fab fa-youtube"></span></a>
                                     </li>
                                 @endif

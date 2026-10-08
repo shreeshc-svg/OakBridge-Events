@@ -189,6 +189,20 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label class="mb-0" for="edition_id">Year <span class="text-danger js-year-star">*</span></label>
+                                    <select name="edition_id" id="edition_id" class="form-control">
+                                        <option value="">{{ $years->isEmpty() ? 'Add a year in Admin › Years first' : 'Choose year' }}</option>
+                                        @foreach ($years as $y)
+                                            <option value="{{ $y->id }}" @selected((string) old('edition_id', $team->edition_id) === (string) $y->id)>{{ $y->year }}</option>
+                                        @endforeach
+                                    </select>
+                                    <small class="text-muted">Speakers are listed under this year (Speakers › 2026). Optional for advisors and the organiser team.</small>
+                                    @error('edition_id')
+                                        <span class="text-danger d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group">
                                     <small class="text-red">&nbsp;&nbsp;Note: size: Width-500px Height: 500px
                                     </small>
                                     <input name="image" accept="image/*" type="file" id="imgInp">
@@ -349,4 +363,15 @@
 
 
 
+    <script>
+        // the year is required for speakers only
+        (function () {
+            var type = document.querySelector('select[name=year]');
+            var star = document.querySelector('.js-year-star');
+            var year = document.getElementById('edition_id');
+            function sync() { var speaker = type.value === 'Speaker'; star.style.display = speaker ? '' : 'none'; year.required = speaker; }
+            type.addEventListener('change', sync);
+            sync();
+        })();
+    </script>
 @stop

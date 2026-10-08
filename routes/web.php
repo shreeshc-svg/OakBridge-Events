@@ -82,6 +82,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::post('sponsors/groups/{group}', [SponsorController::class, 'updateGroup'])->name('sponsors.groups.update');
     Route::delete('sponsors/groups/{group}', [SponsorController::class, 'destroyGroup'])->name('sponsors.groups.destroy');
     Route::post('sponsors/reorder', [SponsorController::class, 'reorder'])->name('sponsors.reorder');
+    Route::post('sponsors/bulk', [SponsorController::class, 'bulk'])->name('sponsors.bulk');
+
+    // Years: speakers, sponsors, gallery, videos and schedules are grouped by year
+    Route::resource('editions', \App\Http\Controllers\EditionController::class);
+    Route::post('editions/{edition}/toggle', [\App\Http\Controllers\EditionController::class, 'toggle'])->name('editions.toggle');
+    Route::post('team-bulk', [TeamController::class, 'bulk'])->name('team.bulk');
+    Route::post('video-bulk', [VideoController::class, 'bulk'])->name('video.bulk');
     Route::post('sponsors/logos', [SponsorController::class, 'storeSponsor'])->name('sponsors.logos.store');
     Route::post('sponsors/logos/{sponsor}', [SponsorController::class, 'updateSponsor'])->name('sponsors.logos.update');
     Route::delete('sponsors/logos/{sponsor}', [SponsorController::class, 'destroySponsor'])->name('sponsors.logos.destroy');
@@ -169,10 +176,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::resource('testimonial', TestimonialController::class);
 
     //gallery
-    Route::get('gallery', [GalleryController::class, 'create'])->name('gallery.create');
+    Route::get('gallery', [GalleryController::class, 'index'])->name('gallery.index');
     Route::post('gallery', [GalleryController::class, 'store'])->name('gallery.store');
-    Route::get('gallery-edit', [GalleryController::class, 'edit'])->name('gallery.edit');
-    Route::post('gallery-edit', [GalleryController::class, 'update'])->name('gallery.update');
+    Route::post('gallery/bulk', [GalleryController::class, 'bulk'])->name('gallery.bulk');
+    Route::post('gallery/{gallery}', [GalleryController::class, 'update'])->name('gallery.update');
+    Route::delete('gallery/{gallery}', [GalleryController::class, 'destroy'])->name('gallery.destroy');
+    Route::get('gallery-edit', [GalleryController::class, 'legacy'])->name('gallery.edit');
 
     // faq
     Route::resource('faq', FaqController::class);
@@ -232,7 +241,7 @@ Route::get('/events/{date?}', [FrontController::class, 'events'])->name('events'
 Route::get('/testimonials',[FrontController::class, 'testimonial'])->name('testimonial');
 Route::get('/faq', [FrontController::class, 'faq'])->name('faq');
 Route::get('/image-gallery', [FrontController::class, 'gallery'])->name('image.gallery');
-Route::get('/videos', [FrontController::class, 'videos'])->name('videos');
+Route::get('/videos/{year?}', [FrontController::class, 'videos'])->where('year', '\d{4}')->name('videos');
 // Route::get('/vidhi-samman', [FrontController::class, 'vidhiSamman'])->name('vidhi.samman');
 
 
@@ -252,9 +261,12 @@ Route::get('/thank-you', [FrontController::class, 'contactThanks'])->name('conta
 // Route::get('/subscription',[FrontController::class,'subscription'])->name('subscription');
 Route::get('/ticket',[FrontController::class,'ticket'])->name('ticket');
 Route::get('/advisors',[FrontController::class,'advisors'])->name('advisors');
-Route::get('/speakers',[FrontController::class, 'speakers'])->name('speakers');
+Route::get('/speakers/{year?}',[FrontController::class, 'speakers'])->where('year', '\d{4}')->name('speakers');
 Route::get('/speaker/{id}',[FrontController::class, 'speakerDetail'])->name('speaker.detail');
-Route::get('/gallery', [FrontController::class, 'gallery'])->name('gallery');
+Route::get('/gallery/{year?}', [FrontController::class, 'gallery'])->where('year', '\d{4}')->name('gallery');
+// year-wise: sponsors and exhibitors on one page, and each year's event schedule
+Route::get('/sponsors/{year?}', [FrontController::class, 'sponsors'])->where('year', '\d{4}')->name('sponsors');
+Route::get('/schedule/{year?}', [FrontController::class, 'schedule'])->where('year', '\d{4}')->name('schedule');
 
 // disabled: grievence(), grievenceForm() and jobNotification() do not exist in FrontController
 // Route::get('/grievence', [FrontController::class, 'grievence'])->name('grievence');

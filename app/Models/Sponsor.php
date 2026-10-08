@@ -14,4 +14,9 @@ class Sponsor extends Model
     {
         return $this->belongsTo(SponsorGroup::class, 'sponsor_group_id');
     }
+
+    public function edition()
+    {
+        return $this->belongsTo(Edition::class);
+    }
 }

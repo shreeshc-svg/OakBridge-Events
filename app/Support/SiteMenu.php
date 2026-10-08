@@ -31,12 +31,15 @@ class SiteMenu
                 'label' => $item->label,
                 'url' => $item->url,
                 'new_tab' => (bool) $item->new_tab,
-                'children' => $item->children->map(fn ($child) => [
-                    'label' => $child->label,
-                    'url' => $child->url,
-                    'new_tab' => (bool) $child->new_tab,
-                    'children' => [],
-                ])->all(),
+                // a tab with a source lists its years automatically (Admin > Years)
+                'children' => $item->source && isset(Editions::SECTIONS[$item->source])
+                    ? Editions::menuChildren($item->source)
+                    : $item->children->map(fn ($child) => [
+                        'label' => $child->label,
+                        'url' => $child->url,
+                        'new_tab' => (bool) $child->new_tab,
+                        'children' => [],
+                    ])->all(),
             ])->all();
         } catch (\Throwable $e) {
             $items = self::defaults($location);
@@ -83,13 +86,13 @@ class SiteMenu
     private static function defaults(string $location): array
     {
         $link = fn ($label, $url, $children = []) => ['label' => $label, 'url' => $url, 'new_tab' => false, 'children' => $children];
-        $schedule = '/event/india-law-ai-tech-summit-2025';
+        $schedule = '/schedule';
 
         if ($location === 'footer') {
             return [
                 $link('Speakers', '/speakers'),
                 $link('Schedule', $schedule),
-                $link('Sponsors', '/#sponsors'),
+                $link('Sponsors', '/sponsors'),
                 $link('Contact Us', '/contact'),
                 $link('Privacy Policy', '/privacy-policy'),
             ];
@@ -99,9 +102,8 @@ class SiteMenu
             $link('Home', '/'),
             $link('Speakers', '/speakers'),
             $link('Schedule', $schedule),
-            $link('Sponsors', '/#sponsors'),
-            $link('Exhibitors', '/#exhibitors'),
-            $link('Gallery', '#', [$link('Images', '/gallery'), $link('Videos', '/videos')]),
+            $link('Sponsors', '/sponsors'),
+            $link('Gallery', '/gallery', [$link('Images', '/gallery'), $link('Videos', '/videos')]),
             $link('About', '/about'),
         ];
     }

@@ -10,14 +10,29 @@
     </td>
     @if ($location === 'header')
         <td>
-            @if (! $child && $item->children->count())
+            @if ($child)
+                <span class="small text-muted">–</span>
+            @else
+                <select form="{{ $formId }}" name="source" class="form-control form-control-sm" title="List the years automatically">
+                    <option value="">No – my own links</option>
+                    @foreach (\App\Support\Editions::SECTIONS as $key => $sectionLabel)
+                        <option value="{{ $key }}" @selected($item->source === $key)>{{ $sectionLabel }}</option>
+                    @endforeach
+                </select>
+            @endif
+        </td>
+        <td>
+            @if (! $child && $item->source)
+                <span class="small text-muted">Years fill in automatically</span>
+                <input form="{{ $formId }}" type="hidden" name="parent_id" value="">
+            @elseif (! $child && $item->children->count())
                 <span class="small text-muted">Has {{ $item->children->count() }} sub-link(s)</span>
                 <input form="{{ $formId }}" type="hidden" name="parent_id" value="">
             @else
                 <select form="{{ $formId }}" name="parent_id" class="form-control form-control-sm">
                     <option value="">— Top level —</option>
                     @foreach ($parents as $parent)
-                        @if ($parent->id !== $item->id)
+                        @if ($parent->id !== $item->id && (! $parent->source || $item->parent_id === $parent->id))
                             <option value="{{ $parent->id }}" @selected($item->parent_id === $parent->id)>{{ $parent->label }}</option>
                         @endif
                     @endforeach
@@ -41,6 +56,8 @@
         ])
         @if ($child && $parentHidden)
             <small class="text-muted d-block">Hidden with its dropdown</small>
+        @elseif ($child && ($parentListsYears ?? false))
+            <small class="text-muted d-block">Not shown – its tab lists years</small>
         @endif
     </td>
     <td class="text-nowrap">

@@ -9,15 +9,51 @@
 @section('content')
     @include('backend.partials.alerts')
 
+    {{-- one year at a time --}}
+    <div class="d-flex flex-wrap align-items-center mb-3">
+        <ul class="nav nav-pills mr-3 mb-2">
+            @foreach ($years as $y)
+                <li class="nav-item">
+                    <a class="nav-link {{ ! $showUntagged && $year && $year->id === $y->id ? 'active' : '' }}"
+                        href="{{ route('sponsors.index', ['year' => $y->id]) }}">{{ $y->year }}</a>
+                </li>
+            @endforeach
+            @if ($untagged)
+                <li class="nav-item">
+                    <a class="nav-link {{ $showUntagged ? 'active' : '' }}" href="{{ route('sponsors.index', ['year' => 'none']) }}">
+                        No year set <span class="badge badge-warning">{{ $untagged }}</span></a>
+                </li>
+            @endif
+            <li class="nav-item"><a class="nav-link text-muted" href="{{ route('editions.index') }}" title="Add or manage years">+ Year</a></li>
+        </ul>
+        <form method="get" class="mb-2 ml-auto" style="min-width: 260px">
+            <input type="hidden" name="year" value="{{ $showUntagged ? 'none' : $year?->id }}">
+            <div class="input-group input-group-sm">
+                <input type="search" name="q" value="{{ $q }}" class="form-control" placeholder="Search logos by name…">
+                <div class="input-group-append"><button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button></div>
+            </div>
+        </form>
+    </div>
+
+    @if ($years->isEmpty())
+        <div class="alert alert-warning">Add a year in <a href="{{ route('editions.index') }}">Years</a> before adding logos.</div>
+    @endif
+
+    @include('backend.partials.bulk-bar', [
+        'formId' => 'bulkSponsors', 'action' => route('sponsors.bulk'), 'years' => $years, 'noun' => 'logo', 'canCopy' => true,
+    ])
+
     <p class="text-muted mb-2">
-        Logos appear on the homepage in the groups below, in this order.
+        Showing <strong>{{ $showUntagged ? 'logos with no year' : ($year ? $year->year : 'all') }}</strong>{{ $q ? ' matching “' . $q . '”' : '' }}.
+        The Sponsors page and the homepage show the newest year that has logos; Exhibitors is one of the groups.
+        Logos appear in the groups below, in this order.
         <strong>Drag</strong> a group by its <i class="fas fa-grip-vertical"></i> handle, or drag a logo within or between groups;
         the new order saves automatically. The section heading is edited in
         <a href="{{ route('page-content.edit', 'home.sponsors') }}">Page Content</a>.
     </p>
-    <div id="orderStatus" class="small mb-3 text-muted">&nbsp;</div>
+    <div id="orderStatus" class="small mb-3 text-muted">{!! $q ? 'Clear the search to drag logos into a new order.' : '&nbsp;' !!}</div>
 
-    <div id="groupList">
+    <div id="groupList" class="{{ $q ? 'no-drag' : '' }}">
         @forelse ($groups as $group)
             <div class="card card-outline {{ $group->is_active ? 'card-primary' : 'card-secondary' }} sponsor-group"
                 data-group-id="{{ $group->id }}">
@@ -64,7 +100,7 @@
                         </div>
                     </form>
                     <form id="delete-group-{{ $group->id }}" action="{{ route('sponsors.groups.destroy', $group) }}"
-                        method="post" onsubmit="return confirm('Delete the group &quot;{{ addslashes($group->title) }}&quot; and all {{ $group->sponsors->count() }} of its logos?');">
+                        method="post" onsubmit="return confirm('Delete the group &quot;{{ addslashes($group->title) }}&quot; and all {{ $group->sponsors_count }} of its logos in every year?');">
                         @csrf
                         @method('delete')
                     </form>
@@ -73,8 +109,10 @@
                 <div class="card-body">
                     <div class="logo-list" data-group-id="{{ $group->id }}">
                         @foreach ($group->sponsors as $sponsor)
-                            <div class="logo-tile {{ $sponsor->is_active ? '' : 'is-hidden' }}" draggable="true"
+                            <div class="logo-tile {{ $sponsor->is_active ? '' : 'is-hidden' }}" draggable="{{ $q ? 'false' : 'true' }}"
                                 data-id="{{ $sponsor->id }}">
+                                <input type="checkbox" class="bulk-check logo-check" form="bulkSponsors" name="ids[]" value="{{ $sponsor->id }}"
+                                    aria-label="Select {{ $sponsor->name ?: 'logo' }}">
                                 <div class="logo-img">
                                     <img src="{{ \App\Support\Uploads::url($sponsor->logo) }}" alt="{{ $sponsor->name }}">
                                 </div>
@@ -89,6 +127,7 @@
                                         data-action="{{ route('sponsors.logos.update', $sponsor) }}"
                                         data-name="{{ $sponsor->name }}" data-url="{{ $sponsor->url }}"
                                         data-group="{{ $sponsor->sponsor_group_id }}"
+                                        data-edition="{{ $sponsor->edition_id }}"
                                         data-active="{{ $sponsor->is_active ? 1 : 0 }}"
                                         data-logo="{{ \App\Support\Uploads::url($sponsor->logo) }}">Edit</button>
                                     <form action="{{ route('sponsors.logos.destroy', $sponsor) }}" method="post"
@@ -109,6 +148,7 @@
                         class="form-row align-items-end">
                         @csrf
                         <input type="hidden" name="sponsor_group_id" value="{{ $group->id }}">
+                        <input type="hidden" name="edition_id" value="{{ $showUntagged ? $years->first()?->id : $year?->id }}">
                         <div class="col-md-3 my-1">
                             <label class="small mb-0">Logo image</label>
                             <input type="file" name="logo" class="form-control-file" accept=".jpg,.jpeg,.png,.webp,.gif" required>
@@ -124,7 +164,8 @@
                                 placeholder="https://...">
                         </div>
                         <div class="col-md-2 my-1">
-                            <button type="submit" class="btn btn-sm btn-success btn-block">+ Add logo</button>
+                            <button type="submit" class="btn btn-sm btn-success btn-block" @disabled($years->isEmpty())>
+                                + Add to {{ $showUntagged ? $years->first()?->year : $year?->year }}</button>
                         </div>
                     </form>
                 </div>
@@ -189,6 +230,14 @@
                         <input type="url" name="url" id="logoUrl" class="form-control" maxlength="500" placeholder="https://...">
                     </div>
                     <div class="form-group">
+                        <label>Year</label>
+                        <select name="edition_id" id="logoEdition" class="form-control" required>
+                            @foreach ($years as $y)
+                                <option value="{{ $y->id }}">{{ $y->year }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Group</label>
                         <select name="sponsor_group_id" id="logoGroup" class="form-control">
                             @foreach ($groups as $group)
@@ -216,7 +265,10 @@
         .sponsor-group.dragging { opacity: .5; }
         .logo-list { display: flex; flex-wrap: wrap; gap: 12px; min-height: 70px; padding: 6px; border: 2px dashed transparent; border-radius: 6px; }
         .logo-list.drop-target { border-color: #007bff; background: #f1f7ff; }
-        .logo-tile { width: 170px; border: 1px solid #dee2e6; border-radius: 6px; background: #fff; padding: 8px; cursor: grab; }
+        .logo-tile { position: relative; width: 170px; border: 1px solid #dee2e6; border-radius: 6px; background: #fff; padding: 8px; cursor: grab; }
+        .logo-tile .logo-check { position: absolute; top: 6px; left: 6px; z-index: 2; width: 16px; height: 16px; }
+        .logo-tile:has(.logo-check:checked) { border-color: #007bff; box-shadow: 0 0 0 2px rgba(0,123,255,.25); }
+        #groupList.no-drag .logo-tile { cursor: default; }
         .logo-tile.dragging { opacity: .4; }
         .logo-tile.is-hidden { opacity: .55; }
         .logo-img { height: 70px; display: flex; align-items: center; justify-content: center; }
@@ -229,6 +281,7 @@
 @stop
 
 @section('js')
+    @include('backend.partials.bulk-bar-js')
     <script>
         (function() {
             var status = document.getElementById('orderStatus');
@@ -340,6 +393,7 @@
                     document.getElementById('logoName').value = btn.dataset.name || '';
                     document.getElementById('logoUrl').value = btn.dataset.url || '';
                     document.getElementById('logoGroup').value = btn.dataset.group;
+                    document.getElementById('logoEdition').value = btn.dataset.edition || '{{ $year?->id }}';
                     document.getElementById('logoActive').checked = btn.dataset.active === '1';
                     $('#logoModal').modal('show');
                 });
