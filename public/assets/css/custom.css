@@ -459,3 +459,36 @@ a.ob-logo:hover,
 /* mobile menu: indent years under their tab, and Images / Videos under their year */
 .mobile-menu .navigation > li > ul > li > a { padding-left: 36px; font-weight: 500; }
 .mobile-menu .navigation > li > ul > li > ul > li > a { padding-left: 56px; font-weight: 400; color: #555; }
+
+/* ---- event schedule cards: content centred against the timeline dot ---- */
+.schedule-timeline .schedule-block .inner-box .inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100px;            /* same height as the time circle */
+    padding-top: 22px;
+    padding-bottom: 22px;
+}
+.schedule-timeline .schedule-block .speaker-info,
+.schedule-timeline .schedule-block.even .speaker-info {
+    padding: 0;                   /* no space kept for a speaker photo the cards never show */
+    min-height: 0;
+}
+.schedule-timeline .schedule-block .speaker-info .name {
+    margin: 0;
+    line-height: 1.45;
+}
+.schedule-timeline .schedule-block .speaker-info .designation {
+    display: block;
+    margin-top: 4px;
+}
+.schedule-timeline .schedule-block .text {
+    margin: 12px 0 0;
+}
+@media (max-width: 767px) {
+    /* phones: cards stack full width, so no mirrored alignment, and no blank line where a time isn't set */
+    .schedule-timeline .schedule-block.even .inner-box { text-align: left; }
+    .schedule-timeline .schedule-block .date.is-empty { display: none; }
+    .schedule-timeline .schedule-block .date { align-self: flex-start; text-align: left; }
+    .schedule-timeline .schedule-block .inner-box .inner { min-height: 0; }
+}

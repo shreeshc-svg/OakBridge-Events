@@ -111,15 +111,24 @@
                             <!-- schedule Block -->
 
                             @forelse ($service->sessions() as $timeline)
+                                @php
+                                    $hasDetails = $timeline['legacy']
+                                        ? trim((string) $timeline['body']) !== ''
+                                        : (count($timeline['speakers']) || trim((string) $timeline['notes']) !== '');
+                                @endphp
                                 <div class="schedule-block @if ($loop->even) even @endif">
                                     <div class="inner-box">
                                         <div class="inner">
-                                            <div class="date">{{ $timeline['from'] }} <br> {{ $timeline['to'] }}</div>
+                                            <div class="date @if (! $timeline['from'] && ! $timeline['to']) is-empty @endif">{{ $timeline['from'] }} <br> {{ $timeline['to'] }}</div>
                                             <div class="speaker-info">
                                                 <h5 class="name">{{ $timeline['title'] }}</h5>
-                                                <span class="designation">{{ $timeline['subheadline'] }} </span>
+                                                @if ($timeline['subheadline'])
+                                                    <span class="designation">{{ $timeline['subheadline'] }}</span>
+                                                @endif
                                             </div>
-                                            <div class="text pt-3">
+                                            {{-- speakers / notes only when there are some, so a title-only session sits centred in its card --}}
+                                            @if ($hasDetails)
+                                            <div class="text">
                                                 @if ($timeline['legacy'])
                                                     {{-- sessions not yet re-saved in the schedule editor keep their original formatting --}}
                                                     @php
@@ -148,6 +157,7 @@
                                                     @endif
                                                 @endif
                                             </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
