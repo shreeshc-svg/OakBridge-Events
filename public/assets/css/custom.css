@@ -485,10 +485,14 @@ a.ob-logo:hover,
 .schedule-timeline .schedule-block .text {
     margin: 12px 0 0;
 }
+/* every card's text centred, on both sides of the timeline */
+.schedule-timeline .schedule-block .inner-box,
+.schedule-timeline .schedule-block.even .inner-box {
+    text-align: center;
+}
 @media (max-width: 767px) {
-    /* phones: cards stack full width, so no mirrored alignment, and no blank line where a time isn't set */
-    .schedule-timeline .schedule-block.even .inner-box { text-align: left; }
+    /* phones: no blank line where a time isn't set */
     .schedule-timeline .schedule-block .date.is-empty { display: none; }
-    .schedule-timeline .schedule-block .date { align-self: flex-start; text-align: left; }
+    .schedule-timeline .schedule-block .date { align-self: center; text-align: center; }
     .schedule-timeline .schedule-block .inner-box .inner { min-height: 0; }
 }
