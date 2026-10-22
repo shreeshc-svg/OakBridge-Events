@@ -1,9 +1,9 @@
 {{-- Text above the registration form (Admin > Page Content > Registration page).
-     $withTitle: also show the event title and subtitle (the /register page already has them in its banner). --}}
+     $withTitle: also show the event title and subtitle (default: yes). --}}
 @php $regText = \App\Support\PageContent::get('register'); @endphp
 <div class="ob-reg-head">
     @if (($withTitle ?? true) && $regText['title'])
-        <p class="ob-reg-head__title">{{ $regText['title'] }}</p>
+        <{{ $titleTag ?? 'p' }} class="ob-reg-head__title">{{ $regText['title'] }}</{{ $titleTag ?? 'p' }}>
         @if ($regText['subtitle'])
             <p class="ob-reg-head__sub">{{ $regText['subtitle'] }}</p>
         @endif
