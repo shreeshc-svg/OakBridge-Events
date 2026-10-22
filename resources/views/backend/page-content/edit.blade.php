@@ -140,7 +140,7 @@
 
         <div class="mb-4">
             <button type="submit" class="btn btn-primary">Save</button>
-            <a href="{{ route('home') }}" target="_blank" class="btn btn-outline-secondary">View site</a>
+            <a href="{{ $key === 'register' ? route('register.page') : route('home') }}" target="_blank" class="btn btn-outline-secondary">View site</a>
         </div>
     </form>
 

@@ -104,4 +104,49 @@
             </div>
         </div>
     </form>
+
+    {{-- stand-alone registration page: links to share --}}
+    @php
+        $registerUrl = route('register.page');
+        $registerEvents = \App\Models\Service::wherePublished('1')->where('date', '>', now())->orderBy('date')->get(['title', 'slug']);
+    @endphp
+    <div class="card card-success card-outline">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-fw fa-link"></i> Registration page</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-3">
+                The same form as the pop-up, on a page of its own: send people straight to it from emails, ads or WhatsApp.
+                Registrations land in Orders and Booking as usual. Its title and subtitle are edited in
+                <a href="{{ route('page-content.edit', 'register') }}">Page Content › Registration page</a>.
+                @unless ($isOpen) <strong class="text-danger">Registration is closed, so the page shows the closed message.</strong> @endunless
+            </p>
+            @foreach (array_merge([['label' => 'Main link', 'url' => $registerUrl]], $registerEvents->map(fn ($e) => ['label' => $e->title . ' (pre-selected)', 'url' => $registerUrl . '?event=' . $e->slug])->all()) as $i => $link)
+                <div class="form-group mb-2">
+                    <label class="small mb-0" for="reglink{{ $i }}">{{ $link['label'] }}</label>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" id="reglink{{ $i }}" value="{{ $link['url'] }}" readonly>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-secondary js-copy" data-target="reglink{{ $i }}">Copy</button>
+                            <a href="{{ $link['url'] }}" target="_blank" rel="noopener" class="btn btn-outline-primary">Open</a>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+@stop
+
+@section('js')
+    <script>
+        document.querySelectorAll('.js-copy').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var input = document.getElementById(btn.dataset.target);
+                input.select();
+                var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1500); };
+                if (navigator.clipboard) { navigator.clipboard.writeText(input.value).then(done, function () { document.execCommand('copy'); done(); }); }
+                else { document.execCommand('copy'); done(); }
+            });
+        });
+    </script>
 @stop

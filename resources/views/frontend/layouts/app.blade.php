@@ -32,7 +32,7 @@
 
     <link href="{{ asset('public/assets/css/responsive.css') }}" rel="stylesheet">
 
-    <link href="{{ asset('public/assets/css/custom.css') }}?v=7" rel="stylesheet">
+    <link href="{{ asset('public/assets/css/custom.css') }}?v=8" rel="stylesheet">
 
     <!--Color Switcher Mockup-->
 
@@ -68,8 +68,10 @@
 
 <body>
 
-    <!-- Registration modal (hidden when registration is closed in Admin > Registration) -->
-    @if ($registrationOpen)
+    <!-- Registration modal (hidden when registration is closed in Admin > Registration).
+         Not on /register, which shows the same form on the page itself. -->
+    @php $onRegisterPage = request()->routeIs('register.page'); @endphp
+    @if ($registrationOpen && ! $onRegisterPage)
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
@@ -177,7 +179,7 @@
                                     @if ($registrationOpen)
                                     <div class="btn-box d-block d-sm-none mt-4 ml-3">
 
-                                        <a href="#" data-toggle="modal" data-target="#exampleModal"
+                                        <a href="{{ $onRegisterPage ? '#register-form' : '#' }}" @unless ($onRegisterPage) data-toggle="modal" data-target="#exampleModal" @endunless
                                             class="theme-btn btn-style-one"><span class="btn-title">{{ $registrationLabel }}</span></a>
 
                                     </div>
@@ -205,7 +207,7 @@
 
                             @if ($registrationOpen)
                             <div class="btn-box">
-                                <a href="#" data-toggle="modal" data-target="#exampleModal"
+                                <a href="{{ $onRegisterPage ? '#register-form' : '#' }}" @unless ($onRegisterPage) data-toggle="modal" data-target="#exampleModal" @endunless
                                     class="theme-btn btn-style-one"><span class="btn-title">{{ $registrationLabel }}</span></a>
 
                             </div>
@@ -605,7 +607,7 @@
     @yield('js')
 
     @if (
-        $registrationOpen && (
+        $registrationOpen && ! $onRegisterPage && (
         $errors->has('name') ||
             $errors->has('email') ||
             $errors->has('phone') ||

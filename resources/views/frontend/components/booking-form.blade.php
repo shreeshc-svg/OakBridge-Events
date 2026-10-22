@@ -67,7 +67,7 @@
             <select name="event" class="form-select w-100 border py-2 rounded ob-event" required>
                 <option value="">Select an Event</option>
                 @foreach ($obEvents as $obEvent)
-                    <option value="{{ $obEvent->title }}" {{ old('event') == $obEvent->title ? 'selected' : '' }}>
+                    <option value="{{ $obEvent->title }}" {{ old('event', $preselect ?? null) == $obEvent->title ? 'selected' : '' }}>
                         {{ $obEvent->title }}
                     </option>
                 @endforeach

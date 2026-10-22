@@ -168,6 +168,19 @@ class PageContent
                 ],
             ],
 
+            // ------------------------------------------------------------ Registration page
+            'register' => [
+                'page' => 'Registration',
+                'label' => 'Registration page (/register)',
+                'hint' => 'A page with just the registration form, for links in emails, ads and posts. Add ?event=event-slug to the link to pre-select an event. Passes and prices are set in Ticketing; opening and closing registration in Registration.',
+                'fields' => [
+                    'title' => ['type' => 'text', 'label' => 'Title', 'default' => 'India Law, AI & Tech Summit 2026'],
+                    'subtitle' => ['type' => 'text', 'label' => 'Subtitle', 'default' => 'Where Law Meets Innovation'],
+                    'form_heading' => ['type' => 'text', 'label' => 'Heading above the form', 'default' => 'Hurry! Register now.'],
+                    'note' => ['type' => 'textarea', 'label' => 'Short note under the heading (optional)', 'default' => ''],
+                ],
+            ],
+
             // ------------------------------------------------------------ Legathon
             'legathon' => [
                 'page' => 'Legathon',
