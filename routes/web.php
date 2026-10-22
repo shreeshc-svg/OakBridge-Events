@@ -48,7 +48,8 @@ use App\Http\Controllers\ScheduleController;
 // });
 
 
-Auth::routes();
+// public sign-up is off; /register is the event registration page below
+Auth::routes(['register' => false]);
 
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
@@ -259,7 +260,9 @@ Route::post('/webhooks/razorpay', [PaymentController::class, 'webhook'])->name('
 Route::get('/thank-you', [FrontController::class, 'contactThanks'])->name('contact.thanks');
 // Route::get('/benefits',[FrontController::class,'benefits'])->name('benefits');
 // Route::get('/subscription',[FrontController::class,'subscription'])->name('subscription');
-Route::get('/ticket',[FrontController::class,'ticket'])->name('ticket');
+// stand-alone registration page (same form as the pop-up); /register?event=<event slug> picks the event
+Route::get('/register', [FrontController::class, 'registerPage'])->name('register.page');
+Route::permanentRedirect('/ticket', '/register')->name('ticket');
 Route::get('/advisors',[FrontController::class,'advisors'])->name('advisors');
 Route::get('/speakers/{year?}',[FrontController::class, 'speakers'])->where('year', '\d{4}')->name('speakers');
 Route::get('/speaker/{id}',[FrontController::class, 'speakerDetail'])->name('speaker.detail');

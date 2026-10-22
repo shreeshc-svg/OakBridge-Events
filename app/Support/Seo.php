@@ -26,6 +26,7 @@ class Seo
         'legathan'       => ['Legathon', 'frontend/legathan'],
         'faq'            => ['FAQ', 'frontend/faq'],
         'blog'           => ['Blog', 'frontend/blog'],
+        'register.page'  => ['Registration page', 'frontend/register'],
     ];
 
     /** other route names that show the same page */

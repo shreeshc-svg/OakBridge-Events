@@ -365,9 +365,21 @@ class FrontController extends Controller
 
 
 
-    public function ticket()
+    /** The registration form on its own page, for direct links from emails, ads and social posts. */
+    public function registerPage(Request $request)
     {
-        return view('frontend.ticket');
+        $page = \App\Support\PageContent::get('register');
+
+        // ?event=<slug> (or the exact title) pre-selects that event
+        $preselect = null;
+        if ($request->filled('event')) {
+            $wanted = (string) $request->input('event');
+            $preselect = Service::wherePublished('1')
+                ->where(fn ($q) => $q->where('slug', $wanted)->orWhere('title', $wanted))
+                ->value('title');
+        }
+
+        return view('frontend.register', compact('page', 'preselect'));
     }
 
     public function advisors()
