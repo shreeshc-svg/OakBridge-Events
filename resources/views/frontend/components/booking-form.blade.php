@@ -6,6 +6,8 @@
         $obEvents = collect($upcomingEvents ?? []);
         $obPricing = $obEvents->mapWithKeys(fn($e) => [$e->title => \App\Support\Pricing::payload($e)]);
         $obHasPricing = $obPricing->contains(fn($p) => count($p['passes']) > 0);
+        // pre-selected: the event a /register?event= link names, else the next upcoming event
+        $obDefaultEvent = $preselect ?? $obEvents->first()?->title;
     @endphp
 
     <form id="registerForm" class="ob-register-form" action="{{ route('book.ticket') }}" method="post"
@@ -67,7 +69,7 @@
             <select name="event" class="form-select w-100 border py-2 rounded ob-event" required>
                 <option value="">Select an Event</option>
                 @foreach ($obEvents as $obEvent)
-                    <option value="{{ $obEvent->title }}" {{ old('event', $preselect ?? null) == $obEvent->title ? 'selected' : '' }}>
+                    <option value="{{ $obEvent->title }}" {{ old('event', $obDefaultEvent) == $obEvent->title ? 'selected' : '' }}>
                         {{ $obEvent->title }}
                     </option>
                 @endforeach
