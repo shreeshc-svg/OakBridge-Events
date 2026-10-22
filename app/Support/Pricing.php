@@ -189,6 +189,10 @@ class Pricing
                 'name' => $pass->name,
                 'price' => $pass->priceOn(),
                 'early' => $pass->isEarlyOn(),
+                // last day of the early-bird price, shown on the form ("ends 15 Nov")
+                'earlyUntil' => $pass->isEarlyOn() && $pass->early_until
+                    ? \Illuminate\Support\Carbon::parse($pass->early_until)->format('j M')
+                    : null,
                 'listPrice' => (float) $pass->price,
                 'extra' => $pass->extraPriceOn(),
                 'bundles' => self::bundles($pass)

@@ -32,7 +32,7 @@
 
     <link href="{{ asset('public/assets/css/responsive.css') }}" rel="stylesheet">
 
-    <link href="{{ asset('public/assets/css/custom.css') }}?v=8" rel="stylesheet">
+    <link href="{{ asset('public/assets/css/custom.css') }}?v=9" rel="stylesheet">
 
     <!--Color Switcher Mockup-->
 
@@ -76,7 +76,7 @@
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Hurry! Register now.</h5>
+                    @include('frontend.components.register-heading', ['tag' => 'h5', 'headingId' => 'exampleModalLabel'])
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

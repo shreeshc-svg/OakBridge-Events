@@ -8,6 +8,8 @@
         $obHasPricing = $obPricing->contains(fn($p) => count($p['passes']) > 0);
         // pre-selected: the event a /register?event= link names, else the next upcoming event
         $obDefaultEvent = $preselect ?? $obEvents->first()?->title;
+        // urgency / reassurance lines: Admin > Page Content > Registration form
+        $obText = \App\Support\PageContent::get('register');
     @endphp
 
     <form id="registerForm" class="ob-register-form" action="{{ route('book.ticket') }}" method="post"
@@ -162,8 +164,14 @@
             </div>
         @endif
 
-        <div class="mb-3">
-            <button id="submitBtn" type="submit" class="btn btn-primary ob-submit">Register Now</button>
+        <div class="mb-3 ob-cta">
+            @if ($obText['urgency'] ?? '')
+                <p class="ob-cta__urgency"><i class="far fa-clock" aria-hidden="true"></i> {{ $obText['urgency'] }}</p>
+            @endif
+            <button id="submitBtn" type="submit" class="btn ob-submit">Register Now</button>
+            @if ($obText['assurance'] ?? '')
+                <p class="ob-cta__assurance"><i class="fas fa-lock" aria-hidden="true"></i> {{ $obText['assurance'] }}</p>
+            @endif
         </div>
     </form>
 
@@ -339,7 +347,16 @@
                         var quantity = parseInt(quantitySelect.value || '1', 10);
                         var result = quote(data, pass, quantity);
 
-                        passNote.textContent = pass.early ? 'Early bird price, while the offer lasts.' : '';
+                        // only real facts: the early-bird end date and the saving set in Ticketing
+                        var saving = pass.early ? Math.max(0, (pass.listPrice || 0) - (pass.price || 0)) : 0;
+                        var note = '';
+                        if (pass.early) {
+                            note = pass.earlyUntil ? 'Early-bird price ends ' + pass.earlyUntil : 'Early-bird price, while the offer lasts';
+                            if (saving > 0) { note += ' – you save ' + money(saving) + ' per pass'; }
+                            note += '.';
+                        }
+                        passNote.textContent = note;
+                        passNote.classList.toggle('ob-pass-note--early', !!pass.early);
                         buildAttendees(quantity);
 
                         var lines = '<div class="d-flex justify-content-between"><span>' + pass.name + ' × ' + quantity +

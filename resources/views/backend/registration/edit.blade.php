@@ -117,8 +117,8 @@
         <div class="card-body">
             <p class="text-muted mb-3">
                 The same form as the pop-up, on a page of its own: send people straight to it from emails, ads or WhatsApp.
-                Registrations land in Orders and Booking as usual. Its title and subtitle are edited in
-                <a href="{{ route('page-content.edit', 'register') }}">Page Content › Registration page</a>.
+                Registrations land in Orders and Booking as usual. Its text, shared with the pop-up, is edited in
+                <a href="{{ route('page-content.edit', 'register') }}">Page Content › Registration form</a>.
                 @unless ($isOpen) <strong class="text-danger">Registration is closed, so the page shows the closed message.</strong> @endunless
             </p>
             @foreach (array_merge([['label' => 'Main link', 'url' => $registerUrl]], $registerEvents->map(fn ($e) => ['label' => $e->title . ' (pre-selected)', 'url' => $registerUrl . '?event=' . $e->slug])->all()) as $i => $link)
