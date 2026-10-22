@@ -3,22 +3,12 @@
 @section('keywords', 'india law ai tech summit registration, legal tech conference tickets, delegate pass')
 @section('description', 'Register for the India Law, AI & Tech Summit: choose your pass and book your seat in a couple of minutes.')
 @section('content')
-    {{-- Title, subtitle and form heading: Admin > Page Content > Registration page --}}
-    <section class="page-title ob-register-title"
-        style="background-image: url({{ asset('public/assets/images/background/bread2.webp') }}); background-size: cover; background-position: center;">
-        <div class="auto-container">
-            <h1>{{ $page['title'] }}</h1>
-            @if ($page['subtitle'])
-                <p class="ob-register-title__sub">{{ $page['subtitle'] }}</p>
-            @endif
-        </div>
-    </section>
-
+    {{-- No banner: the page opens straight on the form so nothing distracts from registering.
+         Title, subtitle and heading: Admin > Page Content > Registration page --}}
     <section class="ob-register">
         <div class="auto-container">
             <div class="ob-register__card" id="register-form">
-                {{-- the title and subtitle are in the banner above --}}
-                @include('frontend.components.register-heading', ['withTitle' => false])
+                @include('frontend.components.register-heading', ['tag' => 'h2', 'titleTag' => 'h1'])
                 @include('frontend.components.booking-form')
             </div>
         </div>
@@ -26,6 +16,17 @@
 @stop
 
 @section('js')
+    @unless ($errors->any())
+        <script>
+            // desktop: start typing straight away (phones skip it, so the keyboard doesn't cover the form)
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.matchMedia('(min-width: 768px)').matches) {
+                    var name = document.querySelector('#registerForm input[name=name]');
+                    if (name && !name.value) { name.focus({ preventScroll: true }); }
+                }
+            });
+        </script>
+    @endunless
     @if ($errors->any())
         <script>
             // back from a failed submit: bring the form (and its messages) into view
