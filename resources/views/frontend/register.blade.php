@@ -17,12 +17,8 @@
     <section class="ob-register">
         <div class="auto-container">
             <div class="ob-register__card" id="register-form">
-                @if ($page['form_heading'])
-                    <h2 class="ob-register__heading">{{ $page['form_heading'] }}</h2>
-                @endif
-                @if ($page['note'])
-                    <p class="ob-register__note">{!! nl2br(e($page['note'])) !!}</p>
-                @endif
+                {{-- the title and subtitle are in the banner above --}}
+                @include('frontend.components.register-heading', ['withTitle' => false])
                 @include('frontend.components.booking-form')
             </div>
         </div>

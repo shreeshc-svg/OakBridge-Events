@@ -172,12 +172,14 @@ class PageContent
             'register' => [
                 'page' => 'Registration',
                 'label' => 'Registration page (/register)',
-                'hint' => 'A page with just the registration form, for links in emails, ads and posts. Add ?event=event-slug to the link to pre-select an event. Passes and prices are set in Ticketing; opening and closing registration in Registration.',
+                'hint' => 'The registration page every Register button on the site opens. Add ?event=event-slug to a /register link to pre-select an event. Passes and prices are set in Ticketing; opening and closing registration in Registration. The early-bird line under Pass type is automatic: it shows the real end date and saving while an early-bird price applies.',
                 'fields' => [
                     'title' => ['type' => 'text', 'label' => 'Title', 'default' => 'India Law, AI & Tech Summit 2026'],
                     'subtitle' => ['type' => 'text', 'label' => 'Subtitle', 'default' => 'Where Law Meets Innovation'],
                     'form_heading' => ['type' => 'text', 'label' => 'Heading above the form', 'default' => 'Hurry! Register now.'],
                     'note' => ['type' => 'textarea', 'label' => 'Short note under the heading (optional)', 'default' => ''],
+                    'urgency' => ['type' => 'text', 'label' => 'Urgency line above the button (optional)', 'help' => 'Keep it true – a claim of scarcity or a deadline that is not real is a "false urgency" dark pattern under the CCPA guidelines. Leave empty to hide.', 'default' => 'Seats at the summit are limited – register now to secure yours.'],
+                    'assurance' => ['type' => 'text', 'label' => 'Reassurance under the button (optional)', 'default' => 'Takes under 2 minutes · Confirmation by email · GST invoice for your company'],
                 ],
             ],
 

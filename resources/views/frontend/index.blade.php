@@ -31,7 +31,7 @@
 
                         </ul>
 
-                        <div class="btn-box"><a href="#" data-toggle="modal" data-target="#exampleModal"
+                        <div class="btn-box"><a href="{{ route('register.page') }}"
                                 class="theme-btn btn-style-two"><span class="btn-title">Book
                                     Now</span></a></div>
 
@@ -65,7 +65,7 @@
 
                         </ul>
 
-                        <div class="btn-box"><a href="#" data-toggle="modal" data-target="#exampleModal"
+                        <div class="btn-box"><a href="{{ route('register.page') }}"
                                 class="theme-btn btn-style-two"><span class="btn-title">Book
                                     Now</span></a></div>
 
@@ -102,12 +102,6 @@
             // Check if the user has already visited the "Thanks" page
             var formSubmitted = localStorage.getItem('form_submitted');
 
-           {{-- if (!formSubmitted) {
-                // Trigger the modal after 30 seconds
-                setTimeout(function() {
-                    $('#exampleModal').modal('show');
-                }, 30000); // 30000 milliseconds = 30 seconds
-            }  --}}
 
             // Store form submission status when the form is submitted
             $('form').on('submit', function() {

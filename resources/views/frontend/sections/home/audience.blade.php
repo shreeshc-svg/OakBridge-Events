@@ -19,7 +19,7 @@
                             </ul>
                         @endif
                         @if ($registrationOpen && $audience['button_label'])
-                            <div class="btn-box"><a href="#" data-toggle="modal" data-target="#exampleModal"
+                            <div class="btn-box"><a href="{{ route('register.page') }}"
                                     class="theme-btn btn-style-three"><span class="btn-title">{{ $audience['button_label'] }}</span></a></div>
                         @endif
                     </div>

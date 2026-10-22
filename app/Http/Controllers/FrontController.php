@@ -45,8 +45,9 @@ class FrontController extends Controller
         //dd($service_categories->toArray());
 
         // upcoming events
+       // upcoming and ongoing: an event stays on the form until its day is over
        $upcomingEvents = Service::wherePublished('1')
-                         ->where('date', '>', now())
+                         ->whereDate('date', '>=', today())
                          ->orderBy('date')
                          ->get();
 
@@ -412,7 +413,7 @@ class FrontController extends Controller
         // hidden date field in the form is not reliable.
         $chosenEvent = Service::wherePublished('1')
             ->where('title', $data['event'])
-            ->where('date', '>', now())
+            ->whereDate('date', '>=', today())
             ->orderBy('date')
             ->first();
         if (! $chosenEvent) {

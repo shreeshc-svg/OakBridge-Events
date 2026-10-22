@@ -53,16 +53,16 @@
                                 <p class="mb-1 text-success font-weight-bold">When ON</p>
                                 <ul class="small pl-3">
                                     <li>"Register Now" button shows at the top right (and in the phone menu)</li>
-                                    <li>Registration pop-up, homepage "Register Now" section and event-page button show</li>
-                                    <li>Clicking the hero banner can open the form (Admin &rsaquo; Hero Banner)</li>
+                                    <li>The registration page (/register), homepage "Register Now" section and event-page button show</li>
+                                    <li>Clicking the hero banner can open the registration page (Admin &rsaquo; Hero Banner)</li>
                                     <li>New registrations are accepted</li>
                                 </ul>
                             </div>
                             <div class="col-md-6">
                                 <p class="mb-1 text-secondary font-weight-bold">When OFF</p>
                                 <ul class="small pl-3">
-                                    <li>All of the above are hidden</li>
-                                    <li>The /ticket page shows the "closed" message below</li>
+                                    <li>The Register buttons and the hero click-through are hidden</li>
+                                    <li>The /register page shows the "closed" message below</li>
                                     <li>Any registration still submitted is rejected</li>
                                     <li>Existing bookings are kept</li>
                                 </ul>
@@ -116,8 +116,8 @@
         </div>
         <div class="card-body">
             <p class="text-muted mb-3">
-                The same form as the pop-up, on a page of its own: send people straight to it from emails, ads or WhatsApp.
-                Registrations land in Orders and Booking as usual. Its title and subtitle are edited in
+                Every Register button on the site opens this page; you can also send people straight to it from emails, ads or WhatsApp.
+                Registrations land in Orders and Booking as usual. Its text is edited in
                 <a href="{{ route('page-content.edit', 'register') }}">Page Content › Registration page</a>.
                 @unless ($isOpen) <strong class="text-danger">Registration is closed, so the page shows the closed message.</strong> @endunless
             </p>
