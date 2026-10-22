@@ -7,14 +7,16 @@
     $heroAlt = $setting->hero_alt ?? '';
     $heroPoster = !empty($setting->hero_poster) ? \App\Support\HeroMedia::url($setting->hero_poster) : null;
     $heroOpensForm = $heroClick === 'register' && $registrationOpen;
-    $heroLink = $heroClick === 'link' && !empty($setting->hero_link) ? $setting->hero_link : null;
+    $heroLink = $heroOpensForm
+        ? route('register.page')
+        : ($heroClick === 'link' && !empty($setting->hero_link) ? $setting->hero_link : null);
     $heroHasVideo = \App\Support\HeroMedia::isVideo($heroDesktop) || \App\Support\HeroMedia::isVideo($heroMobileFile);
-    $modalAttrs = $heroOpensForm ? 'style="cursor: pointer" data-toggle="modal" data-target="#exampleModal"' : '';
+    $modalAttrs = '';
 @endphp
 <section class="pt-5 pt-sm-0">
     @if ($heroEnabled)
         @if ($heroLink)
-            <a href="{{ $heroLink }}" @if ($setting->hero_new_tab) target="_blank" rel="noopener" @endif>
+            <a href="{{ $heroLink }}" @if ($heroClick === 'link' && $setting->hero_new_tab) target="_blank" rel="noopener" @endif>
         @endif
 
         @if (! $heroHasVideo)

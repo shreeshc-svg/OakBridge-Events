@@ -162,7 +162,7 @@
                             <div class="custom-control custom-radio">
                                 <input type="radio" class="custom-control-input" id="click_register" name="hero_click"
                                     value="register" {{ $click === 'register' ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="click_register">Open the registration form</label>
+                                <label class="custom-control-label" for="click_register">Open the registration page</label>
                             </div>
                             <div class="custom-control custom-radio">
                                 <input type="radio" class="custom-control-input" id="click_link" name="hero_click"

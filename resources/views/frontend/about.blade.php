@@ -52,7 +52,7 @@
 
                 <div class="btn-box">
 
-                    <a href="#" data-toggle="modal" data-target="#exampleModal" class="theme-btn btn-style-one"><span
+                    <a href="{{ route('register.page') }}" class="theme-btn btn-style-one"><span
                             class="btn-title">Register
                             Now</span></a>
 

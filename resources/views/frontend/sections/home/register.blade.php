@@ -55,4 +55,14 @@
         </div>
 
     </section>
+
+    @if ($errors->any())
+        <script>
+            // back from a failed submit: show the form and its messages
+            document.addEventListener('DOMContentLoaded', function () {
+                var box = document.getElementById('booking');
+                if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            });
+        </script>
+    @endif
 @endif

@@ -171,8 +171,8 @@ class PageContent
             // ------------------------------------------------------------ Registration page
             'register' => [
                 'page' => 'Registration',
-                'label' => 'Registration form (pop-up and /register page)',
-                'hint' => 'The text around the registration form, in the pop-up and on /register. Add ?event=event-slug to a /register link to pre-select an event. Passes and prices are set in Ticketing; opening and closing registration in Registration. The early-bird line under Pass type is automatic: it shows the real end date and saving while an early-bird price applies.',
+                'label' => 'Registration page (/register)',
+                'hint' => 'The registration page every Register button on the site opens. Add ?event=event-slug to a /register link to pre-select an event. Passes and prices are set in Ticketing; opening and closing registration in Registration. The early-bird line under Pass type is automatic: it shows the real end date and saving while an early-bird price applies.',
                 'fields' => [
                     'title' => ['type' => 'text', 'label' => 'Title', 'default' => 'India Law, AI & Tech Summit 2026'],
                     'subtitle' => ['type' => 'text', 'label' => 'Subtitle', 'default' => 'Where Law Meets Innovation'],

@@ -192,7 +192,7 @@
         @if ($showRegister || $showAgenda || $agendaPending)
             <div class="btn-box w-100 text-center ob-schedule-cta">
                 @if ($showRegister)
-                    <a href="#" data-cta="register" data-toggle="modal" data-target="#exampleModal"
+                    <a href="{{ route('register.page', ['event' => $service->slug]) }}" data-cta="register"
                         class="theme-btn btn-style-one"><span
                             class="btn-title">{{ $schedulePage['register_label'] }}</span></a>
                 @endif
@@ -223,7 +223,7 @@
 
                 <div class="btn-box">
 
-                    <a href="#" data-toggle="modal" data-target="#exampleModal" class="theme-btn btn-style-one"><span
+                    <a href="{{ route('register.page', ['event' => $service->slug]) }}" class="theme-btn btn-style-one"><span
                             class="btn-title">Register Now</span></a>
 
                 </div>

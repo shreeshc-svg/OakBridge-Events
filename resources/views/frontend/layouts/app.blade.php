@@ -68,27 +68,8 @@
 
 <body>
 
-    <!-- Registration modal (hidden when registration is closed in Admin > Registration).
-         Not on /register, which shows the same form on the page itself. -->
+    {{-- Registration happens on /register (Admin > Page Content > Registration page); there is no pop-up. --}}
     @php $onRegisterPage = request()->routeIs('register.page'); @endphp
-    @if ($registrationOpen && ! $onRegisterPage)
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <div class="modal-header">
-                    @include('frontend.components.register-heading', ['tag' => 'h5', 'headingId' => 'exampleModalLabel'])
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {{--<small class="text-danger text-center pb-3">**Booking will be confirmed upon payment.</small>--}}
-                    @include('frontend.components.booking-form')
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
 
 
 
@@ -179,7 +160,7 @@
                                     @if ($registrationOpen)
                                     <div class="btn-box d-block d-sm-none mt-4 ml-3">
 
-                                        <a href="{{ $onRegisterPage ? '#register-form' : '#' }}" @unless ($onRegisterPage) data-toggle="modal" data-target="#exampleModal" @endunless
+                                        <a href="{{ $onRegisterPage ? '#register-form' : route('register.page') }}"
                                             class="theme-btn btn-style-one"><span class="btn-title">{{ $registrationLabel }}</span></a>
 
                                     </div>
@@ -207,7 +188,7 @@
 
                             @if ($registrationOpen)
                             <div class="btn-box">
-                                <a href="{{ $onRegisterPage ? '#register-form' : '#' }}" @unless ($onRegisterPage) data-toggle="modal" data-target="#exampleModal" @endunless
+                                <a href="{{ $onRegisterPage ? '#register-form' : route('register.page') }}"
                                     class="theme-btn btn-style-one"><span class="btn-title">{{ $registrationLabel }}</span></a>
 
                             </div>
@@ -606,26 +587,6 @@
 
     @yield('js')
 
-    @if (
-        $registrationOpen && ! $onRegisterPage && (
-        $errors->has('name') ||
-            $errors->has('email') ||
-            $errors->has('phone') ||
-            $errors->has('designation') ||
-            $errors->has('company') ||
-            $errors->has('registration_closed') ||
-            $errors->has('event') ||
-            $errors->has('date') ||
-            $errors->hasAny(['pass_type_id', 'quantity', 'billing_address', 'billing_state', 'billing_pin', 'buyer_gstin']) ||
-            collect($errors->keys())->contains(fn ($key) => str_starts_with($key, 'attendees.'))))
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Use Bootstrap's modal API to open the modal
-                var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
-                modal.show(); 
-            });
-        </script>
-    @endif
 
 
 
