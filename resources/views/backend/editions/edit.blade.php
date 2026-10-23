@@ -49,13 +49,14 @@
                             <span class="banner-preview__over">Speakers {{ $edition->year }}</span>
                             <span class="banner-preview__under">Speakers {{ $edition->year }}</span>
                         </div>
+                        <div class="alert alert-warning py-1 px-2 small mb-2 d-none" id="bannerShapeNote"></div>
                         <input type="file" name="speakers_banner" id="speakers_banner" class="form-control-file" accept=".jpg,.jpeg,.png,.webp">
                         <small class="form-text text-muted">
                             Upload finished artwork (with its own text if you like) for the top of
                             <a href="{{ route('speakers', $edition->year) }}" target="_blank" rel="noopener">/speakers/{{ $edition->year }}</a>.
-                            It runs edge to edge across the page, shown whole – never cropped or stretched – with nothing on top of it;
-                            “Speakers {{ $edition->year }}” goes underneath. Its height follows its shape, so use a wide image
-                            (about 1920 × 600 px) for a slim banner. JPG / PNG / WebP up to 4 MB.
+                            It is the same size as the standard banner – full width, 350 px tall – with nothing on top of it;
+                            “Speakers {{ $edition->year }}” goes underneath. Make it <strong>1920 × 470 px</strong> so nothing is cut off:
+                            an image of another shape is trimmed top and bottom (the preview shows exactly what is kept). JPG / PNG / WebP up to 4 MB.
                             @unless ($edition->speakers_banner) Until you upload one, the standard banner is used, with the title on it. @endunless
                         </small>
                         @if ($edition->speakers_banner)
@@ -105,12 +106,11 @@
 @section('css')
     <style>
         .banner-preview { position: relative; border-radius: 6px; overflow: hidden; background: #0b1d3a; }
-        .banner-preview img { display: block; width: 100%; height: auto; }
+        .banner-preview img { display: block; width: 100%; aspect-ratio: 1440 / 350; object-fit: cover; object-position: center; }
         .banner-preview__over, .banner-preview__under { display: none; font-weight: 700; }
         .banner-preview__over { position: absolute; inset: 0; align-items: center; justify-content: center; color: #fff; font-size: 26px;
             text-shadow: 0 2px 8px rgba(0, 0, 0, .45); background: rgba(0, 0, 0, .2); }
         .banner-preview__under { padding: 8px 0; background: #fff; color: #212639; text-align: center; font-size: 18px; border: 1px solid #e5e7eb; border-top: 0; border-radius: 0 0 6px 6px; }
-        .banner-preview.is-standard img { object-fit: cover; height: 140px; }
         .banner-preview.is-standard .banner-preview__over { display: flex; }
         .banner-preview.is-custom .banner-preview__under { display: block; }
     </style>
@@ -124,7 +124,21 @@
             var preview = document.getElementById('bannerPreview');
             var img = preview.querySelector('img');
             var remove = document.getElementById('remove_speakers_banner');
-            function mode(custom) { preview.classList.toggle('is-custom', custom); preview.classList.toggle('is-standard', !custom); }
+            var note = document.getElementById('bannerShapeNote');
+            function mode(custom) { preview.classList.toggle('is-custom', custom); preview.classList.toggle('is-standard', !custom); checkShape(); }
+            // warn when the image is a different shape from the banner (about 4.1 : 1), since the top and bottom get trimmed
+            function checkShape() {
+                note.classList.add('d-none');
+                if (!preview.classList.contains('is-custom') || !img.naturalWidth) { return; }
+                var ratio = img.naturalWidth / img.naturalHeight;
+                if (ratio < 3.4) {
+                    var kept = Math.round(100 * ratio / 4.11);
+                    note.textContent = 'This image is ' + img.naturalWidth + ' × ' + img.naturalHeight + ' px, so only the middle ' + kept +
+                        '% of its height shows (as previewed). For the whole image, use 1920 × 470 px.';
+                    note.classList.remove('d-none');
+                }
+            }
+            img.addEventListener('load', checkShape);
             mode(preview.dataset.hasCustom === '1');
             input.addEventListener('change', function () {
                 if (input.files && input.files[0]) {

@@ -576,16 +576,18 @@ a.ob-logo:hover,
     .ob-register .ob-reg-head__heading { margin-top: 12px; font-size: 20px; }
 }
 
-/* ---- a year's own banner artwork (Speakers page): edge to edge, whole, title underneath, nothing overlaps ---- */
+/* ---- a year's own banner (Speakers page): same size as the standard banner, title underneath, nothing on top ---- */
 .ob-art-banner {
     position: relative;
     line-height: 0;
     background: #0b1d3a;
 }
-.ob-art-banner img {           /* full width at its own proportions: never cropped, never stretched */
+.ob-art-banner img {           /* same box as the standard banner: full width, 350px tall, centred */
     display: block;
     width: 100%;
-    height: auto;
+    height: 350px;
+    object-fit: cover;
+    object-position: center;
 }
 .ob-art-title {
     padding: 26px 0 18px;
@@ -608,9 +610,13 @@ a.ob-logo:hover,
 .ob-art-title .bread-crumb li:before { display: none; }
 @media (max-width: 1023px) {
     .ob-art-banner { margin-top: 75px; }            /* clear of the header, which floats over the page here */
+    .ob-art-banner img { height: 275px; }           /* the standard banner's visible height here */
 }
 @media (max-width: 767px) {
     .ob-art-title { padding: 18px 0 12px; }
     .ob-art-title h1 { font-size: 28px; }
     .ob-art-title .bread-crumb li { font-size: 14px; }
+}
+@media (max-width: 767px) {
+    .ob-art-banner img { height: 173px; }           /* matches the standard banner on phones */
 }
