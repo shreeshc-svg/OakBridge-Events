@@ -55,8 +55,10 @@
                             Upload finished artwork (with its own text if you like) for the top of
                             <a href="{{ route('speakers', $edition->year) }}" target="_blank" rel="noopener">/speakers/{{ $edition->year }}</a>.
                             It is the same size as the standard banner – full width, 350 px tall – with nothing on top of it;
-                            “Speakers {{ $edition->year }}” goes underneath. Make it <strong>1920 × 470 px</strong> so nothing is cut off:
-                            an image of another shape is trimmed top and bottom (the preview shows exactly what is kept). JPG / PNG / WebP up to 4 MB.
+                            “Speakers {{ $edition->year }}” goes underneath. Make it <strong>1920 × 470 px</strong> and keep all text inside the
+                            <strong>left 1000 px, between 60 and 410 px from the top</strong> – that part shows on every screen; on phones and tablets
+                            the right-hand side is trimmed, so put only decoration there. An image of another shape is trimmed top and bottom
+                            (the preview shows what is kept). JPG / PNG / WebP up to 4 MB.
                             @unless ($edition->speakers_banner) Until you upload one, the standard banner is used, with the title on it. @endunless
                         </small>
                         @if ($edition->speakers_banner)
@@ -106,7 +108,7 @@
 @section('css')
     <style>
         .banner-preview { position: relative; border-radius: 6px; overflow: hidden; background: #0b1d3a; }
-        .banner-preview img { display: block; width: 100%; aspect-ratio: 1440 / 350; object-fit: cover; object-position: center; }
+        .banner-preview img { display: block; width: 100%; aspect-ratio: 1440 / 350; object-fit: cover; object-position: left center; }
         .banner-preview__over, .banner-preview__under { display: none; font-weight: 700; }
         .banner-preview__over { position: absolute; inset: 0; align-items: center; justify-content: center; color: #fff; font-size: 26px;
             text-shadow: 0 2px 8px rgba(0, 0, 0, .45); background: rgba(0, 0, 0, .2); }
