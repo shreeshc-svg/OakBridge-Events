@@ -6,8 +6,14 @@
     <!--Page Title-->
 
     {{-- <section class="page-title" style="background-image:url({{ asset('public/assets/images/background/5.jpg') }});"> --}}
+    {{-- each year can have its own banner (Admin > Years > Edit) --}}
+    @php
+        $speakersBanner = $edition && $edition->speakers_banner
+            ? \App\Support\Uploads::url($edition->speakers_banner)
+            : asset('public/assets/images/background/bread2.webp');
+    @endphp
     <section class="page-title"
-        style="background-image: url({{ asset('public/assets/images/background/bread2.webp') }}); background-size: cover; background-position: center;">
+        style="background-image: url({{ $speakersBanner }}); background-size: cover; background-position: center;">
 
         <div class="auto-container">
 
