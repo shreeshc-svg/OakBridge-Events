@@ -41,17 +41,25 @@
                     </div>
                     <div class="form-group">
                         <label for="speakers_banner">Speakers page banner</label>
+                        {{-- an uploaded banner is shown whole with the title below it; the standard one has the title on top --}}
                         <div class="banner-preview mb-2" id="bannerPreview"
                             data-default="{{ asset('public/assets/images/background/bread2.webp') }}"
-                            style="background-image: url({{ $edition->speakers_banner ? \App\Support\Uploads::url($edition->speakers_banner) : asset('public/assets/images/background/bread2.webp') }});">
-                            <span>Speakers {{ $edition->year }}</span>
+                            data-has-custom="{{ $edition->speakers_banner ? 1 : 0 }}">
+                            <img src="{{ $edition->speakers_banner ? \App\Support\Uploads::url($edition->speakers_banner) : asset('public/assets/images/background/bread2.webp') }}" alt="">
+                            <span class="banner-preview__over">Speakers {{ $edition->year }}</span>
+                            <span class="banner-preview__under">Speakers {{ $edition->year }}</span>
                         </div>
+                        <div class="alert alert-warning py-1 px-2 small mb-2 d-none" id="bannerShapeNote"></div>
                         <input type="file" name="speakers_banner" id="speakers_banner" class="form-control-file" accept=".jpg,.jpeg,.png,.webp">
                         <small class="form-text text-muted">
-                            Shown behind “Speakers {{ $edition->year }}” at the top of
+                            Upload finished artwork (with its own text if you like) for the top of
                             <a href="{{ route('speakers', $edition->year) }}" target="_blank" rel="noopener">/speakers/{{ $edition->year }}</a>.
-                            Wide image, about 1920 × 500 px, JPG / PNG / WebP up to 4 MB. Keep the middle clear – the title sits there and phones crop the sides.
-                            @unless ($edition->speakers_banner) Until you upload one, the standard banner is used. @endunless
+                            It is the same size as the standard banner – full width, 350 px tall – with nothing on top of it;
+                            “Speakers {{ $edition->year }}” goes underneath. Make it <strong>1920 × 470 px</strong> and keep all text inside the
+                            <strong>left 1000 px, between 60 and 410 px from the top</strong> – that part shows on every screen; on phones and tablets
+                            the right-hand side is trimmed, so put only decoration there. An image of another shape is trimmed top and bottom
+                            (the preview shows what is kept). JPG / PNG / WebP up to 4 MB.
+                            @unless ($edition->speakers_banner) Until you upload one, the standard banner is used, with the title on it. @endunless
                         </small>
                         @if ($edition->speakers_banner)
                             <div class="custom-control custom-checkbox mt-1">
@@ -99,29 +107,51 @@
 
 @section('css')
     <style>
-        .banner-preview { position: relative; height: 140px; border-radius: 6px; background-size: cover; background-position: center;
-            display: flex; align-items: center; justify-content: center; }
-        .banner-preview::before { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, .25); border-radius: 6px; }
-        .banner-preview span { position: relative; color: #fff; font-size: 26px; font-weight: 700; text-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
+        .banner-preview { position: relative; border-radius: 6px; overflow: hidden; background: #0b1d3a; }
+        .banner-preview img { display: block; width: 100%; aspect-ratio: 1440 / 350; object-fit: cover; object-position: left center; }
+        .banner-preview__over, .banner-preview__under { display: none; font-weight: 700; }
+        .banner-preview__over { position: absolute; inset: 0; align-items: center; justify-content: center; color: #fff; font-size: 26px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, .45); background: rgba(0, 0, 0, .2); }
+        .banner-preview__under { padding: 8px 0; background: #fff; color: #212639; text-align: center; font-size: 18px; border: 1px solid #e5e7eb; border-top: 0; border-radius: 0 0 6px 6px; }
+        .banner-preview.is-standard .banner-preview__over { display: flex; }
+        .banner-preview.is-custom .banner-preview__under { display: block; }
     </style>
 @stop
 
 @section('js')
     <script>
-        // preview a newly chosen banner before saving
+        // preview: an uploaded banner shows whole with the title underneath; the standard one has the title on top
         (function () {
             var input = document.getElementById('speakers_banner');
             var preview = document.getElementById('bannerPreview');
+            var img = preview.querySelector('img');
             var remove = document.getElementById('remove_speakers_banner');
+            var note = document.getElementById('bannerShapeNote');
+            function mode(custom) { preview.classList.toggle('is-custom', custom); preview.classList.toggle('is-standard', !custom); checkShape(); }
+            // warn when the image is a different shape from the banner (about 4.1 : 1), since the top and bottom get trimmed
+            function checkShape() {
+                note.classList.add('d-none');
+                if (!preview.classList.contains('is-custom') || !img.naturalWidth) { return; }
+                var ratio = img.naturalWidth / img.naturalHeight;
+                if (ratio < 3.4) {
+                    var kept = Math.round(100 * ratio / 4.11);
+                    note.textContent = 'This image is ' + img.naturalWidth + ' × ' + img.naturalHeight + ' px, so only the middle ' + kept +
+                        '% of its height shows (as previewed). For the whole image, use 1920 × 470 px.';
+                    note.classList.remove('d-none');
+                }
+            }
+            img.addEventListener('load', checkShape);
+            mode(preview.dataset.hasCustom === '1');
             input.addEventListener('change', function () {
                 if (input.files && input.files[0]) {
-                    preview.style.backgroundImage = 'url(' + URL.createObjectURL(input.files[0]) + ')';
+                    img.src = URL.createObjectURL(input.files[0]);
+                    mode(true);
                     if (remove) { remove.checked = false; }
                 }
             });
             if (remove) {
                 remove.addEventListener('change', function () {
-                    if (remove.checked) { preview.style.backgroundImage = 'url(' + preview.dataset.default + ')'; input.value = ''; }
+                    if (remove.checked) { img.src = preview.dataset.default; input.value = ''; mode(false); }
                 });
             }
         })();
