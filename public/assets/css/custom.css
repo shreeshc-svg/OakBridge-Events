@@ -575,3 +575,56 @@ a.ob-logo:hover,
     .ob-register .ob-reg-head__sub { font-size: 15px; }
     .ob-register .ob-reg-head__heading { margin-top: 12px; font-size: 20px; }
 }
+
+/* ---- a year's own banner artwork (Speakers page): shown whole, title underneath, nothing overlaps ---- */
+.ob-art-banner {
+    position: relative;
+    overflow: hidden;
+    background: #0b1d3a;
+    line-height: 0;
+    text-align: center;
+}
+.ob-art-banner::before {           /* the same artwork, blurred, fills the sides on wide screens */
+    content: "";
+    position: absolute;
+    inset: -40px;
+    background: var(--art) center / cover no-repeat;
+    filter: blur(30px) brightness(.6);
+}
+.ob-art-banner img {
+    position: relative;
+    display: block;
+    margin: 0 auto;
+    width: auto;
+    max-width: 100%;
+    max-height: 560px;
+    height: auto;
+}
+.ob-art-title {
+    padding: 26px 0 18px;
+    background: #fff;
+    text-align: center;
+}
+.ob-art-title h1 {
+    margin: 0 0 6px;
+    color: #212639;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+.ob-art-title .bread-crumb { margin: 0; padding: 0; list-style: none; }
+.ob-art-title .bread-crumb li { position: relative; display: inline-block; padding-right: 14px; margin-right: 10px; color: #6b7280; font-size: 16px; line-height: 28px; }
+.ob-art-title .bread-crumb li:last-child { padding-right: 0; margin-right: 0; }
+.ob-art-title .bread-crumb li:not(:last-child)::after { content: "|"; position: absolute; right: 0; top: 0; color: #9ca3af; }
+.ob-art-title .bread-crumb li a { color: #212639; }
+.ob-art-title .bread-crumb li a:hover { color: #D3181F; }
+.ob-art-title .bread-crumb li:before { display: none; }
+@media (max-width: 1023px) {
+    .ob-art-banner { margin-top: 75px; }            /* clear of the header, which floats over the page here */
+}
+@media (max-width: 767px) {
+    .ob-art-banner img { width: 100%; max-height: none; }
+    .ob-art-title { padding: 18px 0 12px; }
+    .ob-art-title h1 { font-size: 28px; }
+    .ob-art-title .bread-crumb li { font-size: 14px; }
+}

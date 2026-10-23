@@ -41,17 +41,21 @@
                     </div>
                     <div class="form-group">
                         <label for="speakers_banner">Speakers page banner</label>
+                        {{-- an uploaded banner is shown whole with the title below it; the standard one has the title on top --}}
                         <div class="banner-preview mb-2" id="bannerPreview"
                             data-default="{{ asset('public/assets/images/background/bread2.webp') }}"
-                            style="background-image: url({{ $edition->speakers_banner ? \App\Support\Uploads::url($edition->speakers_banner) : asset('public/assets/images/background/bread2.webp') }});">
-                            <span>Speakers {{ $edition->year }}</span>
+                            data-has-custom="{{ $edition->speakers_banner ? 1 : 0 }}">
+                            <img src="{{ $edition->speakers_banner ? \App\Support\Uploads::url($edition->speakers_banner) : asset('public/assets/images/background/bread2.webp') }}" alt="">
+                            <span class="banner-preview__over">Speakers {{ $edition->year }}</span>
+                            <span class="banner-preview__under">Speakers {{ $edition->year }}</span>
                         </div>
                         <input type="file" name="speakers_banner" id="speakers_banner" class="form-control-file" accept=".jpg,.jpeg,.png,.webp">
                         <small class="form-text text-muted">
-                            Shown behind “Speakers {{ $edition->year }}” at the top of
+                            Upload finished artwork (with its own text if you like) for the top of
                             <a href="{{ route('speakers', $edition->year) }}" target="_blank" rel="noopener">/speakers/{{ $edition->year }}</a>.
-                            Wide image, about 1920 × 500 px, JPG / PNG / WebP up to 4 MB. Keep the middle clear – the title sits there and phones crop the sides.
-                            @unless ($edition->speakers_banner) Until you upload one, the standard banner is used. @endunless
+                            It is shown whole, never cropped, with nothing on top of it; “Speakers {{ $edition->year }}” goes underneath.
+                            Any shape works – wide (e.g. 1920 × 600) looks best. JPG / PNG / WebP up to 4 MB.
+                            @unless ($edition->speakers_banner) Until you upload one, the standard banner is used, with the title on it. @endunless
                         </small>
                         @if ($edition->speakers_banner)
                             <div class="custom-control custom-checkbox mt-1">
@@ -99,29 +103,38 @@
 
 @section('css')
     <style>
-        .banner-preview { position: relative; height: 140px; border-radius: 6px; background-size: cover; background-position: center;
-            display: flex; align-items: center; justify-content: center; }
-        .banner-preview::before { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, .25); border-radius: 6px; }
-        .banner-preview span { position: relative; color: #fff; font-size: 26px; font-weight: 700; text-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
+        .banner-preview { position: relative; border-radius: 6px; overflow: hidden; background: #0b1d3a; }
+        .banner-preview img { display: block; width: 100%; max-height: 260px; object-fit: contain; }
+        .banner-preview__over, .banner-preview__under { display: none; font-weight: 700; }
+        .banner-preview__over { position: absolute; inset: 0; align-items: center; justify-content: center; color: #fff; font-size: 26px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, .45); background: rgba(0, 0, 0, .2); }
+        .banner-preview__under { padding: 8px 0; background: #fff; color: #212639; text-align: center; font-size: 18px; border: 1px solid #e5e7eb; border-top: 0; border-radius: 0 0 6px 6px; }
+        .banner-preview.is-standard img { object-fit: cover; height: 140px; }
+        .banner-preview.is-standard .banner-preview__over { display: flex; }
+        .banner-preview.is-custom .banner-preview__under { display: block; }
     </style>
 @stop
 
 @section('js')
     <script>
-        // preview a newly chosen banner before saving
+        // preview: an uploaded banner shows whole with the title underneath; the standard one has the title on top
         (function () {
             var input = document.getElementById('speakers_banner');
             var preview = document.getElementById('bannerPreview');
+            var img = preview.querySelector('img');
             var remove = document.getElementById('remove_speakers_banner');
+            function mode(custom) { preview.classList.toggle('is-custom', custom); preview.classList.toggle('is-standard', !custom); }
+            mode(preview.dataset.hasCustom === '1');
             input.addEventListener('change', function () {
                 if (input.files && input.files[0]) {
-                    preview.style.backgroundImage = 'url(' + URL.createObjectURL(input.files[0]) + ')';
+                    img.src = URL.createObjectURL(input.files[0]);
+                    mode(true);
                     if (remove) { remove.checked = false; }
                 }
             });
             if (remove) {
                 remove.addEventListener('change', function () {
-                    if (remove.checked) { preview.style.backgroundImage = 'url(' + preview.dataset.default + ')'; input.value = ''; }
+                    if (remove.checked) { img.src = preview.dataset.default; input.value = ''; mode(false); }
                 });
             }
         })();
