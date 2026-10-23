@@ -77,6 +77,7 @@
                             <td class="vs-dim">
                                 <strong style="font-size: 1.1rem">{{ $edition->year }}</strong>
                                 @if ($edition->title)<div class="small text-muted">{{ $edition->title }}</div>@endif
+                                @if ($edition->speakers_banner)<span class="badge badge-light border" title="Has its own Speakers page banner"><i class="far fa-image"></i> Speakers banner</span>@endif
                             </td>
                             <td class="vs-dim">
                                 @if ($edition->scheduleService)
