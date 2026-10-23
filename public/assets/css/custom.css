@@ -576,28 +576,15 @@ a.ob-logo:hover,
     .ob-register .ob-reg-head__heading { margin-top: 12px; font-size: 20px; }
 }
 
-/* ---- a year's own banner artwork (Speakers page): shown whole, title underneath, nothing overlaps ---- */
+/* ---- a year's own banner artwork (Speakers page): edge to edge, whole, title underneath, nothing overlaps ---- */
 .ob-art-banner {
     position: relative;
-    overflow: hidden;
-    background: #0b1d3a;
     line-height: 0;
-    text-align: center;
+    background: #0b1d3a;
 }
-.ob-art-banner::before {           /* the same artwork, blurred, fills the sides on wide screens */
-    content: "";
-    position: absolute;
-    inset: -40px;
-    background: var(--art) center / cover no-repeat;
-    filter: blur(30px) brightness(.6);
-}
-.ob-art-banner img {
-    position: relative;
+.ob-art-banner img {           /* full width at its own proportions: never cropped, never stretched */
     display: block;
-    margin: 0 auto;
-    width: auto;
-    max-width: 100%;
-    max-height: 560px;
+    width: 100%;
     height: auto;
 }
 .ob-art-title {
@@ -623,7 +610,6 @@ a.ob-logo:hover,
     .ob-art-banner { margin-top: 75px; }            /* clear of the header, which floats over the page here */
 }
 @media (max-width: 767px) {
-    .ob-art-banner img { width: 100%; max-height: none; }
     .ob-art-title { padding: 18px 0 12px; }
     .ob-art-title h1 { font-size: 28px; }
     .ob-art-title .bread-crumb li { font-size: 14px; }

@@ -10,7 +10,7 @@
          text, so it is shown whole - never cropped, nothing on top - and the page title sits underneath. --}}
     @if ($edition && $edition->speakers_banner)
         @php $speakersBanner = \App\Support\Uploads::url($edition->speakers_banner); @endphp
-        <section class="ob-art-banner" style="--art: url('{{ $speakersBanner }}');">
+        <section class="ob-art-banner">
             <img src="{{ $speakersBanner }}" alt="Speakers {{ $edition->year }}{{ $edition->title ? ' – ' . $edition->title : '' }}">
         </section>
         <section class="ob-art-title">

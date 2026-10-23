@@ -53,8 +53,9 @@
                         <small class="form-text text-muted">
                             Upload finished artwork (with its own text if you like) for the top of
                             <a href="{{ route('speakers', $edition->year) }}" target="_blank" rel="noopener">/speakers/{{ $edition->year }}</a>.
-                            It is shown whole, never cropped, with nothing on top of it; “Speakers {{ $edition->year }}” goes underneath.
-                            Any shape works – wide (e.g. 1920 × 600) looks best. JPG / PNG / WebP up to 4 MB.
+                            It runs edge to edge across the page, shown whole – never cropped or stretched – with nothing on top of it;
+                            “Speakers {{ $edition->year }}” goes underneath. Its height follows its shape, so use a wide image
+                            (about 1920 × 600 px) for a slim banner. JPG / PNG / WebP up to 4 MB.
                             @unless ($edition->speakers_banner) Until you upload one, the standard banner is used, with the title on it. @endunless
                         </small>
                         @if ($edition->speakers_banner)
@@ -104,7 +105,7 @@
 @section('css')
     <style>
         .banner-preview { position: relative; border-radius: 6px; overflow: hidden; background: #0b1d3a; }
-        .banner-preview img { display: block; width: 100%; max-height: 260px; object-fit: contain; }
+        .banner-preview img { display: block; width: 100%; height: auto; }
         .banner-preview__over, .banner-preview__under { display: none; font-weight: 700; }
         .banner-preview__over { position: absolute; inset: 0; align-items: center; justify-content: center; color: #fff; font-size: 26px;
             text-shadow: 0 2px 8px rgba(0, 0, 0, .45); background: rgba(0, 0, 0, .2); }
