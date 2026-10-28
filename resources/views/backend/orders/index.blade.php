@@ -3,7 +3,10 @@
 @section('title', 'Orders')
 
 @section('content_header')
-    <h1>Orders</h1>
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <h1>Orders</h1>
+        <a href="{{ route('orders.create') }}" class="btn btn-success"><i class="fas fa-plus"></i> New registration</a>
+    </div>
 @stop
 
 @section('content')

@@ -110,4 +110,10 @@ class Order extends Model
     {
         return self::STATUSES[$this->status] ?? $this->status;
     }
+
+    /** The admin who created this order by hand (null for website orders). */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

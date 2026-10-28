@@ -37,6 +37,10 @@
                         <dt class="col-sm-4">Designation</dt><dd class="col-sm-8">{{ $order->buyer_designation ?: '–' }}</dd>
                         <dt class="col-sm-4">Event</dt><dd class="col-sm-8">{{ $order->event }}</dd>
                         <dt class="col-sm-4">Placed</dt><dd class="col-sm-8">{{ $order->created_at?->format('j M Y, H:i') }}</dd>
+                        @if ($order->created_by)
+                            <dt class="col-sm-4">Created by</dt>
+                            <dd class="col-sm-8">{{ $order->creator?->name ?? 'an admin' }} <span class="badge badge-info">admin registration</span></dd>
+                        @endif
                     </dl>
                 </div>
             </div>
@@ -87,7 +91,13 @@
                             <td class="text-right">{{ $money($order->unit_price * $order->quantity) }}</td>
                         </tr>
                         <tr class="text-muted">
-                            <td class="small">{{ $money($order->unit_price) }} per pass</td>
+                            <td class="small">
+                                {{ $money($order->unit_price) }} per pass
+                                @if ($order->list_price !== null && abs((float) $order->list_price - (float) $order->unit_price) > 0.004)
+                                    <span class="badge badge-primary ml-1">special price</span>
+                                    <span class="d-block">website price {{ $money($order->list_price) }}</span>
+                                @endif
+                            </td>
                             <td></td>
                         </tr>
                         @if ($order->discount_total > 0)
@@ -109,6 +119,21 @@
                     </table>
                 </div>
             </div>
+
+            @if ($order->status === 'pending')
+                <div class="card card-warning card-outline">
+                    <div class="card-header"><h3 class="card-title">Payment link</h3></div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="payLink" readonly value="{{ route('order.pay', $order->order_no) }}">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-primary" id="copyPayLink"><i class="far fa-copy"></i> Copy</button>
+                            </div>
+                        </div>
+                        <small class="text-muted">Send this to {{ $order->buyer_name }} on WhatsApp or email. Their passes and GST invoice are issued as soon as they pay.</small>
+                    </div>
+                </div>
+            @endif
 
             <div class="card card-primary card-outline">
                 <div class="card-header"><h3 class="card-title">Payment</h3></div>
@@ -159,4 +184,20 @@
             @include('backend.orders.reminders', ['order' => $order])
         </div>
     </div>
+@stop
+
+@section('js')
+    <script>
+        (function () {
+            var btn = document.getElementById('copyPayLink');
+            if (!btn) { return; }
+            btn.addEventListener('click', function () {
+                var input = document.getElementById('payLink');
+                input.select();
+                var done = function () { btn.innerHTML = '<i class="fas fa-check"></i> Copied'; setTimeout(function () { btn.innerHTML = '<i class="far fa-copy"></i> Copy'; }, 2000); };
+                if (navigator.clipboard) { navigator.clipboard.writeText(input.value).then(done, function () { document.execCommand('copy'); done(); }); }
+                else { document.execCommand('copy'); done(); }
+            });
+        })();
+    </script>
 @stop
