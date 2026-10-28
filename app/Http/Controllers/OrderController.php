@@ -44,6 +44,70 @@ class OrderController extends Controller
         ]);
     }
 
+    /** Admin > Orders > New registration: the website form's fields plus a special price and how it is paid. */
+    public function create()
+    {
+        $events = \App\Models\Service::wherePublished('1')
+            ->whereDate('date', '>=', today())
+            ->orderBy('date')
+            ->get()
+            ->filter(fn ($event) => \App\Support\Pricing::isPaid($event))
+            ->values();
+
+        $pricing = $events->mapWithKeys(fn ($event) => [$event->title => \App\Support\Pricing::payload($event)]);
+
+        return view('backend.orders.create', compact('events', 'pricing'));
+    }
+
+    public function store(Request $request)
+    {
+        $admin = $request->validate([
+            'unit_price' => 'nullable|numeric|min:0|max:10000000',
+            'payment' => ['required', \Illuminate\Validation\Rule::in(['link', 'paid'])],
+            'paid_method' => 'nullable|required_if:payment,paid|string|max:40',
+            'paid_reference' => 'nullable|string|max:191',
+            'notify' => 'nullable|boolean',
+        ], [
+            'paid_method.required_if' => 'Say how they paid (e.g. Bank transfer, UPI, Cheque).',
+            'unit_price.min' => 'The price cannot be negative.',
+        ]);
+
+        $special = $request->filled('unit_price') ? (float) $admin['unit_price'] : null;
+        $notify = $request->boolean('notify');
+
+        $built = \App\Support\OrderBuilder::fromRequest($request, [
+            'unit_price' => $special,
+            'created_by' => $request->user()->id,
+            'require_paid' => true,
+        ]);
+        $order = $built['order'];
+        $money = \App\Support\Pricing::money((float) $order->total);
+
+        if ((float) $order->total <= 0) {
+            // complimentary: nothing to pay, passes straight away
+            \App\Support\OrderFulfiller::markPaid($order, ['payment_method' => 'Complimentary', 'gateway' => 'admin'], $notify);
+            $message = 'Complimentary ' . \Illuminate\Support\Str::plural('pass', $order->quantity) . ' issued'
+                . ($notify ? ' and emailed to ' . $order->buyer_email : ' (not emailed)') . '.';
+        } elseif ($admin['payment'] === 'paid') {
+            \App\Support\OrderFulfiller::markPaid($order, [
+                'payment_method' => $admin['paid_method'],
+                'payment_reference' => $admin['paid_reference'] ?? null,
+                'gateway' => 'admin',
+            ], $notify);
+            $message = 'Order marked paid (' . $money . ') – ' . $order->quantity . ' ' . \Illuminate\Support\Str::plural('pass', $order->quantity)
+                . ' issued' . ($notify ? ' and emailed to ' . $order->buyer_email : ' (not emailed)') . '.';
+        } else {
+            if ($notify) {
+                \App\Support\OrderFulfiller::notify($order, true);   // the payment link email
+            }
+            $message = 'Order created for ' . $money . '. '
+                . ($notify ? 'The payment link was emailed to ' . $order->buyer_email . '.' : 'Nothing was emailed – copy the payment link below to send it yourself.')
+                . ' Passes are issued when it is paid.';
+        }
+
+        return redirect()->route('orders.show', $order)->with('success', $message);
+    }
+
     public function show(Order $order)
     {
         $order->load('bookings', 'reminders', 'invoice');

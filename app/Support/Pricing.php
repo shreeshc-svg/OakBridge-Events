@@ -91,9 +91,48 @@ class Pricing
             $label = $tier?->label();
         }
 
+        return self::withTax([
+            'unit' => $unit,
+            'is_early' => $passType->isEarlyOn(),
+            'quantity' => $quantity,
+            'subtotal' => $subtotal,
+            'discount' => $discount,
+            'discount_label' => $label,
+            'is_bundle' => $bundle !== null,
+            'net' => $net,
+        ]);
+    }
+
+    /**
+     * A special price per pass set by an admin for one order. It replaces the
+     * Ticketing price, bundle prices and discount slabs; tax follows the usual
+     * setting (added on top, or already included).
+     */
+    public static function quoteAt(float $unit, int $quantity): array
+    {
+        $quantity = max(1, min($quantity, self::maxPasses()));
+        $unit = round(max($unit, 0), 2);
+        $subtotal = round($unit * $quantity, 2);
+
+        return self::withTax([
+            'unit' => $unit,
+            'is_early' => false,
+            'quantity' => $quantity,
+            'subtotal' => $subtotal,
+            'discount' => 0.0,
+            'discount_label' => null,
+            'is_bundle' => false,
+            'net' => $subtotal,
+        ]);
+    }
+
+    /** Adds tax and the total to a quote, per Admin > Ticketing (rate; included or added on top). */
+    private static function withTax(array $quote): array
+    {
         $setting = self::setting();
         $taxPercent = (float) ($setting->tax_percent ?? 0);
         $included = (bool) ($setting->prices_include_tax ?? true);
+        $net = $quote['net'];
 
         if ($taxPercent <= 0) {
             $tax = 0.0;
@@ -107,21 +146,13 @@ class Pricing
             $total = round($net + $tax, 2);
         }
 
-        return [
-            'unit' => $unit,
-            'is_early' => $passType->isEarlyOn(),
-            'quantity' => $quantity,
-            'subtotal' => $subtotal,
-            'discount' => $discount,
-            'discount_label' => $label,
-            'is_bundle' => $bundle !== null,
-            'net' => $net,
+        return $quote + [
             'tax_percent' => $taxPercent,
             'tax' => $tax,
             'tax_included' => $included,
             'tax_label' => (string) ($setting->tax_label ?: 'Tax'),
             'total' => $total,
-            'per_pass' => $quantity ? round($total / $quantity, 2) : 0.0,
+            'per_pass' => $quote['quantity'] ? round($total / $quote['quantity'], 2) : 0.0,
             'currency' => 'INR',
         ];
     }

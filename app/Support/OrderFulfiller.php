@@ -17,9 +17,10 @@ class OrderFulfiller
     /**
      * Mark an order paid and create its bookings.
      *
+     * @param bool $notify false: issue passes and the invoice without emailing anyone (admin choice)
      * @return bool true when this call did the work, false when it was already done
      */
-    public static function markPaid(Order $order, array $payment = []): bool
+    public static function markPaid(Order $order, array $payment = [], bool $notify = true): bool
     {
         if ($order->status === 'paid') {
             return false;
@@ -51,6 +52,18 @@ class OrderFulfiller
         }
 
         $order = $order->fresh('bookings');
+        if (! $notify) {
+            // passes and the invoice number, but nothing sent; the admin shares them
+            if (\App\Support\InvoiceIssuer::blockedReason($order) === null) {
+                try {
+                    \App\Support\InvoiceIssuer::issue($order);
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            }
+
+            return true;
+        }
         self::notify($order);          // buyer receipt + admin copy
         self::notifyAttendees($order); // one email per pass holder
         \App\Support\InvoiceIssuer::autoIssue($order);   // GST invoice, emailed if switched on
