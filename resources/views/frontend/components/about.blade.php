@@ -2,7 +2,7 @@
 @php
     $organizer = \App\Support\PageContent::get('about.organizer');
     $teamSection = \App\Support\PageContent::get('about.team');
-    $organizers = \App\Models\Team::where('year', 'Organizer')->orderBy('id')->get();
+    $organizers = \App\Models\Team::where('year', 'Organizer')->ordered()->get();
 @endphp
 @if (\App\Support\SiteSections::isVisible('about.organizer'))
 <section class="py-5">

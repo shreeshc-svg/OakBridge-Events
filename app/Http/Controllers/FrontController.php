@@ -72,7 +72,7 @@ class FrontController extends Controller
         $speakerYear = \App\Support\Editions::latest('speakers');
         $speakers = Team::where('year', 'Speaker')
             ->when($speakerYear, fn ($q) => $q->where('edition_id', $speakerYear->id))
-            ->take(8)->get();
+            ->ordered()->take(8)->get();
         $testimonials = Testimonial::all();
         $teams = Team::all();
 
@@ -130,7 +130,7 @@ class FrontController extends Controller
         $edition = $this->editionOr404('speakers', $year);
         $speakers = Team::where('year', 'Speaker')
             ->when($edition, fn ($q) => $q->where('edition_id', $edition->id))
-            ->get();
+            ->ordered()->get();
 
         return view('frontend.speakers', compact('speakers', 'edition'));
     }
@@ -385,7 +385,7 @@ class FrontController extends Controller
 
     public function advisors()
     {
-        $advisors = Team::where('year','Advisor')->get();
+        $advisors = Team::where('year', 'Advisor')->ordered()->get();
         return view('frontend.advisors',compact('advisors'));
     }
     
