@@ -19,16 +19,40 @@ class TeamController extends Controller
         $q = trim((string) $request->input('q'));
         $year = $request->input('year');
 
+        $role = $request->input('role');
+        $byType = $role && isset(self::ROLES[$role]);
+        // drag to reorder: one type (speakers: of one year), no search – exactly a list the website shows
+        $canReorder = $byType && $q === '' && ($role !== 'Speaker' || $year);
+
         $teams = Team::with('edition')
             ->when($year === 'none', fn ($query) => $query->whereNull('edition_id'))
             ->when($year && $year !== 'none', fn ($query) => $query->where('edition_id', $year))
-            ->when($request->filled('role'), fn ($query) => $query->where('year', $request->input('role')))
+            ->when($request->filled('role'), fn ($query) => $query->where('year', $role))
             ->when($q !== '', fn ($query) => $query->where(fn ($w) => $w->where('name', 'like', "%{$q}%")->orWhere('position', 'like', "%{$q}%")))
-            ->orderByDesc('id')
-            ->paginate(50)
+            // one type picked: the order the website shows; otherwise newest first
+            ->when($byType, fn ($query) => $query->ordered(), fn ($query) => $query->orderByDesc('id'))
+            ->paginate($canReorder ? 1000 : 50)
             ->withQueryString();
 
-        return view('backend.team.index', ['teams' => $teams, 'years' => \App\Support\Editions::options()]);
+        return view('backend.team.index', [
+            'teams' => $teams,
+            'years' => \App\Support\Editions::options(),
+            'canReorder' => $canReorder,
+            'role' => $byType ? $role : null,
+        ]);
+    }
+
+    /** Drag and drop on the list: save the new website order. */
+    public function reorder(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array|min:1|max:1000',
+            'ids.*' => 'integer|distinct|exists:teams,id',
+        ]);
+
+        Team::reorder($data['ids']);
+
+        return response()->json(['message' => 'Order saved – the website shows it now.']);
     }
 
     /**
@@ -131,6 +155,7 @@ class TeamController extends Controller
             } elseif ($action === 'copy') {
                 $copy = $team->replicate();
                 $copy->edition_id = $edition->id;
+                $copy->sort_order = 0; // the end of that year's list
                 if ($team->image) {
                     $copy->image = \App\Support\YearBulk::duplicateFile(public_path('uploads/images/team'), $team->image);
                 }

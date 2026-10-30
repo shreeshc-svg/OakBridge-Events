@@ -89,6 +89,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::resource('editions', \App\Http\Controllers\EditionController::class);
     Route::post('editions/{edition}/toggle', [\App\Http\Controllers\EditionController::class, 'toggle'])->name('editions.toggle');
     Route::post('team-bulk', [TeamController::class, 'bulk'])->name('team.bulk');
+    Route::post('team-reorder', [TeamController::class, 'reorder'])->name('team.reorder');
     Route::post('video-bulk', [VideoController::class, 'bulk'])->name('video.bulk');
     Route::post('sponsors/logos', [SponsorController::class, 'storeSponsor'])->name('sponsors.logos.store');
     Route::post('sponsors/logos/{sponsor}', [SponsorController::class, 'updateSponsor'])->name('sponsors.logos.update');
