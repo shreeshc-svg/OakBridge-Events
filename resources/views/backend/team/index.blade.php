@@ -22,7 +22,7 @@
     @if ($canReorder)
         <div class="alert alert-light border d-flex align-items-center flex-wrap mb-3" id="reorderHelp">
             <i class="fas fa-arrows-alt-v text-primary mr-2"></i>
-            <span class="mr-2">Drag <i class="fas fa-grip-vertical text-muted"></i> or use the arrows to set the order on the website. It saves by itself.</span>
+            <span class="mr-2">Type an order number (<strong>1</strong> = first) and press Enter, drag <i class="fas fa-grip-vertical text-muted"></i>, or use the arrows. It saves by itself.</span>
             <span class="small ml-auto" id="reorderStatus" role="status" aria-live="polite"></span>
         </div>
     @else
@@ -52,7 +52,7 @@
             <table class="table table-hover mb-0 year-table">
                 <thead>
                     <tr>
-                        @if ($canReorder)<th style="width: 92px">Order</th>@endif
+                        @if ($canReorder)<th style="width: 128px">Order</th>@endif
                         <th style="width: 36px"><input type="checkbox" class="bulk-all" data-form="bulkTeam" aria-label="Select all on this page"></th>
                         <th style="width: 80px">Photo</th>
                         <th>Name</th>
@@ -68,7 +68,8 @@
                             @if ($canReorder)
                                 <td class="text-nowrap">
                                     <span class="drag-handle" title="Drag to reorder" aria-hidden="true"><i class="fas fa-grip-vertical"></i></span>
-                                    <span class="order-no text-muted small">{{ $loop->iteration }}</span>
+                                    <input type="number" class="form-control form-control-sm order-no" min="1" max="{{ $teams->count() }}" step="1"
+                                        inputmode="numeric" value="{{ $loop->iteration }}" aria-label="Order number of {{ $team->name }}" title="Type a number and press Enter">
                                     <span class="btn-group-vertical btn-group-sm align-middle ml-1">
                                         <button type="button" class="btn btn-light btn-xs order-up" title="Move up" aria-label="Move {{ $team->name }} up"><i class="fas fa-chevron-up"></i></button>
                                         <button type="button" class="btn btn-light btn-xs order-down" title="Move down" aria-label="Move {{ $team->name }} down"><i class="fas fa-chevron-down"></i></button>
@@ -124,7 +125,8 @@
         #teamOrder .drag-handle:hover { color: #007bff; }
         #teamOrder tr.dragging { opacity: .45; background: #e9f2ff; }
         #teamOrder .btn-xs { padding: 0 6px; font-size: 10px; line-height: 1.5; }
-        #teamOrder .order-no { display: inline-block; min-width: 18px; text-align: right; }
+        #teamOrder .order-no { display: inline-block; width: 58px; padding: 2px 4px; text-align: center; vertical-align: middle; -moz-appearance: textfield; }
+        #teamOrder .order-no::-webkit-inner-spin-button, #teamOrder .order-no::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         #teamOrder tr.just-moved { background: #fff8db; transition: background .6s; }
     </style>
 @stop
@@ -140,7 +142,7 @@
 
                 function rows() { return Array.prototype.slice.call(body.querySelectorAll('tr[data-id]')); }
                 function order() { return rows().map(function (r) { return parseInt(r.dataset.id, 10); }); }
-                function number() { rows().forEach(function (r, i) { r.querySelector('.order-no').textContent = i + 1; }); }
+                function number() { rows().forEach(function (r, i) { r.querySelector('.order-no').value = i + 1; }); }
                 function say(text, cls) { status.textContent = text; status.className = 'small ml-auto ' + cls; }
 
                 function save() {
@@ -201,6 +203,33 @@
                     flash(dragged);
                     dragged = null;
                     save();
+                });
+
+                // position box: type a number, Enter (or leave the box) moves the person there
+                function moveTo(input) {
+                    var row = input.closest('tr[data-id]'), list = rows(), from = list.indexOf(row) + 1;
+                    var to = parseInt(input.value, 10);
+                    if (isNaN(to)) { input.value = from; return; }
+                    to = Math.min(Math.max(to, 1), list.length);
+                    if (to === from) { input.value = from; return; }
+                    var others = list.filter(function (r) { return r !== row; });
+                    body.insertBefore(row, others[to - 1] || null);
+                    flash(row);
+                    save();
+                    row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+                body.addEventListener('keydown', function (e) {
+                    if (e.target.classList.contains('order-no') && e.key === 'Enter') {
+                        e.preventDefault(); // not the bulk form
+                        moveTo(e.target);
+                        e.target.select();
+                    }
+                });
+                body.addEventListener('change', function (e) {
+                    if (e.target.classList.contains('order-no')) { moveTo(e.target); }
+                });
+                body.addEventListener('focusin', function (e) {
+                    if (e.target.classList.contains('order-no')) { e.target.select(); }
                 });
 
                 // arrows: one place up or down (also works on phones and tablets)
