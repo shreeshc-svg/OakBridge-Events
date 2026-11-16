@@ -121,15 +121,7 @@ class OrderBuilder
         if (count(array_unique($emails)) !== count($emails)) {
             self::fail('email', 'Each pass needs a different email address.');
         }
-        // already registered = holds a pass, or sits in an order that is paid or still awaiting payment
-        $taken = Booking::where('service_id', $chosenEvent->id)
-            ->pluck('email')->filter()->map(fn ($e) => strtolower($e))->all();
-        $heldInOrders = Order::where('service_id', $chosenEvent->id)
-            ->whereIn('status', ['pending', 'paid'])
-            ->pluck('attendees')
-            ->flatMap(fn ($list) => collect((array) $list)->pluck('email'))
-            ->filter()->map(fn ($e) => strtolower($e))->all();
-        $taken = array_unique(array_merge($taken, $heldInOrders));
+        $taken = self::takenEmails($chosenEvent);
         foreach ($emails as $number => $email) {
             if (in_array($email, $taken, true)) {
                 self::fail($number === 1 ? 'email' : "attendees.{$number}.email", $email . ' is already registered for this event.');
@@ -192,6 +184,23 @@ class OrderBuilder
         ] : []));
 
         return ['event' => $chosenEvent, 'data' => $data, 'order' => $order];
+    }
+
+    /**
+     * Emails (lower case) already registered for this event: they hold a pass,
+     * or sit in an order that is paid or still awaiting payment.
+     */
+    public static function takenEmails(Service $event): array
+    {
+        $taken = Booking::where('service_id', $event->id)
+            ->pluck('email')->filter()->map(fn ($e) => strtolower(trim($e)))->all();
+        $heldInOrders = Order::where('service_id', $event->id)
+            ->whereIn('status', ['pending', 'paid'])
+            ->pluck('attendees')
+            ->flatMap(fn ($list) => collect((array) $list)->pluck('email'))
+            ->filter()->map(fn ($e) => strtolower(trim($e)))->all();
+
+        return array_values(array_unique(array_merge($taken, $heldInOrders)));
     }
 
     /** Send the visitor back to the form with one message. */

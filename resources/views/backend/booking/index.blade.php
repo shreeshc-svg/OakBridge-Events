@@ -97,7 +97,12 @@
                                 @foreach ($bookings as $booking)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $booking->booking_id }}</td>
+                                        <td>
+                                            {{ $booking->booking_id }}
+                                            @if ($booking->isComplimentary())
+                                                <br><span class="badge badge-success" title="Free pass issued in Ticketing on {{ $booking->complimentary_at->format('j M Y') }}">Complimentary</span>
+                                            @endif
+                                        </td>
                                         <td class="text-center">
                                             <input form="bulkBookings" type="checkbox" name="ids[]" value="{{ $booking->id }}"
                                                 class="bulk-pick" aria-label="Select {{ $booking->booking_id }}">
