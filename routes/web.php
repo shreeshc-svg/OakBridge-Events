@@ -125,6 +125,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::post('ticketing/complimentary/test', [\App\Http\Controllers\ComplimentaryPassController::class, 'test'])->name('ticketing.comp.test');
     Route::post('ticketing/complimentary/{booking}/resend', [\App\Http\Controllers\ComplimentaryPassController::class, 'resend'])->name('ticketing.comp.resend');
     Route::delete('ticketing/complimentary/{booking}', [\App\Http\Controllers\ComplimentaryPassController::class, 'destroy'])->name('ticketing.comp.destroy');
+    Route::delete('ticketing/complimentary/{booking}/group', [\App\Http\Controllers\ComplimentaryPassController::class, 'destroyGroup'])->name('ticketing.comp.destroy-group');
 
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');

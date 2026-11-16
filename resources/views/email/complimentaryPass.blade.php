@@ -19,7 +19,7 @@
         .pass .label { color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
         .pass .id { font-size: 26px; font-weight: bold; letter-spacing: 2px; color: #1a3d6d; }
         .pass .type { margin-top: 4px; font-size: 15px; }
-        .pass .event { margin-top: 10px; font-size: 14px; color: #444; }
+        .event-line { background: #f8f9fa; border-radius: 5px; padding: 10px 14px; text-align: center; color: #444; }
         .footer { margin-top: 20px; text-align: center; font-size: 0.9em; color: #555; }
         a { color: #007bff; text-decoration: none; }
     </style>
@@ -33,23 +33,35 @@
 
         <p>Dear {{ $data['name'] }},</p>
 
+        @php $passes = $data['passes']; $count = count($passes); @endphp
         <p>
             It is our pleasure to welcome you as our special guest at <strong>{{ $data['event'] }}</strong>.
-            Here is your <strong>complimentary pass</strong> – there is nothing to pay.
+            @if ($count > 1)
+                Here are your <strong>{{ $count }} complimentary passes</strong> – there is nothing to pay.
+            @else
+                Here is your <strong>complimentary pass</strong> – there is nothing to pay.
+            @endif
         </p>
 
-        <div class="pass">
-            <div class="label">Complimentary pass</div>
-            <div class="id">{{ $data['booking_id'] }}</div>
-            <div class="type">{{ $data['pass_name'] ?: 'Complimentary Pass' }} &middot; {{ $data['name'] }}</div>
-            <div class="event">
-                {{ $data['event'] }}
-                @if ($when)<br>{{ $when }}@endif
-                @if (!empty($data['venue']))<br>{{ $data['venue'] }}@endif
-            </div>
-        </div>
+        <p class="event-line">
+            <strong>{{ $data['event'] }}</strong>
+            @if ($when)<br>{{ $when }}@endif
+            @if (!empty($data['venue']))<br>{{ $data['venue'] }}@endif
+        </p>
 
-        <p>Please show this email or quote your pass number at the registration desk.</p>
+        @foreach ($passes as $i => $pass)
+            <div class="pass">
+                <div class="label">Complimentary pass{{ $count > 1 ? ' ' . ($i + 1) . ' of ' . $count : '' }}</div>
+                <div class="id">{{ $pass['booking_id'] }}</div>
+                <div class="type">{{ $pass['pass_name'] ?: 'Complimentary Pass' }} &middot; {{ $pass['holder'] }}</div>
+            </div>
+        @endforeach
+
+        @if ($count > 1)
+            <p>Each guest should quote their own pass number at the registration desk – please forward this email to them, or share their pass number.</p>
+        @else
+            <p>Please show this email or quote your pass number at the registration desk.</p>
+        @endif
 
         <p>
             Questions? Email <a href="mailto:{{ $contact }}">{{ $contact }}</a>@if ($setting?->phone)
