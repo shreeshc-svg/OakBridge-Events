@@ -120,6 +120,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::post('ticketing/tiers/{tier}', [TicketingController::class, 'updateTier'])->name('ticketing.tier.update');
     Route::delete('ticketing/tiers/{tier}', [TicketingController::class, 'destroyTier'])->name('ticketing.tier.destroy');
     Route::post('ticketing/settings', [TicketingController::class, 'updateSettings'])->name('ticketing.settings');
+    // complimentary passes for special guests (emailed)
+    Route::post('ticketing/complimentary', [\App\Http\Controllers\ComplimentaryPassController::class, 'store'])->name('ticketing.comp.store');
+    Route::post('ticketing/complimentary/test', [\App\Http\Controllers\ComplimentaryPassController::class, 'test'])->name('ticketing.comp.test');
+    Route::post('ticketing/complimentary/{booking}/resend', [\App\Http\Controllers\ComplimentaryPassController::class, 'resend'])->name('ticketing.comp.resend');
+    Route::delete('ticketing/complimentary/{booking}', [\App\Http\Controllers\ComplimentaryPassController::class, 'destroy'])->name('ticketing.comp.destroy');
 
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');

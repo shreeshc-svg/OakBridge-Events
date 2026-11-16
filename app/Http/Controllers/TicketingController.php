@@ -30,6 +30,9 @@ class TicketingController extends Controller
             'passTypes' => $event ? PassType::with('bundles')->where('service_id', $event->id)->orderBy('sort_order')->orderBy('id')->get() : collect(),
             'tiers' => PricingTier::whereNull('service_id')->orderBy('min_quantity')->get(),
             'setting' => Setting::findOrFail(1),
+            'complimentary' => $event
+                ? \App\Models\Booking::where('service_id', $event->id)->whereNotNull('complimentary_at')->latest('complimentary_at')->latest('id')->get()
+                : collect(),
         ]);
     }
 
