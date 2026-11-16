@@ -165,11 +165,21 @@
                 Delete selected
             </button>
             <span class="text-muted small mr-auto" id="bulkOrdersCount">Nothing selected</span>
+            @if ($orders->total())
+                <span class="text-muted small mr-3 my-1">Showing {{ $orders->firstItem() }}–{{ $orders->lastItem() }} of {{ $orders->total() }}</span>
+            @endif
             @if ($orders->hasPages())
-                {{ $orders->links() }}
+                <div class="orders-pages my-1">{{ $orders->onEachSide(1)->links('pagination::bootstrap-4') }}</div>
             @endif
         </div>
     </div>
+@stop
+
+@section('css')
+    <style>
+        .orders-pages .pagination { margin-bottom: 0; }
+        .orders-pages .page-link { padding: .25rem .6rem; }
+    </style>
 @stop
 
 @section('js')

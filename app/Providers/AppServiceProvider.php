@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }
+        // the site and admin use Bootstrap 4; Laravel's default (Tailwind) links show giant arrows
+        Paginator::useBootstrapFour();
            $setting = Setting::where('id', 1)->first();
         view::share('setting', $setting);
         View::share(\App\Http\Controllers\RegistrationController::viewData($setting));
