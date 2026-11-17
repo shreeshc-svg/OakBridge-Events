@@ -51,7 +51,7 @@
 
                 <div id="compPaste" class="border rounded p-2 mb-2 bg-light d-none">
                     <label for="compPasteText" class="small mb-1">
-                        One person per line – <code>Name, Phone, Email, Passes, Copy to</code> (Passes and Copy to are optional). Paste straight from Excel; a header row is skipped.
+                        One person per line – <code>Name, Phone, Email, Passes, Copy to</code> (only Name and Email are needed). Paste straight from Excel; a header row is skipped.
                     </label>
                     <textarea id="compPasteText" rows="4" class="form-control form-control-sm"
                         placeholder="Justice A. Sharma, 9810012345, a.sharma@court.in&#10;Big Law LLP, 9820012345, events@biglaw.in, 5, partner@biglaw.in"></textarea>
@@ -69,7 +69,7 @@
                             <tr>
                                 <th style="width: 28px">#</th>
                                 <th>Name <span class="text-danger">*</span></th>
-                                <th style="width: 150px">Phone <span class="text-danger">*</span></th>
+                                <th style="width: 150px">Phone <small class="text-muted">(optional)</small></th>
                                 <th>Email <span class="text-danger">*</span> <small class="text-muted">passes sent here</small></th>
                                 <th style="width: 78px">Passes</th>
                                 <th style="width: 170px">Pass</th>
