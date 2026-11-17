@@ -62,9 +62,8 @@ class ComplimentaryPasses
             }
 
             $phone = self::cleanPhone($phoneRaw);
-            if ($phoneRaw === '') {
-                $errors[$at('phone')] = $label . 'enter the phone number.';
-            } elseif (! $phone) {
+            // phone is optional; if given it must look like one
+            if ($phoneRaw !== '' && ! $phone) {
                 $errors[$at('phone')] = $label . 'the phone number needs 10 to 15 digits (e.g. 9810012345 or +91 98100 12345).';
             }
 
@@ -76,10 +75,8 @@ class ComplimentaryPasses
                 $errors[$at('email')] = $label . 'same email as row ' . $seen[$email] . ' – give row ' . $seen[$email]
                     . ' more passes instead (Passes column).';
             } elseif (isset($taken[$email]) && ! $allowRegistered) {
-                $existing = Booking::where('service_id', $event->id)->whereRaw('LOWER(email) = ?', [$email])->orderBy('id')->value('booking_id');
-                $errors[$at('email')] = $label . $email . ' is already registered for this event'
-                    . ($existing ? ' (pass ' . $existing . ')' : ' (an order is in progress)')
-                    . '. To give them more passes anyway, tick "Allow extra passes for people already registered".';
+                $errors[$at('email')] = $label . $email . ' ' . self::whyTaken($event, $email)
+                    . ' Tick "Allow extra passes for people already registered" to issue anyway.';
             }
             if ($email !== '' && ! isset($seen[$email])) {
                 $seen[$email] = $number;
@@ -135,7 +132,7 @@ class ComplimentaryPasses
         }
 
         if ($number === 0) {
-            $errors['rows'] = 'Add at least one person (name, phone and email).';
+            $errors['rows'] = 'Add at least one person (name and email).';
         } elseif ($number > self::MAX_ROWS) {
             $errors['rows'] = 'That is ' . $number . ' people – please issue at most ' . self::MAX_ROWS . ' at a time.';
         } elseif (($total = array_sum(array_column($clean, 'qty'))) > self::MAX_PASSES) {
@@ -249,6 +246,25 @@ class ComplimentaryPasses
     private static function eventData(Service $event): array
     {
         return ['event' => $event->title, 'event_date' => $event->date, 'venue' => $event->venue];
+    }
+
+    /** Why this email already counts as registered for the event – with the pass or order number to look up. */
+    public static function whyTaken(Service $event, string $email): string
+    {
+        $pass = Booking::where('service_id', $event->id)->whereRaw('LOWER(email) = ?', [$email])->orderBy('id')->first();
+        if ($pass) {
+            return 'already has pass ' . $pass->booking_id . ' for this event'
+                . ($pass->isComplimentary() ? ' (complimentary).' : '.');
+        }
+
+        $order = \App\Models\Order::where('service_id', $event->id)->whereIn('status', ['pending', 'paid'])->orderByDesc('id')->get()
+            ->first(fn ($o) => collect((array) $o->attendees)->pluck('email')->map(fn ($e) => strtolower(trim((string) $e)))->contains($email));
+        if ($order && $order->status === 'pending') {
+            return 'started registering on the website but has not paid yet (order ' . $order->order_no
+                . ', awaiting payment). If they will not pay, delete that order in Orders.';
+        }
+
+        return 'is already registered for this event' . ($order ? ' (paid order ' . $order->order_no . ').' : '.');
     }
 
     /** "+91 98100 00000" -> "+919810000000"; null when it is not a phone number. */
