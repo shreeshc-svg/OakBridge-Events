@@ -35,11 +35,11 @@
 
         @php $passes = $data['passes']; $count = count($passes); @endphp
         <p>
-            It is our pleasure to welcome you as our special guest at <strong>{{ $data['event'] }}</strong>.
+            It is our pleasure to welcome you as our valued guest at <strong>{{ $data['event'] }}</strong>.
             @if ($count > 1)
-                Here are your <strong>{{ $count }} complimentary passes</strong> – there is nothing to pay.
+                Here are your <strong>{{ $count }} complimentary passes</strong>.
             @else
-                Here is your <strong>complimentary pass</strong> – there is nothing to pay.
+                Here is your <strong>complimentary pass</strong>.
             @endif
         </p>
 
