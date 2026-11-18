@@ -112,6 +112,12 @@ class Order extends Model
     }
 
     /** The admin who created this order by hand (null for website orders). */
+    /** The special-price offer link this order came from, if any. */
+    public function offerInvite()
+    {
+        return $this->belongsTo(OfferInvite::class);
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

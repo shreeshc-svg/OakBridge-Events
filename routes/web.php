@@ -121,6 +121,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::delete('ticketing/tiers/{tier}', [TicketingController::class, 'destroyTier'])->name('ticketing.tier.destroy');
     Route::post('ticketing/settings', [TicketingController::class, 'updateSettings'])->name('ticketing.settings');
     // complimentary passes for special guests (emailed)
+    // special-price offers for a list of people (personal links, sent from the bulk mail tool)
+    Route::post('offers', [\App\Http\Controllers\SpecialOfferController::class, 'store'])->name('offers.store');
+    Route::get('offers/{offer}', [\App\Http\Controllers\SpecialOfferController::class, 'show'])->name('offers.show');
+    Route::post('offers/{offer}', [\App\Http\Controllers\SpecialOfferController::class, 'update'])->name('offers.update');
+    Route::delete('offers/{offer}', [\App\Http\Controllers\SpecialOfferController::class, 'destroy'])->name('offers.destroy');
+    Route::post('offers/{offer}/people', [\App\Http\Controllers\SpecialOfferController::class, 'upload'])->name('offers.upload');
+    Route::delete('offers/{offer}/people/{invite}', [\App\Http\Controllers\SpecialOfferController::class, 'remove'])->name('offers.remove');
+    Route::get('offers/{offer}/export', [\App\Http\Controllers\SpecialOfferController::class, 'export'])->name('offers.export');
+    Route::post('offers/{offer}/test', [\App\Http\Controllers\SpecialOfferController::class, 'test'])->name('offers.test');
+    Route::get('offers/{offer}/preview', [\App\Http\Controllers\SpecialOfferController::class, 'preview'])->name('offers.preview');
     Route::post('ticketing/complimentary', [\App\Http\Controllers\ComplimentaryPassController::class, 'store'])->name('ticketing.comp.store');
     Route::post('ticketing/complimentary/test', [\App\Http\Controllers\ComplimentaryPassController::class, 'test'])->name('ticketing.comp.test');
     Route::post('ticketing/complimentary/{booking}/resend', [\App\Http\Controllers\ComplimentaryPassController::class, 'resend'])->name('ticketing.comp.resend');
@@ -264,6 +274,11 @@ Route::middleware('throttle:20,1')->group(function () {
     Route::post('/pay/{orderNo}/verify', [PaymentController::class, 'verify'])->name('order.verify');
     Route::get('/pay/{orderNo}/cancelled', [PaymentController::class, 'cancelled'])->name('order.cancelled');
     Route::get('/pay/{orderNo}/done', [PaymentController::class, 'done'])->name('order.done');
+});
+// personal special-price links (Ticketing > Special price offers)
+Route::middleware('throttle:30,1')->group(function () {
+    Route::get('/offer/{token}', [\App\Http\Controllers\OfferController::class, 'show'])->where('token', '[A-Za-z0-9]{32}')->name('offer.show');
+    Route::post('/offer/{token}', [\App\Http\Controllers\OfferController::class, 'book'])->where('token', '[A-Za-z0-9]{32}')->name('offer.book');
 });
 Route::post('/webhooks/razorpay', [PaymentController::class, 'webhook'])->name('razorpay.webhook')
     ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);

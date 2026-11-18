@@ -37,6 +37,10 @@
                         <dt class="col-sm-4">Designation</dt><dd class="col-sm-8">{{ $order->buyer_designation ?: '–' }}</dd>
                         <dt class="col-sm-4">Event</dt><dd class="col-sm-8">{{ $order->event }}</dd>
                         <dt class="col-sm-4">Placed</dt><dd class="col-sm-8">{{ $order->created_at?->format('j M Y, H:i') }}</dd>
+                        @if ($order->offer_invite_id && $order->offerInvite?->offer)
+                            <dt class="col-sm-4">Special offer</dt>
+                            <dd class="col-sm-8"><a href="{{ route('offers.show', $order->offerInvite->offer) }}">{{ $order->offerInvite->offer->title }}</a> <span class="badge badge-warning">personal link</span></dd>
+                        @endif
                         @if ($order->created_by)
                             <dt class="col-sm-4">Created by</dt>
                             <dd class="col-sm-8">{{ $order->creator?->name ?? 'an admin' }} <span class="badge badge-info">admin registration</span></dd>

@@ -108,13 +108,14 @@ class Pricing
      * Ticketing price, bundle prices and discount slabs; tax follows the usual
      * setting (added on top, or already included).
      */
-    public static function quoteAt(float $unit, int $quantity): array
+    public static function quoteAt(float $unit, int $quantity, bool $withTax = true): array
     {
-        $quantity = max(1, min($quantity, self::maxPasses()));
+        // the caller has already checked the quantity against its own limit
+        $quantity = max(1, min($quantity, self::MAX_PASSES));
         $unit = round(max($unit, 0), 2);
         $subtotal = round($unit * $quantity, 2);
 
-        return self::withTax([
+        $quote = [
             'unit' => $unit,
             'is_early' => false,
             'quantity' => $quantity,
@@ -123,7 +124,21 @@ class Pricing
             'discount_label' => null,
             'is_bundle' => false,
             'net' => $subtotal,
-        ]);
+        ];
+
+        if (! $withTax) {
+            // a special offer sold without GST: the price is the total
+            return $quote + [
+                'tax_percent' => 0.0,
+                'tax' => 0.0,
+                'tax_included' => true,
+                'tax_label' => (string) (self::setting()->tax_label ?: 'Tax'),
+                'total' => $subtotal,
+                'per_pass' => $unit,
+            ];
+        }
+
+        return self::withTax($quote);
     }
 
     /** Adds tax and the total to a quote, per Admin > Ticketing (rate; included or added on top). */
