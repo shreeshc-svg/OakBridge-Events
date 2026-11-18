@@ -11,7 +11,7 @@
         @if ($offers->isNotEmpty())
             <div class="table-responsive mb-3">
                 <table class="table table-sm table-hover mb-0">
-                    <thead class="thead-light"><tr><th>Offer</th><th>Pass</th><th>Price</th><th>People</th><th>Paid</th><th>Last day</th><th>Status</th><th></th></tr></thead>
+                    <thead class="thead-light"><tr><th>Offer</th><th>Pass</th><th>Price</th><th>Link opened</th><th>Paid</th><th>Last day</th><th>Status</th><th></th></tr></thead>
                     <tbody>
                         @foreach ($offers as $o)
                             @php $st = \App\Support\SpecialOffers::stats($o); $reason = $o->closedReason(); @endphp
@@ -19,11 +19,15 @@
                                 <td><a href="{{ route('offers.show', $o) }}" class="font-weight-bold">{{ $o->title }}</a></td>
                                 <td class="small">{{ $o->passType?->name ?? '–' }}</td>
                                 <td class="text-nowrap">{{ $money($o->unit_price) }} <small class="text-muted">{{ $o->charge_tax ? '+ GST' : 'no GST' }}</small></td>
-                                <td>{{ number_format($st['people']) }}</td>
+                                <td>{{ number_format($st['views']) }}</td>
                                 <td>{{ number_format($st['paid_people']) }} <small class="text-muted">({{ $st['paid_passes'] }} {{ \Illuminate\Support\Str::plural('pass', $st['paid_passes']) }})</small></td>
                                 <td class="small text-nowrap">{{ $o->expires_on?->format('j M Y') ?? '–' }}</td>
                                 <td>@if ($reason)<span class="badge badge-secondary" title="{{ $reason }}">Closed</span>@else<span class="badge badge-success">Open</span>@endif</td>
-                                <td class="text-right"><a href="{{ route('offers.show', $o) }}" class="btn btn-outline-primary btn-xs">Manage</a></td>
+                                <td class="text-right text-nowrap">
+                                    <button type="button" class="btn btn-outline-success btn-xs" title="Copy the offer link for your campaign"
+                                        onclick="navigator.clipboard && navigator.clipboard.writeText('{{ $o->sharedLink() }}'); this.textContent = 'Copied';">Copy link</button>
+                                    <a href="{{ route('offers.show', $o) }}" class="btn btn-outline-primary btn-xs">Manage</a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

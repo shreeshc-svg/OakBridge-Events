@@ -277,6 +277,8 @@ Route::middleware('throttle:20,1')->group(function () {
 });
 // personal special-price links (Ticketing > Special price offers)
 Route::middleware('throttle:30,1')->group(function () {
+    Route::get('/offer/o/{code}', [\App\Http\Controllers\OfferController::class, 'shared'])->where('code', '[A-Za-z0-9]{6,16}')->name('offer.shared');
+    Route::post('/offer/o/{code}', [\App\Http\Controllers\OfferController::class, 'sharedBook'])->where('code', '[A-Za-z0-9]{6,16}')->name('offer.shared.book');
     Route::get('/offer/{token}', [\App\Http\Controllers\OfferController::class, 'show'])->where('token', '[A-Za-z0-9]{32}')->name('offer.show');
     Route::post('/offer/{token}', [\App\Http\Controllers\OfferController::class, 'book'])->where('token', '[A-Za-z0-9]{32}')->name('offer.book');
 });

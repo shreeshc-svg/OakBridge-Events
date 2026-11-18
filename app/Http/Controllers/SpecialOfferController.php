@@ -22,10 +22,10 @@ class SpecialOfferController extends Controller
     public function store(Request $request)
     {
         $data = $this->validated($request);
-        $offer = SpecialOffer::create($data + ['created_by' => $request->user()?->id, 'is_active' => true]);
+        $offer = SpecialOffer::create($data + ['created_by' => $request->user()?->id, 'is_active' => true, 'open_to_anyone' => true]);
 
         return redirect()->route('offers.show', $offer)
-            ->with('success', 'Offer created. Next: add the people (paste or upload a CSV), try it with "Send me a test link", then download the links for your mail tool.');
+            ->with('success', 'Offer created. Copy the offer link below into your campaign – try it yourself first.');
     }
 
     public function show(Request $request, SpecialOffer $offer)
@@ -62,7 +62,7 @@ class SpecialOfferController extends Controller
     public function update(Request $request, SpecialOffer $offer)
     {
         $data = $this->validated($request, $offer);
-        $offer->update($data + ['is_active' => $request->boolean('is_active')]);
+        $offer->update($data + ['is_active' => $request->boolean('is_active'), 'open_to_anyone' => $request->boolean('open_to_anyone')]);
 
         return back()->with('success', 'Offer saved.' . ($offer->is_active ? '' : ' It is closed – the links show "This offer has been closed".'));
     }

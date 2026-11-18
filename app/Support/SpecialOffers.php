@@ -209,6 +209,7 @@ class SpecialOffers
         $paidOrders = Order::whereIn('offer_invite_id', $realIds)->where('status', 'paid');
 
         return [
+            'views' => (int) $offer->fresh()->views,
             'people' => (clone $real)->count(),
             'opened' => (clone $real)->whereNotNull('clicked_at')->count(),
             'checkout' => Order::whereIn('offer_invite_id', $realIds)->where('status', 'pending')->distinct()->count('offer_invite_id'),

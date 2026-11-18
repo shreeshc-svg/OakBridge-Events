@@ -12,11 +12,11 @@
         <div class="auto-container">
             <div class="ob-register__card ob-offer" id="offer-form">
                 @if ($preview)
-                    <div class="alert alert-warning mb-3"><strong>Preview</strong> – this is what {{ $invite->name }} sees. Nothing can be paid from a preview.</div>
+                    <div class="alert alert-warning mb-3"><strong>Preview</strong> – this is what {{ $invite ? $invite->name : 'people with the link' }} {{ $invite ? 'sees' : 'see' }}. Nothing can be paid from a preview.</div>
                 @endif
 
                 <div class="ob-offer__head">
-                    <div class="ob-offer__tag">Your personal offer</div>
+                    <div class="ob-offer__tag">{{ $invite ? 'Your personal offer' : 'Special offer' }}</div>
                     <h1 class="ob-offer__title">{{ $offer->title }}</h1>
                     <p class="ob-offer__event">
                         <strong>{{ $event->title }}</strong><br>
@@ -35,7 +35,7 @@
                     <div class="alert alert-success">
                         <strong>You're registered!</strong> Payment received for order {{ $paid->order_no }} –
                         {{ $paid->quantity }} {{ \Illuminate\Support\Str::plural('pass', $paid->quantity) }}.
-                        Your pass {{ $paid->quantity > 1 ? 'numbers were' : 'number was' }} emailed to {{ $invite->email }}.
+                        Your pass {{ $paid->quantity > 1 ? 'numbers were' : 'number was' }} emailed to {{ $paid->buyer_email }}.
                         <div class="mt-2"><a href="{{ route('order.done', $paid->order_no) }}" class="btn btn-sm btn-success">View my passes</a></div>
                     </div>
                 @elseif ($closed)
@@ -44,7 +44,11 @@
                         or write to us at <a href="mailto:{{ $setting->email ?? 'info@oakbridge.in' }}">{{ $setting->email ?? 'info@oakbridge.in' }}</a>.
                     </div>
                 @else
-                    <p class="mb-2">Dear {{ $invite->name }}, this link is just for you ({{ $invite->email }}).</p>
+                    @if ($invite)
+                        <p class="mb-2">Dear {{ $invite->name }}, this link is just for you ({{ $invite->email }}).</p>
+                    @else
+                        <p class="mb-2">Book your {{ \Illuminate\Support\Str::plural($passName, 2) }} at the special price below.</p>
+                    @endif
 
                     @if ($pending && ! $preview)
                         <div class="alert alert-info d-flex flex-wrap align-items-center">
@@ -60,24 +64,29 @@
                         </div>
                     @endif
 
-                    <form id="offerForm" class="ob-register-form" action="{{ route('offer.book', $invite->token) }}" method="post"
+                    <form id="offerForm" class="ob-register-form" action="{{ $form['action'] }}" method="post"
                         data-unit="{{ $unit }}" data-tax="{{ $taxPercent }}" data-included="{{ $taxIncluded ? 1 : 0 }}" data-pass="{{ $passName }}">
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label>Your Name<span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control" maxlength="100" required value="{{ old('name', $invite->name) }}">
+                                <input type="text" name="name" class="form-control" maxlength="100" required value="{{ old('name', $form['name']) }}">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label>Email</label>
-                                <input type="email" class="form-control" value="{{ $invite->email }}" readonly disabled>
+                                @if ($invite)
+                                    <label>Email</label>
+                                    <input type="email" class="form-control" value="{{ $invite->email }}" readonly disabled>
+                                @else
+                                    <label>Email<span class="text-danger">*</span> <small>your passes are sent here</small></label>
+                                    <input type="email" name="email" class="form-control" maxlength="100" required value="{{ old('email', $form['email']) }}">
+                                @endif
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label>Phone<span class="text-danger">*</span> <small>10 digits</small></label>
                                 <input type="tel" name="phone" class="form-control" maxlength="10" inputmode="numeric" required
-                                    value="{{ old('phone', preg_replace('/^(\+?91)(?=\d{10}$)/', '', (string) $invite->phone)) }}">
+                                    value="{{ old('phone', $form['phone']) }}">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label>Organization <small class="text-muted">(optional)</small></label>
