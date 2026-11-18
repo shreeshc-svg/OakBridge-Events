@@ -27,8 +27,8 @@
     {{-- numbers --}}
     <div class="row">
         @foreach ([
-            ['People on the list', number_format($stats['people']), 'fas fa-users', 'secondary'],
-            ['Opened their link', number_format($stats['opened']), 'fas fa-mouse-pointer', 'info'],
+            ['Offer link opened', number_format($stats['views']) . ' ' . \Illuminate\Support\Str::plural('time', $stats['views']), 'fas fa-mouse-pointer', 'info'],
+            ['People who started', number_format($stats['people']), 'fas fa-users', 'secondary'],
             ['Started payment', number_format($stats['checkout']), 'fas fa-hourglass-half', 'warning'],
             ['Paid', number_format($stats['paid_people']) . ' · ' . $stats['paid_passes'] . ' ' . \Illuminate\Support\Str::plural('pass', $stats['paid_passes']), 'fas fa-check-circle', 'success'],
             ['Collected', $money($stats['revenue']), 'fas fa-rupee-sign', 'primary'],
@@ -42,12 +42,42 @@
         @endforeach
     </div>
 
+    {{-- the link for the campaign --}}
+    @php $link = $offer->sharedLink(); @endphp
+    <div class="card card-success card-outline" id="offerLink">
+        <div class="card-header"><h3 class="card-title"><i class="fas fa-link mr-1"></i> Your offer link – paste it into your campaign</h3></div>
+        <div class="card-body">
+            <div class="input-group mb-2">
+                <input type="text" class="form-control form-control-lg" readonly value="{{ $link }}" id="sharedLink">
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-success copy-link" data-target="sharedLink"><i class="far fa-copy"></i> Copy</button>
+                    <a href="{{ $link }}?preview=1" target="_blank" rel="noopener" class="btn btn-outline-secondary"><i class="fas fa-eye"></i> Preview</a>
+                    <a href="{{ $link }}" target="_blank" rel="noopener" class="btn btn-outline-primary" title="Try it as a customer – a real payment issues real passes">Try it</a>
+                </div>
+            </div>
+            <p class="small mb-2">
+                One link for everyone: select your customer segment in your mail tool and put this link on the button.
+                Each customer enters their details and pays {{ \App\Support\Pricing::money((float) $offer->unit_price) }} per pass{{ $offer->charge_tax ? ' + GST' : '' }};
+                every pass gets its own pass number. Passes per email: up to {{ $offer->max_per_person }}.
+            </p>
+            <details class="small">
+                <summary>Optional: fill in the customer's email and name for them</summary>
+                <p class="mb-1 mt-2">If your mail tool has merge tags, add them to the link so the form opens pre-filled (use your tool's own tag names):</p>
+                <code class="d-block p-2 bg-light border rounded">{{ $link }}?email=@{{email}}&amp;name=@{{name}}</code>
+                <p class="mb-0 mt-1 text-muted">Without tags the link works the same – customers just type their email.</p>
+            </details>
+            @unless ($offer->open_to_anyone)
+                <div class="alert alert-warning small mt-2 mb-0">"Only people on the list" is on: the link works only for emails added under <strong>Personal links</strong> below.</div>
+            @endunless
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-lg-5">
             {{-- 1. the offer --}}
             <div class="card card-warning card-outline">
                 <div class="card-header">
-                    <h3 class="card-title">1. The offer</h3>
+                    <h3 class="card-title">The offer</h3>
                     <div class="card-tools">@if ($reason)<span class="badge badge-secondary">Closed – {{ $reason }}</span>@else<span class="badge badge-success">Open – links work</span>@endif</div>
                 </div>
                 <form action="{{ route('offers.update', $offer) }}" method="post">
@@ -85,6 +115,11 @@
                             <label class="custom-control-label small" for="charge_tax">Add GST (unticked: {{ $money($offer->unit_price) }} is the total)</label>
                         </div>
                         <div class="custom-control custom-checkbox">
+                            <input type="hidden" name="open_to_anyone" value="0">
+                            <input type="checkbox" class="custom-control-input" id="open_to_anyone" name="open_to_anyone" value="1" @checked(old('open_to_anyone', $offer->open_to_anyone ? '1' : '0') === '1')>
+                            <label class="custom-control-label small" for="open_to_anyone">Anyone with the offer link can use it (untick: only emails on the list below)</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
                             <input type="hidden" name="is_active" value="0">
                             <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1" @checked(old('is_active', $offer->is_active ? '1' : '0') === '1')>
                             <label class="custom-control-label small" for="is_active">Offer is open (untick to stop all links at once)</label>
@@ -100,9 +135,9 @@
 
             {{-- 2. test --}}
             <div class="card card-info card-outline">
-                <div class="card-header"><h3 class="card-title">2. Test it first</h3></div>
+                <div class="card-header"><h3 class="card-title">Personal test link</h3></div>
                 <div class="card-body">
-                    <p class="small text-muted">Get your own link and go through it like a guest – up to the payment page (a real payment issues real passes; refund it in Razorpay if needed). Test links are not counted or exported.</p>
+                    <p class="small text-muted">Only needed for personal links: get one for yourself and go through it like a guest. Test links are not counted or exported. (For the offer link above, just use "Try it".)</p>
                     <form action="{{ route('offers.test', $offer) }}" method="post" class="input-group input-group-sm mb-2">
                         @csrf
                         <input type="email" name="test_email" class="form-control" value="{{ old('test_email', auth()->user()?->email) }}" aria-label="Your email">
@@ -125,7 +160,7 @@
         <div class="col-lg-7">
             {{-- 3. people --}}
             <div class="card card-primary card-outline">
-                <div class="card-header"><h3 class="card-title">3. Add people</h3></div>
+                <div class="card-header"><h3 class="card-title">Optional: personal links for a list <small class="text-muted">not needed when you use the offer link</small></h3></div>
                 <form action="{{ route('offers.upload', $offer) }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
@@ -148,7 +183,7 @@
 
             {{-- 4. links for the mail tool --}}
             <div class="card card-success card-outline">
-                <div class="card-header"><h3 class="card-title">4. Download the links for your mail tool</h3></div>
+                <div class="card-header"><h3 class="card-title">Download personal links / who used the offer</h3></div>
                 <div class="card-body">
                     <p class="small mb-2">CSV columns: <code>Name, Email, Phone, Offer link, Status</code>. In your mail tool, put the <strong>Offer link</strong> column in the email as a merge field (e.g. <code>@{{offer_link}}</code>).</p>
                     <a href="{{ route('offers.export', $offer) }}" class="btn btn-success btn-sm"><i class="fas fa-download"></i> Everyone ({{ number_format($stats['people']) }})</a>
@@ -196,7 +231,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="text-center text-muted py-4">{{ $stats['people'] ? 'Nobody matches.' : 'Nobody on the list yet – add people above.' }}</td></tr>
+                        <tr><td colspan="6" class="text-center text-muted py-4">{{ $stats['people'] ? 'Nobody matches.' : 'Nobody has used the offer yet.' }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -15,7 +15,22 @@ class SpecialOffer extends Model
         'is_active' => 'boolean',
         'expires_on' => 'date',
         'max_per_person' => 'integer',
+        'open_to_anyone' => 'boolean',
+        'views' => 'integer',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (SpecialOffer $offer) {
+            $offer->code = $offer->code ?: \Illuminate\Support\Str::random(10);
+        });
+    }
+
+    /** The one link for a mail campaign: /offer/o/{code}. */
+    public function sharedLink(): string
+    {
+        return route('offer.shared', $this->code);
+    }
 
     public function service()
     {
