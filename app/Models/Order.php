@@ -60,7 +60,7 @@ class Order extends Model
         return $this->hasMany(OrderReminder::class)->orderByDesc('sent_at');
     }
 
-    /** Attendees kept on the order until it is paid: [1 => ['name'=>, 'email'=>], ...] */
+    /** Attendees kept on the order until it is paid: [1 => ['name'=>, 'email'=>, 'phone'=>], ...] (phone: passes 2+, optional) */
     public function attendeeList(): array
     {
         $list = [];
@@ -68,6 +68,7 @@ class Order extends Model
             $list[(int) $number] = [
                 'name' => (string) ($person['name'] ?? ''),
                 'email' => (string) ($person['email'] ?? ''),
+                'phone' => (string) ($person['phone'] ?? ''),
             ];
         }
         ksort($list);

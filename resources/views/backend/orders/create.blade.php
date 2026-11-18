@@ -223,10 +223,12 @@
                     var box = el('attendees'), qty = parseInt(qtySel.value, 10) || 1, html = '';
                     for (var n = 2; n <= qty; n++) {
                         var a = OLD.attendees[n] || {};
-                        html += '<div class="form-row"><div class="form-group col-md-6 mb-2"><label class="small mb-0">Pass ' + n + ' – name</label>'
+                        html += '<div class="form-row"><div class="form-group col-md-4 mb-2"><label class="small mb-0">Pass ' + n + ' – name</label>'
                             + '<input type="text" class="form-control form-control-sm" name="attendees[' + n + '][name]" maxlength="100" required value="' + (a.name || '').replace(/"/g, '&quot;') + '"></div>'
-                            + '<div class="form-group col-md-6 mb-2"><label class="small mb-0">Pass ' + n + ' – email</label>'
-                            + '<input type="email" class="form-control form-control-sm" name="attendees[' + n + '][email]" maxlength="100" required value="' + (a.email || '').replace(/"/g, '&quot;') + '"></div></div>';
+                            + '<div class="form-group col-md-5 mb-2"><label class="small mb-0">Pass ' + n + ' – email</label>'
+                            + '<input type="email" class="form-control form-control-sm" name="attendees[' + n + '][email]" maxlength="100" required value="' + (a.email || '').replace(/"/g, '&quot;') + '"></div>'
+                            + '<div class="form-group col-md-3 mb-2"><label class="small mb-0">Pass ' + n + ' – phone <span class="text-muted">(optional)</span></label>'
+                            + '<input type="tel" class="form-control form-control-sm" name="attendees[' + n + '][phone]" maxlength="15" value="' + (a.phone || '').replace(/"/g, '&quot;') + '"></div></div>';
                     }
                     box.innerHTML = html ? '<p class="small text-muted mb-1">Pass 1 is for the person above. Each other pass needs its holder\'s name and email.</p>' + html : '';
                 }

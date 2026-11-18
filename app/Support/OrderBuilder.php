@@ -80,6 +80,7 @@ class OrderBuilder
                 'attendees' => 'array',
                 'attendees.*.name' => 'nullable|string|max:100',
                 'attendees.*.email' => 'nullable|string|email|max:100',
+                'attendees.*.phone' => 'nullable|string|max:20',
             ], [
                 'billing_address.required' => 'Please enter your billing address – it goes on your GST invoice.',
                 'billing_state.required' => 'Please choose your state.',
@@ -109,7 +110,18 @@ class OrderBuilder
                 if ($name === '' || $email === '') {
                     self::fail("attendees.{$number}.name", 'Enter the name and email for pass ' . $number . '.');
                 }
-                $attendees[$number] = ['name' => $name, 'email' => $email];
+                // phone is optional for passes 2+; if given: 10 digits (+91, spaces and dashes are fine)
+                $phoneRaw = trim((string) ($attendee['phone'] ?? ''));
+                $phone = null;
+                if ($phoneRaw !== '') {
+                    $digits = preg_replace('/[\s\-().]/', '', $phoneRaw);
+                    $digits = preg_replace('/^(\+91|0091|91(?=\d{10}$)|0(?=\d{10}$))/', '', $digits);
+                    if (! preg_match('/^\d{10}$/', $digits)) {
+                        self::fail("attendees.{$number}.phone", 'The phone number for pass ' . $number . ' should be 10 digits.');
+                    }
+                    $phone = $digits;
+                }
+                $attendees[$number] = ['name' => $name, 'email' => $email] + ($phone ? ['phone' => $phone] : []);
             }
         }
 

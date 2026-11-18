@@ -393,23 +393,27 @@
                         attendees.querySelectorAll('.ob-attendee').forEach(function(row) {
                             typed[row.dataset.number] = {
                                 name: row.querySelector('input[data-field=name]').value,
-                                email: row.querySelector('input[data-field=email]').value
+                                email: row.querySelector('input[data-field=email]').value,
+                                phone: row.querySelector('input[data-field=phone]').value
                             };
                         });
                         attendees.innerHTML = wanted > 0 ? '<p class="mb-2"><strong>Who are the other passes for?</strong></p>' : '';
                         for (var number = 2; number <= quantity; number++) {
-                            var saved = typed[number] || (restore.attendees || {})[number] || { name: '', email: '' };
+                            var saved = typed[number] || (restore.attendees || {})[number] || { name: '', email: '', phone: '' };
                             var row = document.createElement('div');
                             row.className = 'ob-attendee row';
                             row.dataset.number = number;
                             row.innerHTML =
-                                '<div class="col-md-6 mb-2"><input type="text" class="form-control" data-field="name"' +
+                                '<div class="col-md-4 mb-2"><input type="text" class="form-control" data-field="name"' +
                                 ' name="attendees[' + number + '][name]" placeholder="Pass ' + number + ' – full name"></div>' +
-                                '<div class="col-md-6 mb-2"><input type="email" class="form-control" data-field="email"' +
-                                ' name="attendees[' + number + '][email]" placeholder="Pass ' + number + ' – email"></div>';
+                                '<div class="col-md-4 mb-2"><input type="email" class="form-control" data-field="email"' +
+                                ' name="attendees[' + number + '][email]" placeholder="Pass ' + number + ' – email"></div>' +
+                                '<div class="col-md-4 mb-2"><input type="tel" class="form-control" data-field="phone" maxlength="15" inputmode="tel"' +
+                                ' name="attendees[' + number + '][phone]" placeholder="Phone (optional)"></div>';
                             attendees.appendChild(row);
                             row.querySelector('input[data-field=name]').value = saved.name || '';
                             row.querySelector('input[data-field=email]').value = saved.email || '';
+                            row.querySelector('input[data-field=phone]').value = saved.phone || '';
                         }
                         restore.attendees = null;
                     }

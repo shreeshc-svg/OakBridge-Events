@@ -171,12 +171,14 @@
                     var n = parseInt(qty.value, 10) || 1, html = '';
                     for (var i = 2; i <= n; i++) {
                         var a = OLD[i] || {};
-                        var keep = box.querySelector('[name="attendees[' + i + '][name]"]');
-                        var name = keep ? keep.value : (a.name || ''), email = keep ? box.querySelector('[name="attendees[' + i + '][email]"]').value : (a.email || '');
-                        html += '<div class="row"><div class="col-md-6 mb-2"><label class="small mb-0">Pass ' + i + ' – name<span class="text-danger">*</span></label>'
+                        var field = function (f) { var el = box.querySelector('[name="attendees[' + i + '][' + f + ']"]'); return el ? el.value : (a[f] || ''); };
+                        var name = field('name'), email = field('email'), phone = field('phone');
+                        html += '<div class="row"><div class="col-md-4 mb-2"><label class="small mb-0">Pass ' + i + ' – name<span class="text-danger">*</span></label>'
                             + '<input type="text" class="form-control" name="attendees[' + i + '][name]" maxlength="100" required value="' + esc(name) + '"></div>'
-                            + '<div class="col-md-6 mb-2"><label class="small mb-0">Pass ' + i + ' – email<span class="text-danger">*</span></label>'
-                            + '<input type="email" class="form-control" name="attendees[' + i + '][email]" maxlength="100" required value="' + esc(email) + '"></div></div>';
+                            + '<div class="col-md-5 mb-2"><label class="small mb-0">Pass ' + i + ' – email<span class="text-danger">*</span></label>'
+                            + '<input type="email" class="form-control" name="attendees[' + i + '][email]" maxlength="100" required value="' + esc(email) + '"></div>'
+                            + '<div class="col-md-3 mb-2"><label class="small mb-0">Pass ' + i + ' – phone <small class="text-muted">(optional)</small></label>'
+                            + '<input type="tel" class="form-control" name="attendees[' + i + '][phone]" maxlength="15" inputmode="tel" value="' + esc(phone) + '"></div></div>';
                     }
                     box.innerHTML = html ? '<p class="small text-muted mb-1">Pass 1 is yours. Each other pass needs its holder\'s name and email (one pass per email).</p>' + html : '';
                 }
