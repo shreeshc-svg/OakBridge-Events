@@ -22,7 +22,7 @@ use Illuminate\Validation\ValidationException;
 class OrderBuilder
 {
     /**
-     * @param array{unit_price?: float|null, created_by?: int|null, require_paid?: bool} $options
+     * @param array{unit_price?: float|null, created_by?: int|null, require_paid?: bool, no_tax?: bool, max_quantity?: int, offer_invite_id?: int} $options
      *   unit_price  - a special price per pass instead of the Ticketing price (admin only)
      *   created_by  - the admin user creating the order
      *   require_paid - refuse events without passes (admin only)
@@ -76,10 +76,11 @@ class OrderBuilder
                     'required',
                     Rule::exists('pass_types', 'id')->where('service_id', $chosenEvent->id)->where('is_active', 1),
                 ],
-                'quantity' => 'required|integer|min:1|max:' . Pricing::maxPasses(),
+                'quantity' => 'required|integer|min:1|max:' . ($options['max_quantity'] ?? Pricing::maxPasses()),
                 'attendees' => 'array',
                 'attendees.*.name' => 'nullable|string|max:100',
                 'attendees.*.email' => 'nullable|string|email|max:100',
+                'attendees.*.phone' => 'nullable|string|max:20',
             ], [
                 'billing_address.required' => 'Please enter your billing address – it goes on your GST invoice.',
                 'billing_state.required' => 'Please choose your state.',
@@ -109,7 +110,18 @@ class OrderBuilder
                 if ($name === '' || $email === '') {
                     self::fail("attendees.{$number}.name", 'Enter the name and email for pass ' . $number . '.');
                 }
-                $attendees[$number] = ['name' => $name, 'email' => $email];
+                // phone is optional for passes 2+; if given: 10 digits (+91, spaces and dashes are fine)
+                $phoneRaw = trim((string) ($attendee['phone'] ?? ''));
+                $phone = null;
+                if ($phoneRaw !== '') {
+                    $digits = preg_replace('/[\s\-().]/', '', $phoneRaw);
+                    $digits = preg_replace('/^(\+91|0091|91(?=\d{10}$)|0(?=\d{10}$))/', '', $digits);
+                    if (! preg_match('/^\d{10}$/', $digits)) {
+                        self::fail("attendees.{$number}.phone", 'The phone number for pass ' . $number . ' should be 10 digits.');
+                    }
+                    $phone = $digits;
+                }
+                $attendees[$number] = ['name' => $name, 'email' => $email] + ($phone ? ['phone' => $phone] : []);
             }
         }
 
@@ -149,7 +161,7 @@ class OrderBuilder
         // paid event: the price from Ticketing, or a special price set by an admin
         $special = $options['unit_price'] ?? null;
         $quote = $special !== null
-            ? Pricing::quoteAt((float) $special, $quantity)
+            ? Pricing::quoteAt((float) $special, $quantity, ! ($options['no_tax'] ?? false))
             : Pricing::quote($passType, $quantity, $chosenEvent);
 
         $attendeeList = [1 => ['name' => $data['name'], 'email' => $data['email']]] + $attendees;
@@ -178,9 +190,10 @@ class OrderBuilder
             'tax_total' => $quote['tax'],
             'total' => $quote['total'],
             'status' => 'pending',
-        ] + (isset($options['created_by']) ? [
-            'created_by' => $options['created_by'],
+        ] + (isset($options['created_by']) || isset($options['offer_invite_id']) ? [
+            'created_by' => $options['created_by'] ?? null,
             'list_price' => $special !== null ? round($passType->priceOn(), 2) : null,
+            'offer_invite_id' => $options['offer_invite_id'] ?? null,
         ] : []));
 
         return ['event' => $chosenEvent, 'data' => $data, 'order' => $order];

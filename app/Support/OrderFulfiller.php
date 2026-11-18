@@ -89,7 +89,8 @@ class OrderFulfiller
                 'attendee_no' => $number,
                 'name' => $person['name'],
                 'email' => $person['email'],
-                'phone' => $order->buyer_phone,
+                // a guest's own phone when given, else the buyer's (who can reach them)
+                'phone' => ($number > 1 && $person['phone'] !== '') ? $person['phone'] : $order->buyer_phone,
                 'company' => $order->buyer_company,
                 'designation' => $number === 1 ? $order->buyer_designation : null,
                 'amount' => $perPass,

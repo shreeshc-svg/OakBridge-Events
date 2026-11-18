@@ -233,6 +233,8 @@
         </div>
 
         {{-- ------------------------------------------- complimentary passes --}}
+        @include('backend.ticketing.offers')
+
         @include('backend.ticketing.complimentary')
 
         {{-- ------------------------------------------------- collapsed panels --}}

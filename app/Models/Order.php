@@ -60,7 +60,7 @@ class Order extends Model
         return $this->hasMany(OrderReminder::class)->orderByDesc('sent_at');
     }
 
-    /** Attendees kept on the order until it is paid: [1 => ['name'=>, 'email'=>], ...] */
+    /** Attendees kept on the order until it is paid: [1 => ['name'=>, 'email'=>, 'phone'=>], ...] (phone: passes 2+, optional) */
     public function attendeeList(): array
     {
         $list = [];
@@ -68,6 +68,7 @@ class Order extends Model
             $list[(int) $number] = [
                 'name' => (string) ($person['name'] ?? ''),
                 'email' => (string) ($person['email'] ?? ''),
+                'phone' => (string) ($person['phone'] ?? ''),
             ];
         }
         ksort($list);
@@ -112,6 +113,12 @@ class Order extends Model
     }
 
     /** The admin who created this order by hand (null for website orders). */
+    /** The special-price offer link this order came from, if any. */
+    public function offerInvite()
+    {
+        return $this->belongsTo(OfferInvite::class);
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

@@ -37,6 +37,10 @@
                         <dt class="col-sm-4">Designation</dt><dd class="col-sm-8">{{ $order->buyer_designation ?: '–' }}</dd>
                         <dt class="col-sm-4">Event</dt><dd class="col-sm-8">{{ $order->event }}</dd>
                         <dt class="col-sm-4">Placed</dt><dd class="col-sm-8">{{ $order->created_at?->format('j M Y, H:i') }}</dd>
+                        @if ($order->offer_invite_id && $order->offerInvite?->offer)
+                            <dt class="col-sm-4">Special offer</dt>
+                            <dd class="col-sm-8"><a href="{{ route('offers.show', $order->offerInvite->offer) }}">{{ $order->offerInvite->offer->title }}</a> <span class="badge badge-warning">personal link</span></dd>
+                        @endif
                         @if ($order->created_by)
                             <dt class="col-sm-4">Created by</dt>
                             <dd class="col-sm-8">{{ $order->creator?->name ?? 'an admin' }} <span class="badge badge-info">admin registration</span></dd>
@@ -54,17 +58,18 @@
                 <div class="card-body p-0">
                     @if (!$order->bookings->count())
                         <table class="table table-sm mb-0">
-                            <thead><tr><th>#</th><th>Name</th><th>Email</th></tr></thead>
+                            <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th></tr></thead>
                             <tbody>
                                 @foreach ($order->attendeeList() as $number => $person)
-                                    <tr><td>{{ $number }}</td><td>{{ $person['name'] }}</td><td>{{ $person['email'] }}</td></tr>
+                                    <tr><td>{{ $number }}</td><td>{{ $person['name'] }}</td><td>{{ $person['email'] }}</td>
+                                        <td class="small">{{ $number === 1 ? $order->buyer_phone : ($person['phone'] ?: '–') }}</td></tr>
                                 @endforeach
                             </tbody>
                         </table>
                         <p class="text-muted small p-2 mb-0">Booking numbers are issued when the order is paid.</p>
                     @else
                     <table class="table table-sm mb-0">
-                        <thead><tr><th>#</th><th>Booking ID</th><th>Name</th><th>Email</th></tr></thead>
+                        <thead><tr><th>#</th><th>Booking ID</th><th>Name</th><th>Email</th><th>Phone</th></tr></thead>
                         <tbody>
                             @foreach ($order->bookings->sortBy('attendee_no') as $booking)
                                 <tr>
@@ -72,6 +77,7 @@
                                     <td>{{ $booking->booking_id }}</td>
                                     <td>{{ $booking->name }}</td>
                                     <td>{{ $booking->email }}</td>
+                                    <td class="small">{{ $booking->phone }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
