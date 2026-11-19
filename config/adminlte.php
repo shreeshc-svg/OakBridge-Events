@@ -360,6 +360,11 @@ return [
             'icon' => 'fas fa-ticket-alt',
         ],
         [
+            'text' => 'Cancelled passes',
+            'route'  => 'cancelled-passes.index',
+            'icon' => 'fas fa-ban',
+        ],
+        [
             'text'    => 'Posts',
             'url'  => 'admin/post/*',
             'icon'    => 'fas fa-fw fa-book',

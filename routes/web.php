@@ -209,6 +209,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
     Route::resource('team', TeamController::class);
     Route::resource('video', VideoController::class);
+    Route::get('cancelled-passes', [\App\Http\Controllers\CancelledPassController::class, 'index'])->name('cancelled-passes.index');
+    Route::get('cancelled-passes/export', [\App\Http\Controllers\CancelledPassController::class, 'export'])->name('cancelled-passes.export');
     Route::resource('booking', BookingController::class);
     // Route::resource('vidhi', VidhiSammanController::class);
     Route::get('vidhi', [VidhiSammanController::class,'index'])->name('vidhi.index');

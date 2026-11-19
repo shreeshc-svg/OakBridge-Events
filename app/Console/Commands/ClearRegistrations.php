@@ -69,6 +69,10 @@ class ClearRegistrations extends Command
         if ($keep > 0) {
             DB::table('settings')->where('id', 1)->update(['booking_last_number' => $keep]);
         }
+        // keep a record of every pass number being removed
+        \App\Models\Booking::orderBy('id')->chunk(1000, function ($bookings) {
+            \App\Support\CancelledPasses::record($bookings, 'All registrations cleared (server command)', 'Server');
+        });
         DB::table('bookings')->truncate();
 
         $this->info("Deleted {$total} registrations.");

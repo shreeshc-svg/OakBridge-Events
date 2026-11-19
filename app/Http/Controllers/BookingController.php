@@ -15,7 +15,7 @@ class BookingController extends Controller
 
     public function destroy(Booking $booking)
     {
-        $booking->delete();
+        \App\Support\CancelledPasses::remove([$booking], 'Booking list');
         return redirect()->back()->withSuccess('Booking has been deleted successfully!');
     }
 
@@ -29,7 +29,7 @@ class BookingController extends Controller
             'ids.required' => 'Tick the registrations you want to delete first.',
         ]);
 
-        $deleted = Booking::whereIn('id', $data['ids'])->delete();
+        $deleted = \App\Support\CancelledPasses::remove(Booking::whereIn('id', $data['ids'])->get(), 'Booking list – bulk delete');
 
         return back()->with('success', $deleted . ' registration(s) deleted.');
     }

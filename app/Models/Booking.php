@@ -21,6 +21,14 @@ class Booking extends Model
         return $this->belongsTo(Service::class, 'service_id');
     }
 
+    protected static function booted(): void
+    {
+        // safety net: a pass deleted anywhere else still lands in the cancelled-passes log
+        static::deleting(function (Booking $booking) {
+            \App\Support\CancelledPasses::record([$booking], 'Deleted');
+        });
+    }
+
     /** A free pass issued from Admin > Ticketing > Complimentary passes. */
     public function isComplimentary(): bool
     {
