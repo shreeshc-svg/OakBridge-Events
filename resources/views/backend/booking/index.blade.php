@@ -12,6 +12,7 @@
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
                 <li class="breadcrumb-item active">Bookings</li>
             </ol>
+            <a href="{{ route('cancelled-passes.index') }}" class="btn btn-outline-secondary btn-sm float-sm-right mr-3"><i class="fas fa-ban"></i> Cancelled passes</a>
         </div>
     </div>
 @stop

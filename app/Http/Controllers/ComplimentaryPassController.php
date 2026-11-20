@@ -90,9 +90,9 @@ class ComplimentaryPassController extends Controller
     public function destroy(Booking $booking)
     {
         abort_unless($booking->isComplimentary(), 404);
-        $booking->delete();
+        \App\Support\CancelledPasses::remove([$booking], 'Complimentary passes (Ticketing)');
 
-        return $this->back($booking->service, 'success', 'Pass ' . $booking->booking_id . ' (' . $booking->name . ') cancelled. Nobody is emailed about this.');
+        return $this->back($booking->service, 'success', 'Pass ' . $booking->booking_id . ' (' . $booking->name . ') cancelled – it is kept in Cancelled passes. Nobody is emailed about this.');
     }
 
     /** Cancel every pass issued together for this person. */
@@ -100,7 +100,7 @@ class ComplimentaryPassController extends Controller
     {
         abort_unless($booking->isComplimentary(), 404);
         $passes = ComplimentaryPasses::group($booking);
-        Booking::whereIn('id', $passes->pluck('id'))->delete();
+        \App\Support\CancelledPasses::remove($passes, 'Complimentary passes (Ticketing) – cancel all');
 
         return $this->back($booking->service, 'success', 'All ' . $passes->count() . ' ' . Str::plural('pass', $passes->count())
             . ' for ' . $booking->email . ' cancelled (' . $passes->pluck('booking_id')->implode(', ') . '). Nobody is emailed about this.');

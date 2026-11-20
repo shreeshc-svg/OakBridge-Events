@@ -265,7 +265,8 @@ class OrderController extends Controller
         $passes = $order->bookings()->count();
 
         DB::transaction(function () use ($order) {
-            $order->bookings()->delete();    // the passes go with the order
+            // the passes go with the order (kept in the cancelled-passes log)
+            \App\Support\CancelledPasses::remove($order->bookings()->get(), 'Order ' . $order->order_no . ' deleted');
             $order->reminders()->delete();   // and so does its reminder history
             $order->delete();
         });
@@ -309,7 +310,7 @@ class OrderController extends Controller
         DB::transaction(function () use ($orders, &$passes) {
             foreach ($orders as $order) {
                 $passes += $order->bookings()->count();
-                $order->bookings()->delete();
+                \App\Support\CancelledPasses::remove($order->bookings()->get(), 'Order ' . $order->order_no . ' deleted (bulk)');
                 $order->reminders()->delete();
                 $order->delete();
             }

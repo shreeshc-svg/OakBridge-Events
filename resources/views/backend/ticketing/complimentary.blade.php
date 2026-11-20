@@ -12,6 +12,7 @@
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-gift mr-2"></i>Complimentary passes <small class="text-muted ml-1">for special guests – free, emailed to them</small></h3>
         <div class="card-tools">
+            <a href="{{ route('cancelled-passes.index', ['kind' => 'Complimentary', 'event' => $event->title]) }}" class="small mr-2"><i class="fas fa-ban"></i> cancelled ones</a>
             <span class="badge badge-success">{{ $issuedPasses }} {{ \Illuminate\Support\Str::plural('pass', $issuedPasses) }} · {{ $complimentary->count() }} {{ \Illuminate\Support\Str::plural('person', $complimentary->count()) }}</span>
         </div>
     </div>
@@ -155,7 +156,7 @@
                                             <strong>{{ $pass->booking_id }}</strong>
                                             @if ($group->count() > 1)<span class="small text-muted">{{ $pass->name }}</span>@endif
                                             <form action="{{ route('ticketing.comp.destroy', $pass) }}" method="post" class="d-inline"
-                                                onsubmit="return confirm('Cancel pass {{ $pass->booking_id }} ({{ addslashes($pass->name) }})? Nobody is emailed about this.');">
+                                                onsubmit="return confirm('Cancel pass {{ $pass->booking_id }} ({{ addslashes($pass->name) }})? It stays in the Cancelled passes log. Nobody is emailed about this.');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="btn btn-link btn-sm p-0 text-danger" title="Cancel this pass" aria-label="Cancel pass {{ $pass->booking_id }}"><i class="fas fa-times-circle"></i></button>
@@ -183,7 +184,7 @@
                                     </form>
                                     @if ($group->count() > 1)
                                         <form action="{{ route('ticketing.comp.destroy-group', $lead) }}" method="post" class="d-inline"
-                                            onsubmit="return confirm('Cancel all {{ $group->count() }} passes for {{ addslashes($lead->email) }}? Nobody is emailed about this.');">
+                                            onsubmit="return confirm('Cancel all {{ $group->count() }} passes for {{ addslashes($lead->email) }}? It stays in the Cancelled passes log. Nobody is emailed about this.');">
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-outline-danger btn-xs" title="Cancel all {{ $group->count() }} passes">Cancel all</button>

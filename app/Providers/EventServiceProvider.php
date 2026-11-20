@@ -29,7 +29,9 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Admin > Emails sent: a copy of every email the website sends
+        Event::listen(\Illuminate\Mail\Events\MessageSending::class, fn ($e) => \App\Support\MailLogger::sending($e));
+        Event::listen(\Illuminate\Mail\Events\MessageSent::class, fn ($e) => \App\Support\MailLogger::sent($e));
     }
 
     /**
