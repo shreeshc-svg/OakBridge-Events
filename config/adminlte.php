@@ -360,6 +360,11 @@ return [
             'icon' => 'fas fa-ticket-alt',
         ],
         [
+            'text' => 'Emails sent',
+            'route'  => 'emails.index',
+            'icon' => 'fas fa-envelope-open-text',
+        ],
+        [
             'text' => 'Cancelled passes',
             'route'  => 'cancelled-passes.index',
             'icon' => 'fas fa-ban',

@@ -209,6 +209,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
     Route::resource('team', TeamController::class);
     Route::resource('video', VideoController::class);
+    // every email the website sends, searchable
+    Route::get('emails', [\App\Http\Controllers\EmailLogController::class, 'index'])->name('emails.index');
+    Route::get('emails/suggest', [\App\Http\Controllers\EmailLogController::class, 'suggest'])->name('emails.suggest');
+    Route::get('emails/{email}', [\App\Http\Controllers\EmailLogController::class, 'show'])->whereNumber('email')->name('emails.show');
+    Route::get('emails/{email}/body', [\App\Http\Controllers\EmailLogController::class, 'body'])->whereNumber('email')->name('emails.body');
     Route::get('cancelled-passes', [\App\Http\Controllers\CancelledPassController::class, 'index'])->name('cancelled-passes.index');
     Route::get('cancelled-passes/export', [\App\Http\Controllers\CancelledPassController::class, 'export'])->name('cancelled-passes.export');
     Route::resource('booking', BookingController::class);
