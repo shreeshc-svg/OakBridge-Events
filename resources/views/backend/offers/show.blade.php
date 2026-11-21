@@ -58,7 +58,7 @@
             <p class="small mb-2">
                 One link for everyone: select your customer segment in your mail tool and put this link on the button.
                 Each customer enters their details and pays {{ \App\Support\Pricing::money((float) $offer->unit_price) }} per pass{{ $offer->charge_tax ? ' + GST' : '' }};
-                every pass gets its own pass number. Passes per email: up to {{ $offer->max_per_person }}.
+                every pass gets its own pass number. Passes per email: {{ $offer->minPasses() > 1 ? $offer->minPasses() . '–' . $offer->maxPasses() . ' (checkout opens from ' . $offer->minPasses() . ')' : 'up to ' . $offer->maxPasses() }}.
             </p>
             <details class="small">
                 <summary>Optional: fill in the customer's email and name for them</summary>
@@ -100,8 +100,12 @@
                                 <label class="small mb-0" for="unit_price">Price per pass (₹)</label>
                                 <input type="number" name="unit_price" id="unit_price" min="1" step="0.01" class="form-control form-control-sm" value="{{ old('unit_price', (float) $offer->unit_price) }}">
                             </div>
-                            <div class="col-6 form-group">
-                                <label class="small mb-0" for="max_per_person">Passes per person</label>
+                            <div class="col-3 form-group">
+                                <label class="small mb-0" for="min_per_person" title="Checkout stays off until the customer chooses at least this many passes">Min passes</label>
+                                <input type="number" name="min_per_person" id="min_per_person" min="1" max="20" class="form-control form-control-sm" value="{{ old('min_per_person', $offer->minPasses()) }}">
+                            </div>
+                            <div class="col-3 form-group">
+                                <label class="small mb-0" for="max_per_person">Max passes</label>
                                 <input type="number" name="max_per_person" id="max_per_person" min="1" max="20" class="form-control form-control-sm" value="{{ old('max_per_person', $offer->max_per_person) }}">
                             </div>
                             <div class="col-6 form-group">

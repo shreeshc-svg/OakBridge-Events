@@ -26,6 +26,9 @@
                         <span class="ob-offer__amount">{{ $money($unit) }}</span>
                         <span class="ob-offer__per">per {{ $passName }}</span>
                     </div>
+                    @if ($min > 1)
+                        <p class="ob-offer__min"><i class="fas fa-users" aria-hidden="true"></i> Minimum {{ $min }} passes per booking</p>
+                    @endif
                     @if ($offer->expires_on && $canBook)
                         <p class="ob-offer__expiry"><i class="far fa-clock" aria-hidden="true"></i> Offer valid until {{ $offer->expires_on->format('j F Y') }}</p>
                     @endif
@@ -64,7 +67,7 @@
                         </div>
                     @endif
 
-                    <form id="offerForm" class="ob-register-form" action="{{ $form['action'] }}" method="post"
+                    <form id="offerForm" data-min="{{ $min }}" class="ob-register-form" action="{{ $form['action'] }}" method="post"
                         data-unit="{{ $unit }}" data-tax="{{ $taxPercent }}" data-included="{{ $taxIncluded ? 1 : 0 }}" data-pass="{{ $passName }}">
                         @csrf
                         <div class="row">
@@ -102,10 +105,14 @@
                             <label for="offerQty">Number of passes</label>
                             <select name="quantity" id="offerQty" class="form-select form-control w-auto ob-offer__qty">
                                 @for ($n = 1; $n <= $max; $n++)
-                                    <option value="{{ $n }}" @selected((int) old('quantity', 1) === $n)>{{ $n }} {{ \Illuminate\Support\Str::plural('pass', $n) }}</option>
+                                    <option value="{{ $n }}" @selected((int) old('quantity', $min) === $n)>{{ $n }} {{ \Illuminate\Support\Str::plural('pass', $n) }}{{ $n < $min ? ' – below the minimum' : '' }}</option>
                                 @endfor
                             </select>
-                            @if ($max > 1)<small class="text-muted d-block">Up to {{ $max }} passes at the offer price – each pass gets its own pass number.</small>@endif
+                            @if ($min > 1)
+                                <small class="d-block ob-offer__minhint">This offer is for {{ $min }}{{ $max > $min ? '–' . $max : '' }} passes – each pass gets its own pass number.</small>
+                            @elseif ($max > 1)
+                                <small class="text-muted d-block">Up to {{ $max }} passes at the offer price – each pass gets its own pass number.</small>
+                            @endif
                         </div>
                         <div class="ob-offer__attendees mb-2"></div>
 
@@ -158,6 +165,8 @@
         .ob-offer__event { color: #555; margin-bottom: 10px; }
         .ob-offer__amount { font-size: 34px; font-weight: 700; color: #1a3d6d; }
         .ob-offer__per { color: #666; }
+        .ob-offer__min { color: #1a3d6d; font-weight: 600; margin: 4px 0 0; }
+        #offerPay:disabled { opacity: .55; cursor: not-allowed; }
         .ob-offer__expiry { color: #c0392b; font-weight: 600; margin: 6px 0 0; }
         @media (max-width: 767px) { .ob-offer__title { font-size: 22px; } .ob-offer__amount { font-size: 28px; } }
     </style>
@@ -168,6 +177,7 @@
                 var unit = parseFloat(form.dataset.unit), tax = parseFloat(form.dataset.tax) || 0, included = form.dataset.included === '1';
                 var qty = document.getElementById('offerQty'), box = form.querySelector('.ob-offer__attendees');
                 var OLD = @json(old('attendees', []));
+                var PREVIEW = @json((bool) $preview);
 
                 function money(v) {
                     var r = Math.round(v * 100) / 100, t = r.toFixed(r % 1 === 0 ? 0 : 2), p = t.split('.'), w = p[0];
@@ -200,7 +210,12 @@
                     }
                     html += '<div class="d-flex justify-content-between mt-1" style="font-size:1.15em"><strong>Total</strong><strong>' + money(total) + '</strong></div>';
                     document.getElementById('offerSummary').innerHTML = html;
-                    document.getElementById('offerPay').textContent = 'Pay ' + money(total);
+                    // below the offer's minimum: no checkout until enough passes are chosen
+                    var min = parseInt(form.dataset.min, 10) || 1, pay = document.getElementById('offerPay'), short = n < min;
+                    pay.disabled = short || PREVIEW;
+                    pay.textContent = short ? 'Choose at least ' + min + ' passes' : 'Pay ' + money(total);
+                    var hint = form.querySelector('.ob-offer__minhint');
+                    if (hint) { hint.classList.toggle('text-danger', short); hint.classList.toggle('font-weight-bold', short); hint.classList.toggle('text-muted', !short); }
                 }
                 qty.addEventListener('change', function () { attendees(); summary(); });
                 form.addEventListener('submit', function () { var b = document.getElementById('offerPay'); b.disabled = true; b.textContent = 'Please wait…'; });

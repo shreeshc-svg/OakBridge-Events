@@ -15,6 +15,7 @@ class SpecialOffer extends Model
         'is_active' => 'boolean',
         'expires_on' => 'date',
         'max_per_person' => 'integer',
+        'min_per_person' => 'integer',
         'open_to_anyone' => 'boolean',
         'views' => 'integer',
     ];
@@ -45,6 +46,17 @@ class SpecialOffer extends Model
     public function invites()
     {
         return $this->hasMany(OfferInvite::class);
+    }
+
+    /** The least passes per checkout (never more than the most). */
+    public function minPasses(): int
+    {
+        return max(1, min((int) ($this->min_per_person ?: 1), $this->maxPasses()));
+    }
+
+    public function maxPasses(): int
+    {
+        return max(1, (int) $this->max_per_person);
     }
 
     /** Why the offer links do not work right now, or null when they do. */
