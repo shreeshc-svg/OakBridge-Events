@@ -17,7 +17,8 @@
                             @php $st = \App\Support\SpecialOffers::stats($o); $reason = $o->closedReason(); @endphp
                             <tr>
                                 <td><a href="{{ route('offers.show', $o) }}" class="font-weight-bold">{{ $o->title }}</a></td>
-                                <td class="small">{{ $o->passType?->name ?? '–' }}</td>
+                                <td class="small">{{ $o->passType?->name ?? '–' }}
+                                    <div class="text-muted">{{ $o->minPasses() > 1 ? $o->minPasses() . '–' . $o->maxPasses() : 'up to ' . $o->maxPasses() }} per person</div></td>
                                 <td class="text-nowrap">{{ $money($o->unit_price) }} <small class="text-muted">{{ $o->charge_tax ? '+ GST' : 'no GST' }}</small></td>
                                 <td>{{ number_format($st['views']) }}</td>
                                 <td>{{ number_format($st['paid_people']) }} <small class="text-muted">({{ $st['paid_passes'] }} {{ \Illuminate\Support\Str::plural('pass', $st['paid_passes']) }})</small></td>
@@ -64,8 +65,12 @@
                             <input type="number" name="unit_price" id="of_price" min="1" step="0.01" class="form-control" placeholder="7999" value="{{ old('unit_price') }}">
                         </div>
                     </div>
-                    <div class="col-md-2 form-group">
-                        <label class="small mb-0" for="of_max">Passes per person</label>
+                    <div class="col-md-1 form-group">
+                        <label class="small mb-0" for="of_min" title="Checkout stays off until the customer chooses at least this many passes">Min passes</label>
+                        <input type="number" name="min_per_person" id="of_min" min="1" max="20" class="form-control form-control-sm" value="{{ old('min_per_person', 1) }}">
+                    </div>
+                    <div class="col-md-1 form-group">
+                        <label class="small mb-0" for="of_max">Max passes</label>
                         <input type="number" name="max_per_person" id="of_max" min="1" max="20" class="form-control form-control-sm" value="{{ old('max_per_person', 5) }}">
                     </div>
                     <div class="col-md-2 form-group">

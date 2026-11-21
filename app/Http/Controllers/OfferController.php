@@ -108,7 +108,8 @@ class OfferController extends Controller
             'closed' => $paid ? null : $offer->closedReason(),
             'preview' => $preview,
             'unit' => (float) $offer->unit_price,
-            'max' => max(1, (int) $offer->max_per_person),
+            'max' => $offer->maxPasses(),
+            'min' => $offer->minPasses(),
             'taxPercent' => $payload ? (float) ($payload['taxPercent'] ?? 0) : 0.0,
             'taxIncluded' => $payload ? (bool) ($payload['taxIncluded'] ?? true) : true,
         ])->header('X-Robots-Tag', 'noindex, nofollow'); // offer links stay out of search engines
@@ -119,6 +120,10 @@ class OfferController extends Controller
     {
         if ($reason = $offer->closedReason()) {
             throw ValidationException::withMessages(['offer' => $reason]);
+        }
+        $min = $offer->minPasses();
+        if ((int) $request->input('quantity', 1) < $min) {
+            throw ValidationException::withMessages(['quantity' => 'This offer is for ' . $min . ' or more passes – please choose at least ' . $min . '.']);
         }
 
         // the offer decides the event, the pass and who is buying
@@ -143,7 +148,7 @@ class OfferController extends Controller
             return OrderBuilder::fromRequest($request, [
                 'unit_price' => (float) $offer->unit_price,
                 'no_tax' => ! $offer->charge_tax,
-                'max_quantity' => max(1, (int) $offer->max_per_person),
+                'max_quantity' => $offer->maxPasses(),
                 'offer_invite_id' => $invite->id,
                 'require_paid' => true,
             ])['order'];

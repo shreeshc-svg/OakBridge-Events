@@ -194,6 +194,7 @@ class SpecialOfferController extends Controller
             'unit_price' => 'required|numeric|min:1|max:10000000',
             'charge_tax' => 'nullable|boolean',
             'max_per_person' => 'required|integer|min:1|max:20',
+            'min_per_person' => 'nullable|integer|min:1|max:20|lte:max_per_person',
             'expires_on' => 'nullable|date' . ($offer ? '' : '|after_or_equal:today'),
         ], [
             'title.required' => 'Give the offer a name, e.g. "Delegate ₹7,999".',
@@ -202,7 +203,9 @@ class SpecialOfferController extends Controller
             'unit_price.required' => 'Enter the offer price per pass.',
             'unit_price.min' => 'The offer price must be at least ₹1 (use Complimentary passes for free ones).',
             'expires_on.after_or_equal' => 'The last day cannot be in the past.',
+            'min_per_person.lte' => 'The minimum passes cannot be more than the maximum passes per person.',
         ]);
+        $data['min_per_person'] = (int) ($data['min_per_person'] ?? 1);
 
         unset($data['service_id']);
         if (! $offer) {
