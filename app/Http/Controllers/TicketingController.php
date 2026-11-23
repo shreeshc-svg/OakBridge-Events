@@ -30,6 +30,7 @@ class TicketingController extends Controller
             'passTypes' => $event ? PassType::with('bundles')->where('service_id', $event->id)->orderBy('sort_order')->orderBy('id')->get() : collect(),
             'tiers' => PricingTier::whereNull('service_id')->orderBy('min_quantity')->get(),
             'setting' => Setting::findOrFail(1),
+            'coupons' => $event ? \App\Models\Coupon::with('passType')->where('service_id', $event->id)->latest('id')->get() : collect(),
             'offers' => $event ? \App\Models\SpecialOffer::with('passType')->where('service_id', $event->id)->latest('id')->get() : collect(),
             // complimentary passes, one entry per person (passes issued together share a group)
             'complimentary' => $event

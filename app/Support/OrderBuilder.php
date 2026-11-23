@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\PassType;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -22,7 +23,8 @@ use Illuminate\Validation\ValidationException;
 class OrderBuilder
 {
     /**
-     * @param array{unit_price?: float|null, created_by?: int|null, require_paid?: bool, no_tax?: bool, max_quantity?: int, offer_invite_id?: int} $options
+     * @param array{unit_price?: float|null, created_by?: int|null, require_paid?: bool, no_tax?: bool, max_quantity?: int, offer_invite_id?: int, allow_coupon?: bool} $options
+     *   allow_coupon - the website form: a coupon code in "coupon_code" is applied (and claimed)
      *   unit_price  - a special price per pass instead of the Ticketing price (admin only)
      *   created_by  - the admin user creating the order
      *   require_paid - refuse events without passes (admin only)
@@ -165,8 +167,30 @@ class OrderBuilder
             : Pricing::quote($passType, $quantity, $chosenEvent);
 
         $attendeeList = [1 => ['name' => $data['name'], 'email' => $data['email']]] + $attendees;
+        $couponCode = ($options['allow_coupon'] ?? false) && $special === null
+            ? Coupons::normalize($request->input('coupon_code')) : '';
 
-        $order = Order::create([
+        // with a coupon: claim it and create the order in one transaction (the code is locked meanwhile)
+        return DB::transaction(function () use ($couponCode, $chosenEvent, $passType, $quantity, $data, $quote, $attendeeList, $special, $options) {
+            $claim = null;
+            if ($couponCode !== '') {
+                $claim = Coupons::claim($couponCode, $chosenEvent, $passType, $quantity, $data['email']);
+                $unit = round($passType->priceOn(), 2);
+                $quote = Pricing::quoteWithDiscount($unit, $quantity, $claim['coupon']->discountOn($unit), $claim['label']);
+            }
+
+            $order = self::createOrder($chosenEvent, $passType, $quantity, $data, $quote, $attendeeList, $special, $options, $claim);
+            if ($claim) {
+                Coupons::record($claim, $order);
+            }
+
+            return ['event' => $chosenEvent, 'data' => $data, 'order' => $order];
+        });
+    }
+
+    private static function createOrder(Service $chosenEvent, PassType $passType, int $quantity, array $data, array $quote, array $attendeeList, $special, array $options, ?array $claim): Order
+    {
+        return Order::create([
             'order_no' => Order::newOrderNumber(),
             'service_id' => $chosenEvent->id,
             'pass_type_id' => $passType->id,
@@ -194,9 +218,10 @@ class OrderBuilder
             'created_by' => $options['created_by'] ?? null,
             'list_price' => $special !== null ? round($passType->priceOn(), 2) : null,
             'offer_invite_id' => $options['offer_invite_id'] ?? null,
+        ] : []) + ($claim ? [
+            'coupon_code_id' => $claim['code']->id,
+            'coupon_code' => $claim['code']->code,
         ] : []));
-
-        return ['event' => $chosenEvent, 'data' => $data, 'order' => $order];
     }
 
     /**

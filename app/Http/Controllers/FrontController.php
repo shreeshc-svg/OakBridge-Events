@@ -399,7 +399,7 @@ class FrontController extends Controller
         }
 
         // same checks and order creation as Admin > Orders > New registration
-        $built = \App\Support\OrderBuilder::fromRequest($request);
+        $built = \App\Support\OrderBuilder::fromRequest($request, ['allow_coupon' => true]);
         $chosenEvent = $built['event'];
         $data = $built['data'];
 

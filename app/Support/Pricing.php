@@ -141,6 +141,26 @@ class Pricing
         return self::withTax($quote);
     }
 
+    /** A coupon price: the current pass price less the coupon's discount per pass, plus tax as usual. */
+    public static function quoteWithDiscount(float $unit, int $quantity, float $discountPerPass, string $label): array
+    {
+        $quantity = max(1, min($quantity, self::MAX_PASSES));
+        $unit = round(max($unit, 0), 2);
+        $subtotal = round($unit * $quantity, 2);
+        $discount = round(min(max($discountPerPass, 0), $unit) * $quantity, 2);
+
+        return self::withTax([
+            'unit' => $unit,
+            'is_early' => false,
+            'quantity' => $quantity,
+            'subtotal' => $subtotal,
+            'discount' => $discount,
+            'discount_label' => $label,
+            'is_bundle' => false,
+            'net' => round($subtotal - $discount, 2),
+        ]);
+    }
+
     /** Adds tax and the total to a quote, per Admin > Ticketing (rate; included or added on top). */
     private static function withTax(array $quote): array
     {

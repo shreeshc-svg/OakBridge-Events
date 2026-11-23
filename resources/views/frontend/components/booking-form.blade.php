@@ -111,6 +111,22 @@
                     <div class="text-danger mb-2">{{ $attendeeError[0] }}</div>
                 @endforeach
 
+                {{-- coupon code (Admin > Ticketing > Coupons); the server checks it again when the form is sent --}}
+                <div class="ob-coupon mb-3">
+                    <label>Coupon code <small class="text-muted">(optional)</small></label>
+                    <div class="input-group">
+                        <input type="text" name="coupon_code" class="form-control text-uppercase ob-coupon-input" maxlength="40"
+                            autocomplete="off" spellcheck="false" placeholder="Have a code? Enter it here" value="{{ old('coupon_code') }}">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-secondary ob-coupon-apply">Apply</button>
+                        </div>
+                    </div>
+                    <small class="d-block mt-1 ob-coupon-msg" aria-live="polite"></small>
+                    @error('coupon_code')
+                        <span class="text-danger d-block ob-coupon-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 <div class="ob-summary mb-3 p-3 rounded" style="background:#f8f9fa;border:1px solid #e9ecef"></div>
 
                 {{-- billing details: every paid order gets a GST invoice --}}
@@ -291,6 +307,10 @@
                     var quantitySelect = form.querySelector('.ob-quantity');
                     var attendees = form.querySelector('.ob-attendees');
                     var summary = form.querySelector('.ob-summary');
+                    var couponInput = form.querySelector('.ob-coupon-input');
+                    var couponBtn = form.querySelector('.ob-coupon-apply');
+                    var couponMsg = form.querySelector('.ob-coupon-msg');
+                    var coupon = null; // the checked code, while it fits the chosen pass and number of passes
                     var restore = { pass: OLD.pass, quantity: OLD.quantity, attendees: OLD.attendees };
 
                     function current() {
@@ -346,6 +366,17 @@
                         })[0] || data.passes[0];
                         var quantity = parseInt(quantitySelect.value || '1', 10);
                         var result = quote(data, pass, quantity);
+                        if (coupon) {
+                            var fits = (!coupon.pass_type_id || String(coupon.pass_type_id) === String(pass.id)) && quantity <= coupon.max_passes;
+                            if (fits) {
+                                result = couponQuote(data, pass, quantity, coupon);
+                                couponNote(coupon.message, 'text-success');
+                            } else {
+                                couponNote(coupon.pass_type_id && String(coupon.pass_type_id) !== String(pass.id)
+                                    ? 'This code is for the ' + coupon.pass_name + ' only.'
+                                    : 'This code is for ' + coupon.max_passes + ' pass' + (coupon.max_passes > 1 ? 'es' : '') + ' per booking – choose ' + coupon.max_passes + ' or fewer.', 'text-danger');
+                            }
+                        }
 
                         // only real facts: the early-bird end date and the saving set in Ticketing
                         var saving = pass.early ? Math.max(0, (pass.listPrice || 0) - (pass.price || 0)) : 0;
@@ -418,10 +449,65 @@
                         restore.attendees = null;
                     }
 
+                    // coupon: same maths as App\Support\Pricing::quoteWithDiscount
+                    function couponQuote(pricing, pass, quantity, c) {
+                        var unit = pass.price, subtotal = Math.round(unit * quantity * 100) / 100;
+                        var off = c.type === 'amount' ? c.value : unit * c.value / 100;
+                        off = Math.min(Math.max(Math.round(off * 100) / 100, 0), unit);
+                        var discount = Math.round(off * quantity * 100) / 100, net = Math.round((subtotal - discount) * 100) / 100;
+                        var tax = 0, total = net;
+                        if (pricing.taxPercent > 0) {
+                            if (pricing.taxIncluded) { tax = Math.round((net - net / (1 + pricing.taxPercent / 100)) * 100) / 100; }
+                            else { tax = Math.round(net * pricing.taxPercent / 100 * 100) / 100; total = Math.round((net + tax) * 100) / 100; }
+                        }
+                        return { unit: unit, subtotal: subtotal, discount: discount, label: c.label, isBundle: false, net: net, tax: tax, total: total,
+                            perPass: quantity ? Math.round(total / quantity * 100) / 100 : 0 };
+                    }
+                    function couponNote(text, cls) {
+                        if (!couponMsg) { return; }
+                        couponMsg.textContent = text || '';
+                        couponMsg.className = 'd-block mt-1 ob-coupon-msg ' + (cls || '');
+                    }
+                    function applyCoupon() {
+                        var code = (couponInput.value || '').trim().toUpperCase().replace(/\s+/g, '');
+                        couponInput.value = code;
+                        coupon = null;
+                        var old = form.querySelector('.ob-coupon-error'); if (old) { old.remove(); }
+                        if (!code) { couponNote(''); render(); return; }
+                        couponBtn.disabled = true;
+                        couponNote('Checking…', 'text-muted');
+                        var emailField = form.querySelector('input[name=email]');
+                        fetch(@json(route('coupon.check')), {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+                                'X-CSRF-TOKEN': (form.querySelector('input[name=_token]') || {}).value || '' },
+                            body: JSON.stringify({ code: code, event: eventSelect.value, pass_type_id: passSelect.value,
+                                quantity: parseInt(quantitySelect.value || '1', 10), email: emailField ? emailField.value : '' })
+                        }).then(function (r) {
+                            return r.json().then(function (body) { return { ok: r.ok, body: body }; });
+                        }).then(function (res) {
+                            if (res.ok && res.body.ok) { coupon = res.body; couponNote(res.body.message, 'text-success'); }
+                            else { couponNote((res.body && res.body.message) || 'This code cannot be used.', 'text-danger'); }
+                            render();
+                        }).catch(function () {
+                            couponNote('Could not check the code just now – it will be checked when you register.', 'text-muted');
+                        }).then(function () { couponBtn.disabled = false; });
+                    }
+                    if (couponInput && couponBtn) {
+                        couponBtn.addEventListener('click', applyCoupon);
+                        couponInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); } });
+                        couponInput.addEventListener('input', function () {
+                            if (coupon) { coupon = null; couponNote('Press Apply to use this code.', 'text-muted'); render(); }
+                        });
+                        eventSelect.addEventListener('change', function () { if (coupon) { coupon = null; couponNote('Press Apply again for this event.', 'text-muted'); } });
+                    }
+
                     eventSelect.addEventListener('change', fillPasses);
                     passSelect.addEventListener('change', render);
                     quantitySelect.addEventListener('change', render);
                     fillPasses();
+                    // back from the server with a code typed in: check it again so the total is right
+                    if (couponInput && couponInput.value.trim() && !form.querySelector('.ob-coupon-error')) { applyCoupon(); }
 
                     form.addEventListener('submit', function() {
                         var button = form.querySelector('.ob-submit');
