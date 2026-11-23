@@ -136,7 +136,10 @@ class TicketingController extends Controller
             'extra_price' => ($data['extra_price'] ?? null) !== null && $data['extra_price'] !== '' ? $data['extra_price'] : null,
         ]);
 
-        foreach (range(1, $max) as $quantity) {
+        // 1 pass is never a bundle: it costs the pass price (a stray old one is cleared)
+        PassBundle::where('pass_type_id', $pass->id)->where('quantity', '<', 2)->delete();
+
+        foreach (range(2, max(2, $max)) as $quantity) {
             $row = $data['bundles'][$quantity] ?? [];
             $early = ($row['early_total'] ?? '') === '' ? null : (float) $row['early_total'];
             $list = ($row['total'] ?? '') === '' ? null : (float) $row['total'];
