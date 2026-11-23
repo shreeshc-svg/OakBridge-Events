@@ -137,9 +137,47 @@ class OrderFulfiller
     /** Confirmation to the buyer (and the admin copy), plus the WhatsApp message. */
     public static function notify(Order $order, bool $awaitingPayment = false, array $extra = []): void
     {
+        $payload = self::payload($order, $awaitingPayment, $extra);
+
+        try {
+            event(new \App\Events\BookingCreated($payload));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if (! $awaitingPayment) {
+            self::whatsApp($order);
+        }
+    }
+
+    /**
+     * Send a paid order's confirmation (with the pass numbers) to the buyer again –
+     * only the buyer: no admin copy, no WhatsApp. False if it is not paid or could not be sent.
+     */
+    public static function resendPass(Order $order): bool
+    {
+        if (! $order->isPaid() || ! $order->bookings()->exists()) {
+            return false;
+        }
+
+        try {
+            \Notification::route('mail', $order->buyer_email)
+                ->notify(new \App\Notifications\BookingCreatedUserNotificationUpdated(self::payload($order)));
+
+            return true;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return false;
+        }
+    }
+
+    /** What the confirmation email needs. */
+    public static function payload(Order $order, bool $awaitingPayment = false, array $extra = []): array
+    {
         $bookings = $order->bookings()->orderBy('attendee_no')->get();
 
-        $payload = [
+        return [
             'name' => $order->buyer_name,
             'email' => $order->buyer_email,
             'phone' => $order->buyer_phone,
@@ -158,16 +196,6 @@ class OrderFulfiller
             'payment_instructions' => Setting::find(1)?->payment_instructions,
             'ip' => request()?->ip(),
         ] + $extra;
-
-        try {
-            event(new \App\Events\BookingCreated($payload));
-        } catch (\Throwable $e) {
-            report($e);
-        }
-
-        if (! $awaitingPayment) {
-            self::whatsApp($order);
-        }
     }
 
     /** WhatsApp confirmation through Interakt; never blocks anything. */

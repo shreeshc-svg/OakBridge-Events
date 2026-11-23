@@ -134,6 +134,32 @@ class OrderController extends Controller
         return back()->with('success', 'Reminder sent to ' . $order->buyer_email . '.');
     }
 
+    /** Email a paid order's pass(es) to the buyer again. */
+    public function resendPass(Order $order)
+    {
+        if (! $order->isPaid()) {
+            return back()->withErrors(['resend' => 'Order ' . $order->order_no . ' is not paid, so it has no passes yet.']);
+        }
+
+        return \App\Support\OrderFulfiller::resendPass($order)
+            ? back()->with('success', 'Pass email sent again to ' . $order->buyer_email . '.')
+            : back()->withErrors(['resend' => 'The email to ' . $order->buyer_email . ' could not be sent. Please try again later.']);
+    }
+
+    /** Re-send the pass email for several paid orders at once. */
+    public function bulkResendPass(Request $request)
+    {
+        $data = $request->validate(['ids' => 'required|array|min:1', 'ids.*' => 'integer'], ['ids.required' => 'Tick the orders first.']);
+        $sent = 0;
+        $skipped = [];
+        foreach (Order::whereIn('id', $data['ids'])->get() as $order) {
+            \App\Support\OrderFulfiller::resendPass($order) ? $sent++ : $skipped[] = $order->order_no;
+        }
+
+        return back()->with($sent ? 'success' : 'warning', $sent . ' pass ' . \Illuminate\Support\Str::plural('email', $sent) . ' sent again.'
+            . ($skipped ? ' Not sent (not paid or failed): ' . implode(', ', $skipped) . '.' : ''));
+    }
+
     /** Chase several unpaid orders at once from the list. */
     public function bulkRemind(Request $request)
     {

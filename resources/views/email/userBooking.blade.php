@@ -27,6 +27,10 @@
         table.summary tr.total td { border-top: 2px solid #333; border-bottom: none; font-weight: bold; font-size: 16px; }
         .box { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 5px; padding: 12px 16px; margin: 16px 0; }
         .muted { color: #666; font-size: 13px; }
+        .pass { background: #f8f9fa; border: 2px solid #1a3d6d; border-radius: 8px; padding: 14px; margin: 12px 0; text-align: center; }
+        .pass .label { color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .pass .id { font-size: 24px; font-weight: bold; letter-spacing: 2px; color: #1a3d6d; }
+        .pass .who { font-size: 14px; }
     </style>
 </head>
 
@@ -42,6 +46,17 @@
         @if ($order && $quote)
             @if ($isPaid)
                 <p><strong>Payment received &ndash; your {{ $order->quantity > 1 ? 'passes are' : 'pass is' }} confirmed.</strong></p>
+                {{-- the pass itself: every pass number in this order, the buyer's included --}}
+                @foreach ($attendees as $i => $attendee)
+                    @if (!empty($attendee['booking_id']))
+                        <div class="pass">
+                            <div class="label">{{ count($attendees) > 1 ? 'Pass ' . ($i + 1) . ' of ' . count($attendees) : 'Your pass number' }}</div>
+                            <div class="id">{{ $attendee['booking_id'] }}</div>
+                            <div class="who">{{ $order->pass_name }} &middot; {{ $attendee['name'] }}</div>
+                        </div>
+                    @endif
+                @endforeach
+                <p>Please keep this email &ndash; show it or quote your pass number at the registration desk.@if (count($attendees) > 1) Each other pass holder has also been emailed their own pass.@endif</p>
             @elseif ($failed)
                 <p><strong>Your payment did not go through, so nothing has been charged.</strong></p>
                 @if (!empty($data['failure_reason']))
@@ -74,7 +89,7 @@
                     </tr>
                 @endif
                 <tr class="total">
-                    <td>Amount payable</td>
+                    <td>{{ $isPaid ? 'Amount paid' : 'Amount payable' }}</td>
                     <td class="amount">{{ $money($quote['total']) }}</td>
                 </tr>
             </table>
@@ -105,8 +120,8 @@
                 </div>
             @endif
 
-            @if (count($attendees) > 1)
-                <p><strong>{{ $isPaid ? 'Your passes:' : 'Passes in this order:' }}</strong></p>
+            @if (!$isPaid && count($attendees) > 1)
+                <p><strong>Passes in this order:</strong></p>
                 <ul>
                     @foreach ($attendees as $attendee)
                         <li>{{ $attendee['name'] }} ({{ $attendee['email'] }}) &ndash; {{ $attendee['booking_id'] }}</li>

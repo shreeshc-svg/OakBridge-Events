@@ -84,7 +84,12 @@ class MailLogger
             'ComplimentaryPassNotification' => 'Complimentary pass',
             'PaymentReminderNotification' => 'Payment reminder',
             'InvoiceNotification' => 'Invoice',
-            'BookingCreatedUserNotificationUpdated' => stripos($subject, 'pay') !== false ? 'Payment link / booking' : 'Booking confirmation',
+            'BookingCreatedUserNotificationUpdated' => match (true) {
+                stripos($subject, 'payment received') !== false => 'Pass / payment received',
+                stripos($subject, 'could not be completed') !== false => 'Payment failed',
+                stripos($subject, 'complete your payment') !== false => 'Payment link',
+                default => 'Booking confirmation',
+            },
             'BookingCreatedAdminNotification' => 'Admin copy',
             'InviteeConfirmationNotification' => 'Invitee pass',
             '' => stripos($subject, 'contact') !== false ? 'Contact form' : 'Other',

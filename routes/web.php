@@ -159,6 +159,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     // chase an unpaid order
     Route::post('orders/{order}/remind', [OrderController::class, 'remind'])->name('orders.remind');
     Route::post('orders-bulk-remind', [OrderController::class, 'bulkRemind'])->name('orders.bulk-remind');
+    Route::post('orders-bulk-resend-pass', [OrderController::class, 'bulkResendPass'])->name('orders.bulk-resend-pass');
+    Route::post('orders/{order}/resend-pass', [OrderController::class, 'resendPass'])->name('orders.resend-pass');
     // GST tax invoices
     Route::get('invoice-settings', [InvoiceController::class, 'settings'])->name('invoices.settings');
     Route::post('invoice-settings', [InvoiceController::class, 'saveSettings'])->name('invoices.settings.save');

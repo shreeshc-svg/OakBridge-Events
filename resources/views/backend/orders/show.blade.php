@@ -62,6 +62,15 @@
                     <h3 class="card-title">
                         {{ $order->isPaid() ? 'Passes issued' : 'Passes to be issued' }} ({{ $order->quantity }})
                     </h3>
+                    @if ($order->isPaid())
+                        <div class="card-tools">
+                            <form action="{{ route('orders.resend-pass', $order) }}" method="post" class="d-inline"
+                                onsubmit="return confirm('Email the pass confirmation again to {{ addslashes($order->buyer_email) }}?');">
+                                @csrf
+                                <button class="btn btn-outline-primary btn-sm"><i class="fas fa-paper-plane"></i> Email the pass again</button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
                 <div class="card-body p-0">
                     @if (!$order->bookings->count())

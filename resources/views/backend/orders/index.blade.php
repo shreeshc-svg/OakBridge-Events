@@ -161,6 +161,11 @@
                 onclick="window.obBulkAction = 'remind';">
                 Remind selected
             </button>
+            <button type="submit" form="bulkOrders" formaction="{{ route('orders.bulk-resend-pass') }}"
+                class="btn btn-sm btn-outline-info mr-2" id="bulkResendBtn" disabled
+                onclick="window.obBulkAction = 'resend';">
+                Resend passes
+            </button>
             <button type="submit" form="bulkOrders" class="btn btn-sm btn-outline-danger mr-3" id="bulkOrdersBtn" disabled>
                 Delete selected
             </button>
@@ -200,6 +205,12 @@
                 }
                 return confirm('Issue and email invoices for the paid orders among the ' + ticked + ' selected?\n\n'
                     + 'Unpaid ones are skipped. Orders that already have an invoice get the same one again.');
+            }
+
+            if (kind === 'resend') {
+                var count = document.querySelectorAll('input.bulk-pick:checked').length;
+                if (!count) { alert('Tick the orders first.'); return false; }
+                return confirm('Email the pass confirmation again to the buyers of the paid orders among the ' + count + ' selected?\n\nUnpaid ones are skipped.');
             }
 
             if (kind !== 'remind') {
