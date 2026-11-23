@@ -121,6 +121,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::delete('ticketing/tiers/{tier}', [TicketingController::class, 'destroyTier'])->name('ticketing.tier.destroy');
     Route::post('ticketing/settings', [TicketingController::class, 'updateSettings'])->name('ticketing.settings');
     // complimentary passes for special guests (emailed)
+    // coupon codes (Ticketing > Coupons)
+    Route::post('coupons', [\App\Http\Controllers\CouponController::class, 'store'])->name('coupons.store');
+    Route::get('coupons/{coupon}', [\App\Http\Controllers\CouponController::class, 'show'])->name('coupons.show');
+    Route::post('coupons/{coupon}', [\App\Http\Controllers\CouponController::class, 'update'])->name('coupons.update');
+    Route::delete('coupons/{coupon}', [\App\Http\Controllers\CouponController::class, 'destroy'])->name('coupons.destroy');
+    Route::post('coupons/{coupon}/shared', [\App\Http\Controllers\CouponController::class, 'addShared'])->name('coupons.shared');
+    Route::post('coupons/{coupon}/generate', [\App\Http\Controllers\CouponController::class, 'generate'])->name('coupons.generate');
+    Route::get('coupons/{coupon}/export', [\App\Http\Controllers\CouponController::class, 'export'])->name('coupons.export');
+    Route::post('coupons/{coupon}/codes/{code}/toggle', [\App\Http\Controllers\CouponController::class, 'toggle'])->name('coupons.toggle');
+    Route::delete('coupons/{coupon}/codes/{code}', [\App\Http\Controllers\CouponController::class, 'destroyCode'])->name('coupons.code.destroy');
     // special-price offers for a list of people (personal links, sent from the bulk mail tool)
     Route::post('offers', [\App\Http\Controllers\SpecialOfferController::class, 'store'])->name('offers.store');
     Route::get('offers/{offer}', [\App\Http\Controllers\SpecialOfferController::class, 'show'])->name('offers.show');
@@ -282,6 +292,9 @@ Route::middleware('throttle:20,1')->group(function () {
     Route::get('/pay/{orderNo}/cancelled', [PaymentController::class, 'cancelled'])->name('order.cancelled');
     Route::get('/pay/{orderNo}/done', [PaymentController::class, 'done'])->name('order.done');
 });
+// the coupon box on the registration form: check a code (never uses it); slowed down against guessing
+Route::post('/coupon/check', \App\Http\Controllers\CouponCheckController::class)->middleware('throttle:20,1')->name('coupon.check');
+
 // personal special-price links (Ticketing > Special price offers)
 Route::middleware('throttle:30,1')->group(function () {
     Route::get('/offer/o/{code}', [\App\Http\Controllers\OfferController::class, 'shared'])->where('code', '[A-Za-z0-9]{6,16}')->name('offer.shared');
