@@ -55,9 +55,10 @@
                                 <div class="input-group input-group-sm">
                                     <input type="number" name="discount_value" id="discount_value" min="0.01" step="0.01" class="form-control" value="{{ old('discount_value', (float) $coupon->discount_value) }}">
                                     <div class="input-group-append">
-                                        <select name="discount_type" class="custom-select custom-select-sm" aria-label="Discount type" style="max-width: 70px">
-                                            <option value="percent" @selected(old('discount_type', $coupon->discount_type) === 'percent')>%</option>
-                                            <option value="amount" @selected(old('discount_type', $coupon->discount_type) === 'amount')>₹</option>
+                                        <select name="discount_type" class="custom-select custom-select-sm" aria-label="Discount type" style="max-width: 110px">
+                                            <option value="percent" @selected(old('discount_type', $coupon->discount_type) === 'percent')>% off</option>
+                                            <option value="amount" @selected(old('discount_type', $coupon->discount_type) === 'amount')>₹ off</option>
+                                            <option value="price" @selected(old('discount_type', $coupon->discount_type) === 'price')>= ₹ price</option>
                                         </select>
                                     </div>
                                 </div>
