@@ -38,20 +38,24 @@ class Coupon extends Model
         return $this->hasMany(CouponRedemption::class);
     }
 
-    /** "20% off" / "₹2,000 off" */
+    /** "20% off" / "₹2,000 off" / "member price ₹7,995" */
     public function label(): string
     {
-        return $this->discount_type === 'amount'
-            ? \App\Support\Pricing::money((float) $this->discount_value) . ' off'
-            : rtrim(rtrim(number_format((float) $this->discount_value, 2), '0'), '.') . '% off';
+        return match ($this->discount_type) {
+            'amount' => \App\Support\Pricing::money((float) $this->discount_value) . ' off',
+            'price' => 'member price ' . \App\Support\Pricing::money((float) $this->discount_value),
+            default => rtrim(rtrim(number_format((float) $this->discount_value, 2), '0'), '.') . '% off',
+        };
     }
 
-    /** The discount on one pass of this price. */
+    /** The discount on one pass of this price ("price": down to exactly that price, never up). */
     public function discountOn(float $unit): float
     {
-        $off = $this->discount_type === 'amount'
-            ? (float) $this->discount_value
-            : $unit * (float) $this->discount_value / 100;
+        $off = match ($this->discount_type) {
+            'amount' => (float) $this->discount_value,
+            'price' => $unit - (float) $this->discount_value,
+            default => $unit * (float) $this->discount_value / 100,
+        };
 
         return round(min(max($off, 0), $unit), 2);
     }

@@ -452,7 +452,7 @@
                     // coupon: same maths as App\Support\Pricing::quoteWithDiscount
                     function couponQuote(pricing, pass, quantity, c) {
                         var unit = pass.price, subtotal = Math.round(unit * quantity * 100) / 100;
-                        var off = c.type === 'amount' ? c.value : unit * c.value / 100;
+                        var off = c.type === 'amount' ? c.value : (c.type === 'price' ? unit - c.value : unit * c.value / 100);
                         off = Math.min(Math.max(Math.round(off * 100) / 100, 0), unit);
                         var discount = Math.round(off * quantity * 100) / 100, net = Math.round((subtotal - discount) * 100) / 100;
                         var tax = 0, total = net;

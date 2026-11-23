@@ -218,7 +218,7 @@ class CouponController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:120',
             'pass_type_id' => ['nullable', Rule::exists('pass_types', 'id')->where('service_id', $event->id)],
-            'discount_type' => ['required', Rule::in(['percent', 'amount'])],
+            'discount_type' => ['required', Rule::in(['percent', 'amount', 'price'])],
             'discount_value' => 'required|numeric|min:0.01|max:10000000',
             'max_passes' => 'required|integer|min:1|max:20',
             'valid_from' => 'nullable|date',
@@ -231,6 +231,17 @@ class CouponController extends Controller
         ]);
         if ($data['discount_type'] === 'percent' && $data['discount_value'] > 100) {
             throw ValidationException::withMessages(['discount_value' => 'A percentage discount cannot be more than 100%.']);
+        }
+        // a member price must be below what the pass costs now, or the code would do nothing
+        if ($data['discount_type'] === 'price') {
+            $passes = ! empty($data['pass_type_id'])
+                ? PassType::whereKey($data['pass_type_id'])->get()
+                : PassType::where('service_id', $event->id)->where('is_active', 1)->get();
+            $cheapest = $passes->map(fn ($p) => $p->priceOn())->min();
+            if ($cheapest !== null && (float) $data['discount_value'] >= $cheapest) {
+                throw ValidationException::withMessages(['discount_value' => 'The member price must be below the pass\'s current price ('
+                    . \App\Support\Pricing::money((float) $cheapest) . ').']);
+            }
         }
         $data['pass_type_id'] = $data['pass_type_id'] ?? null;
         $data['once_per_email'] = $request->boolean('once_per_email');

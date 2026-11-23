@@ -45,7 +45,7 @@ class CouponCheckController extends Controller
             'max_passes' => $coupon->max_passes,
             'pass_type_id' => $coupon->pass_type_id,
             'pass_name' => $coupon->passType?->name,
-            'message' => $coupon->label() . ' applied' . ($coupon->max_passes === 1 ? ' (1 pass per code).' : ' (up to ' . $coupon->max_passes . ' passes).'),
+            'message' => ucfirst($coupon->label()) . ' applied' . ($coupon->max_passes === 1 ? ' (1 pass per code).' : ' (up to ' . $coupon->max_passes . ' passes).'),
         ]);
     }
 }
