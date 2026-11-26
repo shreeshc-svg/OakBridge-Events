@@ -22,8 +22,8 @@ class TeamRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:75',
-            'position' => 'required|string|max:75',
+            'name' => 'required|string|max:100',
+            'position' => 'required|string|max:100',
             'image' => 'nullable|image|mimes:png,jpg,webp,jpeg|max:2048',
             'social' => 'nullable',
             'bio' => 'nullable',

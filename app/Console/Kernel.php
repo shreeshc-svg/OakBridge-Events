@@ -11,6 +11,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\ClearRegistrations::class,
         \App\Console\Commands\SendPaymentReminders::class,
+        \App\Console\Commands\ResendPasses::class,
     ];
 
     /**

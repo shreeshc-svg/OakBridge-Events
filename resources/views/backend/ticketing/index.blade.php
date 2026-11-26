@@ -120,7 +120,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @for ($quantity = 1; $quantity <= $max; $quantity++)
+                                        <tr class="text-muted small">
+                                            <th>1</th>
+                                            <td colspan="2">One pass always costs the pass price above (early bird {{ $early ? 'now' : 'when on' }}). For a special price use a <a href="#coupons">coupon</a> or an <a href="#offers">offer</a>.</td>
+                                            <td class="align-middle">{{ $money(\App\Support\Pricing::quote($pass, 1, $event)['total']) }}</td>
+                                            <td></td>
+                                        </tr>
+                                        @for ($quantity = 2; $quantity <= $max; $quantity++)
                                             @php
                                                 $row = $bundles->get($quantity);
                                                 $quote = \App\Support\Pricing::quote($pass, $quantity, $event);

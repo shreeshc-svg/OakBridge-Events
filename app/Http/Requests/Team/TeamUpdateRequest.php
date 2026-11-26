@@ -22,8 +22,8 @@ class TeamUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|required|string|max:75',
-            'position' => 'nullable|string|max:75',
+            'name' => 'sometimes|required|string|max:100',
+            'position' => 'nullable|string|max:100',
             'image' => 'sometimes|nullable|image|mimes:png,jpg,webp,jpeg|max:2048',
             'social' => 'sometimes|nullable',
             'bio' => 'nullable',

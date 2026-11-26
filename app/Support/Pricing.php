@@ -198,7 +198,8 @@ class Pricing
         $key = 'site.pricing.bundles.' . $passType->id;
         if (! app()->bound($key)) {
             try {
-                $rows = \App\Models\PassBundle::where('pass_type_id', $passType->id)->orderBy('quantity')->get();
+                // a "bundle" is 2 or more passes; one pass always costs the pass price (special prices are coupons or offers)
+                $rows = \App\Models\PassBundle::where('pass_type_id', $passType->id)->where('quantity', '>=', 2)->orderBy('quantity')->get();
             } catch (\Throwable $e) {
                 $rows = collect();
             }
